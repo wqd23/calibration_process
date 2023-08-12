@@ -7,6 +7,7 @@
 ├── data
 │   ├── 03B
 │   │   ├── ec_logs
+│   │   ├── raw_data
 │   │   ├── single_process
 │   │   └── tb_logs
 │   └── 07

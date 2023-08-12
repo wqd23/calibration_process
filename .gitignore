@@ -10,7 +10,7 @@ wheels/
 .venv
 
 # raw data 
-raw_data/
+raw_data
 
 # binary data
 *.npy
