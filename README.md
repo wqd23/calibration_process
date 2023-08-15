@@ -70,6 +70,7 @@ src/grid_calibration
 1. 数据读取(实验数据及可能存在的背景数据)
 2. 能谱统计
 3. 全能峰拟合
+
 因而在`file_lib.py`中定义`class File_operation_05b`用于对单次实验的数据进行处理。使用方法可以参考`src/grid_calibration/process03B/single.py`
 
 ## operatoin
