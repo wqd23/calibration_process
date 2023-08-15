@@ -85,6 +85,8 @@ class File_operation_05b():
             data =  ver.single_read03b(config.path, config.config_file)
         elif config.ending == "03b-src":
             data = ver.src_read03b(config.path, config.config_file)
+        elif config.ending == "07":
+            data = ver.single_read07(config.path)
         else:
             raise ValueError(f"ending {config.ending} not supported")
         if config.time_cut != None:
@@ -100,7 +102,7 @@ class File_operation_05b():
         spectrum = [s/bin_width for s in spectrum]
         spectrum_err = [s/bin_width for s in spectrum_err]
         return spectrum, spectrum_err, x
-    def __raw_rate(self, spectrum, spectrum_err, timestampEvt, eventid):
+    def __raw_rate(self, spectrum, spectrum_err, timestampEvt):
         if self.read_config.time_cut == None:
             time_spec = np.array([np.max(np.hstack(timestampEvt)) - np.min(np.hstack(timestampEvt))]*4)
         else:
@@ -117,7 +119,7 @@ class File_operation_05b():
         # Integral of the spectrum is total count
         spectrum, spectrum_err, x = self.__raw_spectrum(amp, self.spectrum_config.bin_width, spec_range=[[0,c*self.spectrum_config.adc_max] for c in corr])
         # integral is total count rate
-        spectrum, spectrum_err, rate, rate_err = self.__raw_rate(spectrum, spectrum_err, self.sci['timestampEvt'], self.sci['eventID'])
+        spectrum, spectrum_err, rate, rate_err = self.__raw_rate(spectrum, spectrum_err, self.sci['timestampEvt'])
         
         if self.bkg_read_config.path != '':
             bkg_corr = util.tb_corr(self.spectrum_config.corr, self.bkg_tel['tempSipm'], self.bkg_tel['bias'])

@@ -8,6 +8,12 @@ Basic functions for different version of GRID data processing\n
 from .gridProcessFunctions import gridProcessFunctions03 as process
 from .gridParameters import gridParameters03 as specificParam
 from .my_type import *
+
+def refactor_to4chan(v):
+    return [np.array(v[i]) for i in range(4)]
+def data_refactor(sci:dict):
+    return {k:v if len(v) != 4 else refactor_to4chan(v) for k,v in sci.items()}
+
 def single_read05b_normal(path:str)-> Tuple[Dict[str, Float_array_4channel], Dict[str, Float_array_4channel]]:
     """read all file in single temp bias experiment
 
@@ -38,10 +44,7 @@ def single_read05b_normal(path:str)-> Tuple[Dict[str, Float_array_4channel], Dic
     sciExtracted, telExtracted = process.dataReadout(path, configFile='', singleFile=False, featureMode=False, newDatapack=True, timeCut=None, doDeduplicate=False,
                         useFitBaseline=True, maxUdpReadout=-1, reqNum=[], ignoreCrc=False, plot=False, energyCut=None, baseLen=specificParam.baseLen,
                         noUdp=True, ending="normal")
-    for k,v in sciExtracted.items():
-        sciExtracted[k] = [np.array(v[i]) for i in range(4)]
-    for k,v in telExtracted.items():
-        telExtracted[k] = [np.array(v[i]) for i in range(4)]
+    sciExtracted, telExtracted = data_refactor(sciExtracted), data_refactor(telExtracted)
     
     return sciExtracted, telExtracted
 def single_read05b_xray(path:str, config:str, time_cut=None)-> Tuple[Dict[str, Float_array_4channel], Dict[str, Any]]:
@@ -76,27 +79,18 @@ def single_read05b_xray(path:str, config:str, time_cut=None)-> Tuple[Dict[str, F
     sciExtracted, telExtracted = process.dataReadout(path, configFile=config, singleFile=False, featureMode=False, newDatapack=True, timeCut=None, doDeduplicate=False,
                         useFitBaseline=True, maxUdpReadout=-1, reqNum=[], ignoreCrc=False, plot=False, energyCut=None, baseLen=specificParam.baseLen,
                         noUdp=True, ending="x_ray")
-    for k,v in sciExtracted.items():
-        sciExtracted[k] = [np.array(v[i]) for i in range(4)]
-    for k,v in telExtracted.items():
-        telExtracted[k] = [np.array(v[i]) for i in range(4)]
+    sciExtracted, telExtracted = data_refactor(sciExtracted), data_refactor(telExtracted)
     return sciExtracted, telExtracted
 
 def single_read03b(path:str, config:str, time_cut=None):
     sciExtracted, telExtracted = process.dataReadout(path, configFile=config, singleFile=False, featureMode=True, newDatapack=True, timeCut=None, doDeduplicate=False,
                         useFitBaseline=True, maxUdpReadout=specificParam.maxUdpReadout, reqNum=[], ignoreCrc=False, plot=False, energyCut=None, baseLen=specificParam.baseLen,
                         noUdp=False, ending="03b")
-    for k,v in sciExtracted.items():
-        sciExtracted[k] = [np.array(v[i]) for i in range(4)]
-    for k,v in telExtracted.items():
-        telExtracted[k] = [np.array(v[i]) for i in range(4)]
+    sciExtracted, telExtracted = data_refactor(sciExtracted), data_refactor(telExtracted)
     return sciExtracted, telExtracted
 def src_read03b(path:str, config:str, time_cut=None):
     sciExtracted, telExtracted = process.dataReadout(path, configFile=config, singleFile=False, featureMode=False, newDatapack=True, timeCut=None, doDeduplicate=False,
                         useFitBaseline=True, maxUdpReadout=specificParam.maxUdpReadout, reqNum=[], ignoreCrc=False, plot=False, energyCut=None, baseLen=specificParam.baseLen,
                         noUdp=False, ending="03b")
-    for k,v in sciExtracted.items():
-        sciExtracted[k] = [np.array(v[i]) for i in range(4)]
-    for k,v in telExtracted.items():
-        telExtracted[k] = [np.array(v[i]) for i in range(4)]
+    sciExtracted, telExtracted = data_refactor(sciExtracted), data_refactor(telExtracted)
     return sciExtracted, telExtracted
