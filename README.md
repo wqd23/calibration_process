@@ -32,7 +32,7 @@
 
 # lib_reader
 
-`lib_reader`为单独python modoule 用于定义数据文件读取接口，对各版本载荷实现读取函数。
+`lib_reader`为单独 python module 用于定义数据文件读取接口，对各版本载荷实现读取函数。
 ```python
 # lib_reader/src/lib_reader/__init__.py
 from .reader05.version_lib import src_read03b, single_read03b, single_read05b_normal, single_read05b_xray
@@ -73,7 +73,7 @@ src/grid_calibration
 
 因而在`file_lib.py`中定义`class File_operation_05b`用于对单次实验的数据进行处理。使用方法可以参考`src/grid_calibration/process03B/single.py`
 
-## operatoin
+## operation
 
 对于完整标定数据处理，每代卫星载荷之间存在一定差距，但是在通过`file_lib`对单次数据处理进行抽象后，所需的就只是为`file_lib`提供合适的参数，并予以调用。
 
