@@ -11,7 +11,12 @@ ec_energy = util.json_load(energy)
 def get_fit_result(file):
     path = os.path.join(dir, file)
     data = util.pickle_load(path)
-    energy = ec_energy[f"{data['file']}.dat"]
+    key = f"{os.path.splitext(os.path.basename(data['file']))[0]}"
+    if "src" in key:
+        key = f"{key}.dat"
+    else:
+        key = key.split('_')[1] + ".dat"
+    energy = ec_energy[key]
     return energy, data['fit_result']
 
 src_result = []

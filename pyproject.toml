@@ -14,6 +14,7 @@ dependencies = [
     "lmfit>=1.2.2",
     "nptyping>=2.5.0",
     "dill>=0.3.7",
+    "fire>=0.5.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -31,6 +32,8 @@ allow-direct-references = true
 
 [tool.rye.scripts]
 main = {call = "grid_calibration.main:main", help = "Main entry point."}
+tb07 = {call = "grid_calibration.process07.temp_bias"}
+tbfit07 = {call = "grid_calibration.process07.temp_fit"}
 [[tool.rye.sources]]
 name = "tuna_source"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"

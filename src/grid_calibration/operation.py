@@ -8,6 +8,14 @@ import json
 import matplotlib.pyplot as plt
 from . import file_lib
 
+
+class Operation():
+    '''wrapper for tb_op, x of ec_op, and src of ec_op
+    '''
+    def __init__(self, files, file_config, op) -> None:
+        self.files = files
+        self.file_config = file_config
+        self.op = op
 class TB_operation_05B():
     """a class collect all config and function for temperature bias fit
     """
@@ -33,6 +41,8 @@ class TB_operation_05B():
         spectrum_config = file_lib.Spectrum_config(bin_width=self.bin_width)
         fit_config = file_lib.Fit_config(self.fit_range[basename])
         return [read_config, bkg_read_config, spectrum_config, fit_config]
+    def to_op(self):
+        return Operation(self.files, lambda file: self.file_config(file), op=self)
     def load_data(self):
         data = (util.pickle_load(os.path.join(self.save_path, f"{os.path.splitext(file)[0]}.pickle")) for file in self.files)
         data_all = [[],[],[],[]]
@@ -165,6 +175,8 @@ class EC_operation_05B():
             np.save(f'{self.result_path}/{util.headtime(data_name)}', arr=save_data)
         util.ec_plot(energy,center, result, src_energy, x_energy, src_result, x_result, self.result_path)
         return result
+
+        
 
 class TB_operation_03B(TB_operation_05B):
     def __init__(self, path, fit_range, save_path, save_fig_path, result_path) -> None:
@@ -308,5 +320,6 @@ def process(op:Operation, file:str, fp_method = None,**kw_args) -> None:
         util.raw_plot(fp.spectrum, fp.x, title=file, x_lim=kw_args["x_lim"], save_path=kw_args.get("save_path", None))
         return 
     fp.peak_fit()
+    file = os.path.splitext(file)[0]
     util.fit_plot(fp.spectrum, fp.x, fp.fit_result, title=file, bkgForm=fit_config.bkg_form, fit_range=fit_config.fit_range, save_path=f"{op.op.save_fig_path}/{file}.png")
     fp.save(os.path.join(op.op.save_path,f'{file}.pickle'))

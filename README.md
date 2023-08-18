@@ -130,4 +130,5 @@ python3 -m grid_calibration.process03B.temp_bias run 0
 在`data/07/single_process/single_fit_fig`目录下找到拟合结果，判断是否需要改进。
 # TODO
 - [x] 命令行接口重写，批量生成
+- [ ] 保持不同配置文件中，key的一致性
 - [ ] operation 拆分

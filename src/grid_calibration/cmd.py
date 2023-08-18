@@ -30,6 +30,6 @@ class file_list_op():
     def run(self, n):
         if n == 'all':
             for file in self.files:
-                process(self.op, file)
+                process(self.op, file, fp_method=self.fp_method)
         else:
             process(self.op, self.__get_file(n), fp_method=self.fp_method)
