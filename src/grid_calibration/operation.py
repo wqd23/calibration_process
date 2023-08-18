@@ -117,6 +117,10 @@ class EC_operation_05B():
         fit_config = file_lib.Fit_config(self.fit_range[basename],self.bkg_form[basename])
         return [read_config, bkg_read_config, spectrum_config, fit_config]
     
+    def to_x_op(self):
+        return Operation(self.x_list, lambda file: self.xray_config(file), self)
+    def to_src_op(self):
+        return Operation(self.src_list, lambda file: self.src_config(file), self)
     def __center_fit(self, energy:Float1D, center:Float1D, center_err:Float1D):
         popt, pcov = np.polyfit(center, energy,deg=2, full=False, cov=True, w=1./center_err)
         perr = np.sqrt(np.diag(pcov))
@@ -256,3 +260,53 @@ class TB_operation_07B(TB_operation_05B):
         spectrum_config = file_lib.Spectrum_config(bin_width=self.bin_width)
         fit_config = file_lib.Fit_config(self.fit_range[basename])
         return [read_config, bkg_read_config, spectrum_config, fit_config]
+    
+def __get_fp05B(config) -> file_lib.File_operation_05b:
+    return file_lib.File_operation_05b(config[0].path, *config)
+def __dict_4ch_reconstruct(dict_4ch):
+    # dict_4ch is list of 4 dict all value to be list with 4 elements, return a dict with 4 all value to be 4 ch 
+    dict_4ch_re = {}
+    for key in dict_4ch[0].keys():
+        dict_4ch_re[key] = []
+        for i in range(4):
+            dict_4ch_re[key].append(dict_4ch[i][key][i])
+    return dict_4ch_re 
+def __get_fp03B(config) -> file_lib.File_operation_05b:
+    read_config, bkg_read_config, spectrum_config, fit_config = config
+    fps = [file_lib.File_operation_05b(read_config[i].path, read_config[i], bkg_read_config[i], spectrum_config, fit_config) for i in range(4)]
+    sci = __dict_4ch_reconstruct([fps[i].sci for i in range(4)])
+    tel = __dict_4ch_reconstruct([fps[i].tel for i in range(4)])
+    bkg_sci = __dict_4ch_reconstruct([fps[i].bkg_sci for i in range(4)])
+    bkg_tel = __dict_4ch_reconstruct([fps[i].bkg_tel for i in range(4)])
+    fp = fps[0]
+    fp.sci, fp.tel = sci, tel
+    fp.bkg_sci, fp.bkg_tel = bkg_sci, bkg_tel
+    return fp
+def process(op:Operation, file:str, fp_method = None,**kw_args) -> None:
+    '''process file in sinlge experiment, like specific temp bias or photon energy
+    
+    Parameters
+    ----------
+    op: Operation
+        from TB_operation.to_op, EC_operation.to_x_op, EC_operation.to_src_op
+    file: str
+        element of op.files
+    fp_method: Optional, default to be None for 05B like, else to be 03B like 
+
+    kw_args: 
+        x_lim: [int, int], optional, default to be None
+            plot the raw figure, specify the x_lim
+        save_path: str, optional, default to be None
+            path of the figure to save, None for show the figure
+    '''
+    fp_method = __get_fp05B if fp_method is None else __get_fp03B
+    config = op.file_config(file)
+    read_config, bkg_read_config, spectrum_config, fit_config = config
+    fp = fp_method(config)
+    fp.get_spectrum()
+    if kw_args.get("x_lim", None) is not None:
+        util.raw_plot(fp.spectrum, fp.x, title=file, x_lim=kw_args["x_lim"], save_path=kw_args.get("save_path", None))
+        return 
+    fp.peak_fit()
+    util.fit_plot(fp.spectrum, fp.x, fp.fit_result, title=file, bkgForm=fit_config.bkg_form, fit_range=fit_config.fit_range, save_path=f"{op.op.save_fig_path}/{file}.png")
+    fp.save(os.path.join(op.op.save_path,f'{file}.pickle'))

@@ -11,6 +11,10 @@
 │   │   ├── single_process
 │   │   └── tb_logs
 │   └── 07
+│       ├── ec_logs
+│       ├── raw_data
+│       ├── single_process
+│       └── tb_logs
 ├── lib_reader
 │   ├── README.md
 │   ├── pyproject.toml
@@ -22,10 +26,13 @@
 └── src
     └── grid_calibration
         ├── __init__.py
+        ├── __pycache__
+        ├── cmd.py
         ├── file_lib.py
         ├── main.py
         ├── operation.py
         ├── process03B
+        ├── process07
         └── util_lib.py
 ```
 其中`./data/03B/raw_data`指向实际03B标定数据，clone后需要手动完成。
@@ -47,6 +54,7 @@ from .reader07.read import single_read07
 ```
 src/grid_calibration
 ├── __init__.py
+├── cmd.py
 ├── file_lib.py
 ├── main.py
 ├── operation.py
@@ -59,10 +67,12 @@ src/grid_calibration
 │   └── temp_fit.py
 ├── process07
 │   ├── __init__.py
-│   └── single.py
+│   ├── single.py
+│   ├── temp_bias.py
+│   └── test.py
 └── util_lib.py
 ```
-其中`main.py`为待完成的通用接口，暂无了解必要。
+其中`main.py`为待完成的通用接口，暂无了解必要。`cmd.py`提供通用的命令行接口。
 
 ## file_lib
 
@@ -91,13 +101,14 @@ src/grid_calibration
 当前03B已经实现了命令行接口调用，调用方式如下：
 在仓库根目录下有以下命令可供执行
 ```bash
-python3 -m grid_calibration.process03B.temp_bias -h      # 查看temp_bias帮助
 python3 -m grid_calibration.process03B.temp_bias list    # 列出所有温度偏压实验数据文件
 python3 -m grid_calibration.process03B.temp_bias run {n} # 处理{n}号文件
 python3 -m grid_calibration.process03B.temp_bias run all # 处理所有文件
+python3 -m grid_calibration.process03B.temp_bias raw {n} {l} {r} [./test.png] # 绘出{n}号文件的在[l,r]之间的原始能谱；并保存为./test.png，不提供此参数则为直接显示
 
 python3 -m grid_calibration.process03B.temp_fit          # 使用temp_bias处理结果完成温度偏压实验处理
 ```
+
 ```bash
 python3 -m grid_calibration.process03B.ec_preprocess -h         # 查看ec_preprocess帮助
 python3 -m grid_calibration.process03B.ec_preprocess x -h       # 查看x光机实验数据处理帮助
@@ -106,7 +117,17 @@ python3 -m grid_calibration.process03B.ec_preprocess x/src ...  # 与temp_bias�
 
 python3 -m grid_calibration.process03B.ec_fit                   # 使用ec_preprocess 结果完成能量响应
 ```
-
+## 07使用方法
+在重写了命令行接口后，07也有了直接命令行调用的方法，具体参数与03B相同，目前仅支持temp_bias命令，下面给出使用示例。
+绘出0号文件[0,1000]道址内的原始波形，
+```bash
+python3 -m grid_calibration.process03B.temp_bias raw 0 0 1000 [./test.png]
+```
+从而方便观察全能峰拟合范围，据此更新`data/07/single_process/fit_range.json`文件，在使用以下命令进行拟合，
+```bash
+python3 -m grid_calibration.process03B.temp_bias run 0
+```
+在`data/07/single_process/single_fit_fig`目录下找到拟合结果，判断是否需要改进。
 # TODO
-- [ ] 命令行接口重写，批量生成
+- [x] 命令行接口重写，批量生成
 - [ ] operation 拆分

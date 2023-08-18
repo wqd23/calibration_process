@@ -126,7 +126,7 @@ class File_operation_05b():
             bkg_amp = [factor*a for factor, a in zip(bkg_corr, self.bkg_sci['amp'])]
             # keep the same spec_range with data
             bkg_spectrum, bkg_spectrum_err, _ = self.__raw_spectrum(bkg_amp, self.spectrum_config.bin_width, spec_range=[[0,c*self.spectrum_config.adc_max] for c in corr])
-            bkg_spectrum, bkg_spectrum_err, bkg_rate, bkg_rate_err = self.__raw_rate(bkg_spectrum, bkg_spectrum_err, self.bkg_sci['timestampEvt'], self.bkg_sci['eventID'])
+            bkg_spectrum, bkg_spectrum_err, bkg_rate, bkg_rate_err = self.__raw_rate(bkg_spectrum, bkg_spectrum_err, self.bkg_sci['timestampEvt'])
             
             # get pure spectrum without bkg
             spectrum = [s-b for s,b in zip(spectrum, bkg_spectrum)]
