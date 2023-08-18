@@ -70,13 +70,15 @@ def __raw_plot(spectrum:Float_array_4channel, x:Float_array_4channel,title:str, 
         ax.set_xlabel('ADC/channel')
         ax.set_ylabel('count rate/cps')
         ax.grid()
-        # ax.set_xlim((0, 4000))
+        # ax.set_xlim((0, 1000))
         # kwargs
         # log scale
         if kwargs["log_scale"] in ["log", "semilogx"]:
             ax.set_xscale('log')
         if kwargs["log_scale"] in ["log", "semilogy"]:
             ax.set_yscale('log')
+        if kwargs.get("x_lim", None) is not None:
+            ax.set_xlim(kwargs['x_lim'])
     return fig, fig.axes
 def raw_plot(spectrum:Float_array_4channel, x:Float_array_4channel,title:str,save_path: Optional[str] = None, **kwargs):
     fig, axs = __raw_plot(spectrum, x, title, **kwargs)
@@ -679,3 +681,4 @@ def data_load(path):
         else:
             print(f'key {header} not found')
     return sci, tel
+    

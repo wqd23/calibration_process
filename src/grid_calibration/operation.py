@@ -238,7 +238,8 @@ class EC_operation_03B(EC_operation_05B):
 class TB_operation_07B(TB_operation_05B):
     def __init__(self, path, fit_range, save_path, save_fig_path, result_path) -> None:
         self.path = path
-        self.files = [file for file in os.listdir(self.path) if "rundata" in file and 'baseline' not in file and "CI" not in file and '50C' not in file]
+        # 
+        self.files = [file for file in os.listdir(self.path) if os.path.splitext(file)[1] == '.txt']
         self.adc_max = 16384.0
         self.source = "Am241"
         
@@ -250,7 +251,7 @@ class TB_operation_07B(TB_operation_05B):
     def file_config(self, file):
         file = os.path.join(self.path,file)
         basename = os.path.basename(file)
-        read_config = file_lib.Read_config(file, ending='03b')
+        read_config = file_lib.Read_config(file, ending='07')
         bkg_read_config = file_lib.Read_config()
         spectrum_config = file_lib.Spectrum_config(bin_width=self.bin_width)
         fit_config = file_lib.Fit_config(self.fit_range[basename])
