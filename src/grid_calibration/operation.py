@@ -48,7 +48,7 @@ class TB_operation_05B():
         data_all = [[],[],[],[]]
         for tb in data:
             fit_4ch = tb['fit_result']
-            tel_4ch = [{k:v[i] for k,v in tb['tel'].items() } for i in range(4)]
+            tel_4ch = [{k:v[i] for k,v in tb['tel'].items() if len(v) == 4} for i in range(4)]
             for data, fit, tel in zip(data_all, fit_4ch, tel_4ch):
                 if fit is None:
                     continue
