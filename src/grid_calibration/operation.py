@@ -256,7 +256,7 @@ class TB_operation_07B(TB_operation_05B):
         self.path = path
         # 
         self.files = [file for file in os.listdir(self.path) if os.path.splitext(file)[1] == '.txt']
-        self.adc_max = 16384.0
+        self.adc_max = 65535.0
         self.source = "Am241"
         
         self.fit_range = util.json_load(fit_range)
@@ -269,7 +269,7 @@ class TB_operation_07B(TB_operation_05B):
         basename = os.path.basename(file)
         read_config = file_lib.Read_config(file, ending='07')
         bkg_read_config = file_lib.Read_config()
-        spectrum_config = file_lib.Spectrum_config(bin_width=self.bin_width)
+        spectrum_config = file_lib.Spectrum_config(bin_width=self.bin_width, adc_max=self.adc_max)
         fit_config = file_lib.Fit_config(self.fit_range[basename])
         return [read_config, bkg_read_config, spectrum_config, fit_config]
     
