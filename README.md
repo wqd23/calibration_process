@@ -101,12 +101,13 @@ src/grid_calibration
 当前03B已经实现了命令行接口调用，调用方式如下：
 在仓库根目录下有以下命令可供执行
 ```bash
-python3 -m grid_calibration.process03B.temp_bias list    # 列出所有温度偏压实验数据文件
-python3 -m grid_calibration.process03B.temp_bias run {n} # 处理{n}号文件
-python3 -m grid_calibration.process03B.temp_bias run all # 处理所有文件
-python3 -m grid_calibration.process03B.temp_bias raw {n} {l} {r} [./test.png] # 绘出{n}号文件的在[l,r]之间的原始能谱；并保存为./test.png，不提供此参数则为直接显示
+python3 -m grid_calibration.process03B.temp_bias list                           # 列出所有温度偏压实验数据文件
+python3 -m grid_calibration.process03B.temp_bias run {n}                        # 处理{n}号文件
+python3 -m grid_calibration.process03B.temp_bias run {n} {end}                  # 处理[n, end]号文件
+python3 -m grid_calibration.process03B.temp_bias run all                        # 处理所有文件
+python3 -m grid_calibration.process03B.temp_bias raw {n} {l} {r} [./test.png]   # 绘出{n}号文件的在[l,r]之间的原始能谱；并保存为./test.png，不提供此参数则为直接显示
 
-python3 -m grid_calibration.process03B.temp_fit          # 使用temp_bias处理结果完成温度偏压实验处理
+python3 -m grid_calibration.process03B.temp_fit                                 # 使用temp_bias处理结果完成温度偏压实验处理
 ```
 
 ```bash

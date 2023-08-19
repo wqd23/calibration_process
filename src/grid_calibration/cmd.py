@@ -25,11 +25,16 @@ class file_list_op():
     # plot the raw figure of {n}th file, within(left, right)
     def raw(self, n, left, right, save_path = None):
         process(self.op, self.__get_file(n),fp_method=self.fp_method, x_lim = [left, right], save_path=save_path)
+    def __process_list(self, n_list:list):
+        for n in n_list:
+            process(self.op, self.__get_file(n), fp_method=self.fp_method)
 
     # process the {n}th file of list, or "all" file
-    def run(self, n):
+    def run(self, n, end = None):
         if n == 'all':
-            for file in self.files:
-                process(self.op, file, fp_method=self.fp_method)
+            self.__process_list(range(len(self.files)))
         else:
-            process(self.op, self.__get_file(n), fp_method=self.fp_method)
+            if end is None:
+                self.__process_list([n])
+            else:
+                self.__process_list(range(n, end+1))
