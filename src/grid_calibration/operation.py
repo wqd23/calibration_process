@@ -223,7 +223,7 @@ class EC_operation_03B(EC_operation_05B):
         self.result_path = result_path
         self.x_ch = [f for f in os.listdir(self.x_path) if '_rundata' in f and 'CI' not in f]
         
-        self.x_list = list(set([f.split('_')[1] for f in self.x_ch]))
+        self.x_list = sorted(list(set([f.split('_')[1] for f in self.x_ch])))
 
         # self.src_list = [f for f in os.listdir(self.src_path) if 'rundata' in f and 'bkg' not in f and 'CI' not in f]
         self.src_list = ['src_Na22_20m_10cm_rundata2021-05-05-15-29-56.dat','src_Am241_5m_10cm_rundata2021-05-05-15-15-48.dat','src_Cs137_12m_10cm_rundata2021-05-05-12-12-27.dat']
