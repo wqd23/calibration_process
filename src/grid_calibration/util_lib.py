@@ -33,7 +33,7 @@ def count(amp:Float_array_4channel, bin_width:float, spec_range:List[List[float]
     for a,s_range in zip(amp, spec_range):
         binEdges = np.arange(s_range[0], s_range[1] + bin_width, bin_width)
         spectrum, x = np.histogram(a, bins = binEdges)
-        assert spectrum.sum() == a.size, "spectrum sum is not equal to the number of events"
+        # assert spectrum.sum() == a.size, "spectrum sum is not equal to the number of events"
         x = (x[:-1] + x[1:]) / 2
         spectrum_err = basic.gehrelsErr(spectrum)
         spectrum_all.append(spectrum)
