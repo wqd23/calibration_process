@@ -586,7 +586,7 @@ def ec_plot(energy,center, result, src_energy, x_energy, src_result,x_result, sa
         ax.set_ylim(10., 1500.)
         ax.legend(loc = 0)
         ax.grid()
-        fig.savefig(time_save(os.path.join(save_path, f"ec_fit_ch{i}.png")))
+        fig.savefig(os.path.join(save_path, headtime(f"ec_fit_ch{i}.png")))
     
     e_low = np.arange(np.min(energy), 50.2)
     e_high = np.arange(50.2, np.max(energy))
@@ -620,7 +620,7 @@ def ec_plot(energy,center, result, src_energy, x_energy, src_result,x_result, sa
         ax.set_ylim(8, 150)
         ax.legend(loc = 0)
         ax.grid()
-        fig.savefig(time_save(os.path.join(save_path, f"resolution_fit_ch{i}.png")))
+        fig.savefig(os.path.join(save_path, headtime(f"resolution_fit_ch{i}.png")))
 
 def resolution_fit(energy:Float1D, resolution:Float1D, resolution_err:Float1D):
     # initial value
