@@ -19,20 +19,19 @@ class Operation():
 class TB_operation_05B():
     """a class collect all config and function for temperature bias fit
     """
-    def __init__(self) -> None:
+    def __init__(self, path, fit_range, save_path, save_fig_path, result_path) -> None:
         """config used in different function
         """
         # universal config
-        self.path = "/mnt/d/material/repos/python/tsinghua/GRID/calibration/GRID-calibration/GridDataProcessor/GRID05B标定数据/温度偏压实验"
+        self.path = path
         self.files = [file for file in os.listdir(self.path) if "rundata" in file and '50C' not in file]
         self.adc_max = 16384.0
         self.source = "Am241"
-        fit_range = "05B/single_process/fit_range.json"
         self.fit_range = util.json_load(fit_range)
         self.bin_width = 6
-        self.save_path = "05B/single_process/TB_fit_result"
-        self.save_fig_path = "05B/single_process/single_fit_fig"
-        self.result_path = "05B/tb_logs"
+        self.save_path = save_path
+        self.save_fig_path = save_fig_path
+        self.result_path = result_path
     def file_config(self, file):
         file = os.path.join(self.path,file)
         basename = os.path.basename(file)
@@ -77,9 +76,9 @@ class TB_operation_05B():
         return result
 
 class EC_operation_05B():
-    def __init__(self, tb_result_path:str, fit_range:str, time_cut:str, energy:str, bkg_form:str) -> None:
+    def __init__(self, tb_result_path:str, fit_range:str, time_cut:str, energy:str, bkg_form:str,x_path, src_path, save_path, save_fig_path, result_path, x_config) -> None:
         # read config
-        self.x_config = "../GRID05B标定数据/X光机实验-天格_reset/config.json"
+        self.x_config = x_config
         self.time_cut = util.json_load(time_cut)
         self.bkg_time_cut = {k:[v[1],v[2],v[3],v[0]] for k,v in self.time_cut.items()}
 
@@ -95,11 +94,11 @@ class EC_operation_05B():
         self.fit_range = util.json_load(fit_range)
         self.bkg_form = util.json_load(bkg_form)
         # ec file process
-        self.x_path = "../GRID05B标定数据/X光机实验-天格_reset"
-        self.src_path = '../GRID05B标定数据/放射源实验'
-        self.save_path = "05B/single_process/EC_fit_result"
-        self.save_fig_path = "05B/single_process/single_fit_fig"
-        self.result_path = "05B/ec_logs"
+        self.x_path = x_path
+        self.src_path = src_path
+        self.save_path = save_path
+        self.save_fig_path = save_fig_path
+        self.result_path = result_path
         self.x_list = [f for f in os.listdir(self.x_path) if '_observe.dat' in f and 'XM_22' not in f]
         self.src_list = [f for f in os.listdir(self.src_path) if 'rundata' in f and 'bkg' not in f]
         self.energy = util.json_load(energy)

@@ -1,0 +1,22 @@
+{
+    "src_Am241_10cm_rundata2022-04-18-17-03-30.dat": "lin", 
+    "src_Cs137_10cm_rundata2022-04-18-14-27-50.dat": null, 
+    "src_Co60_10cm_rundata2022-04-18-15-25-15.dat": "exp", 
+    "src_Na22_25cm_rundata2022-04-18-16-37-26.dat": "lin", 
+    
+    "XM_100_026_observe.dat": "gaus", 
+    "XM_110_027_observe.dat": "gaus", 
+    "XM_120_028_observe.dat": "gaus", 
+    "XM_29_009_observe.dat": null, 
+    "XM_35_006_observe.dat": null,
+    "XM_40_005_observe.dat": null,
+    "XM_45_021_observe.dat": null,
+    "XM_47_020_observe.dat": null,
+    "XM_49_019_observe.dat": null,
+    "XM_51_018_observe.dat": null,
+    "XM_53_017_observe.dat": null,
+    "XM_55_016_observe.dat": null,
+    "XM_65_015_observe.dat": null,
+    "XM_75_013_observe.dat": null,
+    "XM_80_012_observe.dat": null,
+    "XM_90_025_observe.dat": "gaus"}
