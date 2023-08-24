@@ -275,13 +275,15 @@ class TB_operation_07B(TB_operation_05B):
 def __get_fp05B(config) -> file_lib.File_operation_05b:
     return file_lib.File_operation_05b(config[0].path, *config)
 def __dict_4ch_reconstruct(dict_4ch):
-    # dict_4ch is list of 4 dict all value to be list with 4 elements, return a dict with 4 all value to be 4 ch 
+    # dict_4ch is list of 4 dict all value to be list with 4 elements, return a dict with all value to be 4 ch, each value from corresponding dict
     dict_4ch_re = {}
     for key in dict_4ch[0].keys():
         dict_4ch_re[key] = []
         for i in range(4):
-            dict_4ch_re[key].append(dict_4ch[i][key][i])
-    return dict_4ch_re 
+            if len(dict_4ch[i][key]) == 4:
+                dict_4ch_re[key].append(dict_4ch[i][key][i])
+            else:
+                dict_4ch_re[key].append(dict_4ch[i][key])
 def __get_fp03B(config) -> file_lib.File_operation_05b:
     read_config, bkg_read_config, spectrum_config, fit_config = config
     fps = [file_lib.File_operation_05b(read_config[i].path, read_config[i], bkg_read_config[i], spectrum_config, fit_config) for i in range(4)]
