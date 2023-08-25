@@ -1,0 +1,23 @@
+{
+    "12p0": null,
+    "15p0": null,
+    "22p0": null,
+    "29p0": null,
+    "35p0": null,
+    "40p0": null,
+    "45p0": null,
+    "47p1": null,
+    "49p1": null,
+    "51p1": null,
+    "53p1": null,
+    "55p1": null,
+    "64p8": null,
+    "74p8": null,
+    "79p9": null,
+    "90p1": "lin",
+    "99p9": "lin",
+    "211127154145_COM3-bnu_src_Cs137_45min_10cm.txt": "lin",
+    "211127164103_COM3-bnu_src_Co60_30min_10cm.txt": "gaus",
+    "211127173549_COM3-bnu_src_Am241_6min_10cm.txt": "lin",
+    "211127175108_COM3-bnu_src_Na22_30min_20cm.txt": "lin"
+}
