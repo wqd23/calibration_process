@@ -122,13 +122,18 @@ python3 -m grid_calibration.process03B.ec_fit                   # 使用ec_prepr
 在重写了命令行接口后，07也有了直接命令行调用的方法，具体参数与03B相同，目前仅支持temp_bias命令，下面给出使用示例。
 绘出0号文件[0,1000]道址内的原始波形，
 ```bash
-python3 -m grid_calibration.process03B.temp_bias raw 0 0 1000 [./test.png]
+python3 -m grid_calibration.process07.temp_bias raw 0 0 1000 [./test.png]
 ```
 从而方便观察全能峰拟合范围，据此更新`data/07/single_process/fit_range.json`文件，在使用以下命令进行拟合，
 ```bash
-python3 -m grid_calibration.process03B.temp_bias run 0
+python3 -m grid_calibration.process07.temp_bias run 0
 ```
 在`data/07/single_process/single_fit_fig`目录下找到拟合结果，判断是否需要改进。
+
+```bash
+python3 -m grid_calibration.process07.temp_fit                                 # 使用temp_bias处理结果完成温度偏压实验处理
+
+```
 # TODO
 - [x] 命令行接口重写，批量生成
 - [ ] 处理数据包中，没有4 channel的数据
