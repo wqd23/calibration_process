@@ -284,6 +284,7 @@ def __dict_4ch_reconstruct(dict_4ch):
                 dict_4ch_re[key].append(dict_4ch[i][key][i])
             else:
                 dict_4ch_re[key].append(dict_4ch[i][key])
+        return dict_4ch_re
 def __get_fp03B(config) -> file_lib.File_operation_05b:
     read_config, bkg_read_config, spectrum_config, fit_config = config
     fps = [file_lib.File_operation_05b(read_config[i].path, read_config[i], bkg_read_config[i], spectrum_config, fit_config) for i in range(4)]
