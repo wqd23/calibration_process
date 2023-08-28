@@ -119,7 +119,7 @@ python3 -m grid_calibration.process03B.ec_preprocess x/src ...  # 与temp_bias�
 python3 -m grid_calibration.process03B.ec_fit                   # 使用ec_preprocess 结果完成能量响应
 ```
 ## 07使用方法
-在重写了命令行接口后，07也有了直接命令行调用的方法，具体参数与03B相同，目前仅支持temp_bias命令，下面给出使用示例。
+在重写了命令行接口后，07也有了直接命令行调用的方法，具体参数与03B相同，下面给出使用示例。
 绘出0号文件[0,1000]道址内的原始波形，
 ```bash
 python3 -m grid_calibration.process07.temp_bias raw 0 0 1000 [./test.png]
@@ -132,7 +132,16 @@ python3 -m grid_calibration.process07.temp_bias run 0
 
 ```bash
 python3 -m grid_calibration.process07.temp_fit                                 # 使用temp_bias处理结果完成温度偏压实验处理
+```
 
+07的`ec_preprocess`与`ec_fit`使用方法与03相同：
+```bash
+python3 -m grid_calibration.process07.ec_preprocess -h         # 查看ec_preprocess帮助
+python3 -m grid_calibration.process07.ec_preprocess x -h       # 查看x光机实验数据处理帮助
+python3 -m grid_calibration.process07.ec_preprocess src -h     # 查看放射源实验数据处理帮助
+python3 -m grid_calibration.process07.ec_preprocess x/src ...  # 与temp_bias有同样参数
+
+python3 -m grid_calibration.process07.ec_fit                   # 使用ec_preprocess 结果完成能量响应
 ```
 # TODO
 - [x] 命令行接口重写，批量生成
