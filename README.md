@@ -139,3 +139,5 @@ python3 -m grid_calibration.process07.temp_fit                                 #
 - [ ] 处理数据包中，没有4 channel的数据
 - [ ] 保持不同配置文件中，key的一致性
 - [ ] operation 拆分
+- [ ] 确认07 数据点与拟合线偏离原因
+- [ ] 07 15p0能谱暗噪声
