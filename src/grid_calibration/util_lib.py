@@ -20,6 +20,7 @@ import json
 import os
 import datetime
 import math
+import re
 def count_spectrum(amp, nbins, spec_range, bin_width, adc_max):
     spectrum, x = basic.getSpectrum(
         amp, nbins=nbins, specRange=spec_range, binWidth=bin_width, adcMax=adc_max)
@@ -647,6 +648,55 @@ def get_hpge_data(path):
     # unit: keV
     energy = np.arange(0, len(counts), 1)
     return energy, counts
+
+def get_fit_dict(path:str, ec_energy, suffix='dat'):
+    """get energy and fit result of both x and src files, return result dicts
+    
+    Parameters
+    ----------
+    path : str
+        path of EC_fit_result
+    ec_energy : Any
+        ec_energy through load_json
+    suffix : str
+        [Default: 'dat'] suffix of data files, 'txt' for 07 and 'dat' for 03 & 05
+    """
+    # key -> energy, value -> fit-result
+    x_result = {}
+    src_result = {}
+    f_list = os.listdir(path)
+    # X: for 03 & 07, [?p?.pickle] alike gauge
+    regex_x_energy = r'^(\d+)p(\d+)(.pickle)$'
+    # X: for 05, [X/x M/m···observe.pickle] alike gauge
+    regex_xm = r'[xX][mM]\S+(observe.pickle)$'
+    # SRC: [src···.pickle] alike gauge
+    regex_src = r'src\S+(.pickle)$'
+    for f in f_list:
+        match_x_energy = re.search(regex_x_energy, f)
+        match_xm = re.search(regex_xm, f)
+        match_src = re.search(regex_src, f)
+        if match_x_energy != None:
+            integer, fraction, _ = match_x_energy.groups()
+            # ec_energy x key: [?p?] alike gauge
+            f_name = integer+'p'+fraction
+            energy = ec_energy[f_name]
+            data = pickle_load(os.path.join(path, f))
+            x_result[energy] = data['fit_result']
+            continue
+        elif match_xm != None:
+            # ec_energy x key: [filename] alike gauge
+            f_name = re.sub('pickle', suffix, f)
+            energy = ec_energy[f_name]
+            data = pickle_load(os.path.join(path, f))
+            x_result[energy] = data['fit_result']
+            continue
+        elif match_src != None:
+            # ec_energy src key: [filename] alike gauge
+            f_name = re.sub('pickle', suffix, f)
+            energy = ec_energy[f_name]
+            data = pickle_load(os.path.join(path, f))
+            src_result[energy] = data['fit_result']
+    return x_result, src_result
 
 def print_temp(tel):
     temp = tel['tempSipm']
