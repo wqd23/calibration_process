@@ -618,7 +618,7 @@ def ec_plot(energy,center, result, src_energy, x_energy, src_result,x_result, sa
         ax.set_xscale('log')
         ax.set_yscale('log')
         # ax.set_xlim(20, 1500)
-        ax.set_ylim(8, 150)
+        # ax.set_ylim(8, 150)
         ax.legend(loc = 0)
         ax.grid()
         fig.savefig(os.path.join(save_path, headtime(f"resolution_fit_ch{i}.png")))
