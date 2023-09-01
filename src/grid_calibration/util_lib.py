@@ -552,13 +552,12 @@ def tb_corr(corr:List[Callable[[float, float],float]], temp:Float_array_4channel
     corr_factor = [f(t,b) for f,t,b in zip(corr,temp_avg, bias_avg)]
     return corr_factor
 
-def ec_plot(energy,center, result, src_energy, x_energy, src_result,x_result, save_path):
-    plt.ion()
-    q_low = energy<50.2
-    q_high = energy>=50.2
+def ec_plot(energy,center, result, src_energy, x_energy, src_result,x_result, save_path, energy_split_low, energy_split_high):
+    q_low = energy < energy_split_low
+    q_high = energy > energy_split_high
     center_low = [c[q_low] for c in center]
     center_high = [c[q_high] for c in center]
-
+    x_energy, src_energy = np.asarray(x_energy), np.asarray(src_energy)
     adc_low = [np.arange(np.min(center_low[i]),np.max(center_low[i])) for i in range(4)]
     adc_high = [np.arange(np.min(center_high[i]),np.max(center_high[i])) for i in range(4)]
     energy_low = [np.polyval(result[i]['EC_low'], adc_low[i]) for i in range(4)]
@@ -570,15 +569,21 @@ def ec_plot(energy,center, result, src_energy, x_energy, src_result,x_result, sa
     x_center_err = [np.array([fit[i]['b_err'] for fit in x_result]) for i in range(4)]
 
     
+    xpoint = (x_energy > energy_split_high) | (x_energy < energy_split_low)
+    xpoint_not = np.logical_not(xpoint)
     gs = gridspec.GridSpec(2, 1, wspace = 0.5, hspace = 0.2, left = 0.13, right = 0.95,height_ratios = [4, 1])
     for i in range(4):
         fig = plt.figure(figsize = (12, 8))
         ax = fig.add_subplot(gs[0])
-        ax.errorbar(x_center[i], x_energy, xerr = x_center_err[i], fmt = 's', mfc = 'white', ms = 6, elinewidth = 1, capsize = 3, barsabove = True, zorder = 1, label = f' CH{i}')
+        ax.errorbar(x_center[i][xpoint], x_energy[xpoint], xerr = x_center_err[i][xpoint], fmt = 's', mfc = 'white', ms = 6, elinewidth = 1, capsize = 3, barsabove = True, zorder = 1, label = f' CH{i}')
         ax.errorbar(src_center[i], src_energy, xerr = src_center_err[i], fmt = '^', mfc = 'white', ms = 6, elinewidth = 1, capsize = 3, barsabove = True, zorder = 0, \
             label = f'source CH{i}')
+        ax.errorbar(x_center[i][xpoint_not], x_energy[xpoint_not], xerr = x_center_err[i][xpoint_not], fmt = 's', mfc = 'red', ms = 6, elinewidth = 1, capsize = 3, barsabove = True, zorder = 1, label = f' CH{i} data not used')
+        
         ax.plot(adc_low[i], energy_low[i], linestyle = '-', label = f'quadratic fit on EC data of ch{i}, < 50.2keV')
         ax.plot(adc_high[i], energy_high[i], linestyle = '-', label = f'quadratic fit on EC data of ch{i}, > 50.2keV')
+        ax.axhline(energy_split_low)
+        ax.axhline(energy_split_high)
         ax.set_xlabel('ADC')
         ax.set_ylabel('Energy/keV')
         ax.set_xscale('log')
@@ -603,7 +608,8 @@ def ec_plot(energy,center, result, src_energy, x_energy, src_result,x_result, sa
         fig = plt.figure(figsize = (12, 8))
         ax = fig.add_subplot(gs[0])
         if not any(map(math.isinf,x_resolution_err[i])):
-            ax.errorbar(x_energy, x_resolution[i]*100, yerr = x_resolution_err[i]*100, fmt = 's', mfc = 'white', ms = 6, elinewidth = 1, capsize = 3, barsabove = True, zorder = 1, label = f' CH{i}')
+            ax.errorbar(x_energy[xpoint], x_resolution[i][xpoint]*100, yerr = x_resolution_err[i][xpoint]*100, fmt = 's', mfc = 'white', ms = 6, elinewidth = 1, capsize = 3, barsabove = True, zorder = 1, label = f' CH{i} data used')
+            ax.errorbar(x_energy[xpoint_not], x_resolution[i][xpoint_not]*100, yerr = x_resolution_err[i][xpoint_not]*100, fmt = 's', mfc = 'white', ms = 6, elinewidth = 1, capsize = 3, barsabove = True, zorder = 1, label = f' CH{i} data not used')
         else:
             ax.scatter(x_energy, x_resolution[i]*100,label = f' CH{i}, inf in error')
         if not any(map(math.isinf,src_resolution_err[i])):
@@ -613,12 +619,14 @@ def ec_plot(energy,center, result, src_energy, x_energy, src_result,x_result, sa
             ax.scatter(src_energy, src_resolution[i]*100,label = f'source CH{i}, inf in error')
         ax.plot(e_low, resolution_low[i]*100, linestyle = '-', label = f'Fit on resolution data of ch{i}, < 50.2keV')
         ax.plot(e_high, resolution_high[i]*100, linestyle = '-', label = f'Fit on resolution data of ch{i}, > 50.2keV')
+        ax.axvline(energy_split_low)
+        ax.axvline(energy_split_high)
         ax.set_xlabel('Energy/keV')
         ax.set_ylabel('Resolution/%')
         ax.set_xscale('log')
         ax.set_yscale('log')
         # ax.set_xlim(20, 1500)
-        # ax.set_ylim(8, 150)
+        ax.set_ylim(min(8, *list(src_resolution[i]*100)), 150)
         ax.legend(loc = 0)
         ax.grid()
         fig.savefig(os.path.join(save_path, headtime(f"resolution_fit_ch{i}.png")))

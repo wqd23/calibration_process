@@ -102,7 +102,9 @@ class EC_operation_05B():
         self.x_list = [f for f in os.listdir(self.x_path) if '_observe.dat' in f and 'XM_22' not in f]
         self.src_list = [f for f in os.listdir(self.src_path) if 'rundata' in f and 'bkg' not in f]
         self.energy = util.json_load(energy)
-        self.energy_split = 50.2 # keV, absorption edges of Gd
+        # self.energy_split = 50.2 # keV, absorption edges of Gd
+        self.energy_split_high = 52
+        self.energy_split_low = 49
     def __get_src_bkg(self, file):
         src = file.split('_')[1]
         bkg = [f for f in os.listdir(self.src_path) if src in f and 'bkg' in f and 'rundata' in f][0]
@@ -147,8 +149,8 @@ class EC_operation_05B():
         center_err = [np.array([fit[i]['b_err'] for _,fit in data]) for i in range(4)]
         resolution = [np.array([fit[i]['resolution'] for _,fit in data]) for i in range(4)]
         resolution_err = [np.array([fit[i]['resolution_err'] for _,fit in data]) for i in range(4)]
-        q_low = energy<self.energy_split
-        q_high = energy>=self.energy_split
+        q_low = energy<self.energy_split_low
+        q_high = energy>=self.energy_split_high
         result = [{},{},{},{}]
         for i in range(4):
             ec_low,ec_low_err = self.__center_fit(energy[q_low], center[i][q_low], center_err[i][q_low])
@@ -172,7 +174,7 @@ class EC_operation_05B():
             save_data = np.array([energy, center[i]], dtype=np.float64)
             data_name = f'ec_data_ch{i}.npy'
             np.save(f'{self.result_path}/{util.headtime(data_name)}', arr=save_data)
-        util.ec_plot(energy,center, result, src_energy, x_energy, src_result, x_result, self.result_path)
+        util.ec_plot(energy,center, result, src_energy, x_energy, src_result, x_result, self.result_path, self.energy_split_low, self.energy_split_high)
         return result
 
         
@@ -228,7 +230,9 @@ class EC_operation_03B(EC_operation_05B):
         self.src_list = ['src_Na22_20m_10cm_rundata2021-05-05-15-29-56.dat','src_Am241_5m_10cm_rundata2021-05-05-15-15-48.dat','src_Cs137_12m_10cm_rundata2021-05-05-12-12-27.dat']
         self.src_bkg = ['src_bkg_5m_10cm_rundata2021-05-05-15-54-31.dat',   'src_bkg_5m_10cm_rundata2021-05-05-14-55-58.dat',  'src_bkg_5m_10cm_rundata2021-05-05-12-33-57.dat']
         self.energy = util.json_load(energy)
-        self.energy_split = 50.2 # keV, absorption edges of Gd
+        # self.energy_split = 50.2 # keV, absorption edges of Gd
+        self.energy_split_high = 50.2
+        self.energy_split_low = 49
     def __get_x_files(self, energy_name:str):
         return [[os.path.join(self.x_path, f) for f in self.x_ch if f"{energy_name}_ch{i}" in f][0] for i in range(4)]
     def xray_config(self, energy_name:str):
@@ -301,8 +305,9 @@ class EC_operation_07B(EC_operation_05B):
         # self.src_list = [f for f in os.listdir(self.src_path) if 'rundata' in f and 'bkg' not in f and 'CI' not in f]
         self.src_list = [f for f in os.listdir(self.src_path) if 'src' in f and '_bk_' not in f and 'bkg' not in f]
         self.energy = util.json_load(energy)
-        self.energy_split = 50.2 # keV, absorption edges of Gd
-
+        # self.energy_split = 50.2 # keV, absorption edges of Gd
+        self.energy_split_high = 55
+        self.energy_split_low = 49
     def __get_x_files(self, energy_name:str):
         return [[os.path.join(self.x_path, f) for f in self.x_ch if energy_name in f and f"_ch{i}_" in f][0] for i in range(4)]
     def xray_config(self, energy_name:str):
