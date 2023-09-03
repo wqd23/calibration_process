@@ -136,8 +136,11 @@ class EC_operation_05B():
         popt, pcov = np.polyfit(center, energy,deg=2, full=False, cov=True, w=1./center_err)
         perr = np.sqrt(np.diag(pcov))
         return list(popt), list(perr)
-    def __resolution_fit(self, energy, resolution, resolution_err):
-        popt, perr = util.resolution_fit(energy, resolution, resolution_err)
+    def resolution_fit(self, energy, resolution, resolution_err):
+        p0, pcov = util.resolution_polyfit(energy, resolution, resolution_err)
+        perr = np.sqrt(np.diag(pcov))
+        popt = list(p0)
+        perr = list(perr)
         return popt, perr
     def ec_fit(self,src_result,src_energy,x_result,x_energy):
         result = src_result + x_result
@@ -155,8 +158,8 @@ class EC_operation_05B():
         for i in range(4):
             ec_low,ec_low_err = self.__center_fit(energy[q_low], center[i][q_low], center_err[i][q_low])
             ec_high,ec_high_err = self.__center_fit(energy[q_high], center[i][q_high], center_err[i][q_high])
-            resolution_low, resolution_low_err = self.__resolution_fit(energy[q_low], resolution[i][q_low], resolution_err[i][q_low])
-            resolution_high, resolution_high_err = self.__resolution_fit(energy[q_high], resolution[i][q_high], resolution_err[i][q_high])
+            resolution_low, resolution_low_err = self.resolution_fit(energy[q_low], resolution[i][q_low], resolution_err[i][q_low])
+            resolution_high, resolution_high_err = self.resolution_fit(energy[q_high], resolution[i][q_high], resolution_err[i][q_high])
             
             result[i] = {
                 'channel':i,
@@ -231,8 +234,11 @@ class EC_operation_03B(EC_operation_05B):
         self.src_bkg = ['src_bkg_5m_10cm_rundata2021-05-05-15-54-31.dat',   'src_bkg_5m_10cm_rundata2021-05-05-14-55-58.dat',  'src_bkg_5m_10cm_rundata2021-05-05-12-33-57.dat']
         self.energy = util.json_load(energy)
         # self.energy_split = 50.2 # keV, absorption edges of Gd
-        self.energy_split_high = 50.2
+        self.energy_split_high = 51
         self.energy_split_low = 49
+    def resolution_fit(self, energy, resolution, resolution_err):
+        popt, perr = util.resolution_lmfit(energy, resolution, resolution_err)
+        return popt, perr
     def __get_x_files(self, energy_name:str):
         return [[os.path.join(self.x_path, f) for f in self.x_ch if f"{energy_name}_ch{i}" in f][0] for i in range(4)]
     def xray_config(self, energy_name:str):

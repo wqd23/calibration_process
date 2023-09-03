@@ -631,19 +631,26 @@ def ec_plot(energy,center, result, src_energy, x_energy, src_result,x_result, sa
         ax.grid()
         fig.savefig(os.path.join(save_path, headtime(f"resolution_fit_ch{i}.png")))
 
-def resolution_fit(energy:Float1D, resolution:Float1D, resolution_err:Float1D):
-    # initial value
+def resolution_polyfit(energy:Float1D, resolution:Float1D, resolution_err:Float1D):
     data = (resolution*energy)**2
     error = 2*energy**2*resolution_err
     p0, pcov = np.polyfit(energy, data, deg=2, w=1./error, cov=True)
     perr = np.sqrt(np.diag(pcov))
     popt = list(p0)
     perr = list(perr)
-    # mod = lmfit.Model(resolutionFunction)
-    # param = mod.make_params(a=p0[0], b=p0[1], c=p0[2])
-    # result = mod.fit(resolution, param, weights=1./resolution_err, x= energy)
-    # popt = [result.best_values['a'], result.best_values['b'], result.best_values['c']]
-    # perr = [param['a'].stderr, param['b'].stderr, param['c'].stderr]
+    return p0, pcov
+def resolution_lmfit(energy:Float1D, resolution:Float1D, resolution_err:Float1D):
+    # initial value
+    p0, pcov = resolution_polyfit(energy, resolution, resolution_err)
+    mod = lmfit.Model(resolutionFunction)
+    param = mod.make_params(a=0.1 if p0[0]>0 else p0[0], b=0.1 if p0[0]>0 and p0[2]>0 else p0[1], c=0.1 if p0[2]>0 else p0[2])
+    # if p0[0]>0 and p0[2]>0:
+    # param['a'].min=0
+    param['b'].min=0
+    param['c'].min=0
+    result = mod.fit(resolution, param, weights=1./resolution_err, x= energy)
+    popt = [result.best_values['a'], result.best_values['b'], result.best_values['c']]
+    perr = [param['a'].stderr, param['b'].stderr, param['c'].stderr]
     return popt, perr
 
 def get_key(file_name:str):
