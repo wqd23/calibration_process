@@ -1,6 +1,7 @@
 import lib_reader as ver
 from . import util_lib as util
 from lib_reader.reader05.my_type import *
+from lib_plot import plot
 import os
 import numpy as np
 from dataclasses import dataclass
@@ -71,7 +72,7 @@ class TB_operation_05B():
 
             data = np.stack([temp,bias], axis=1)
             name = f'temp_bias_fit_{ich}.png'
-            util.fit_err_plot_2d(data, center, lambda x: util.tempbias2DFunctionInternal(x, *(list(res.values())[:5])),("temp$^\\circ$C","bias/V","center"), title=f"temp bias fit: channel {ich}", save_path=os.path.join(self.result_path, f"{util.headtime(name)}"))
+            plot.fit_err_plot_2d(data, center, lambda x: util.tempbias2DFunctionInternal(x, *(list(res.values())[:5])),("temp$^\\circ$C","bias/V","center"), title=f"temp bias fit: channel {ich}", save_path=os.path.join(self.result_path, f"{util.headtime(name)}"))
         util.json_save(result, os.path.join(self.result_path, f"{util.headtime('temp_bias_fit.json')}"))
         return result
 
@@ -177,7 +178,7 @@ class EC_operation_05B():
             save_data = np.array([energy, center[i]], dtype=np.float64)
             data_name = f'ec_data_ch{i}.npy'
             np.save(f'{self.result_path}/{util.headtime(data_name)}', arr=save_data)
-        util.ec_plot(energy,center, result, src_energy, x_energy, src_result, x_result, self.result_path, self.energy_split_low, self.energy_split_high)
+        plot.ec_plot(energy,center, result, src_energy, x_energy, src_result, x_result, self.result_path, self.energy_split_low, self.energy_split_high)
         return result
 
         
@@ -383,9 +384,9 @@ def process(op:Operation, file:str, fp_method = None,**kw_args) -> None:
     fp = fp_method(config)
     fp.get_spectrum()
     if kw_args.get("x_lim", None) is not None:
-        util.raw_plot(fp.spectrum, fp.x, title=file, x_lim=kw_args["x_lim"], save_path=kw_args.get("save_path", None))
+        plot.raw_plot(fp.spectrum, fp.x, title=file, x_lim=kw_args["x_lim"], save_path=kw_args.get("save_path", None))
         return 
     fp.peak_fit()
     file = os.path.splitext(file)[0]
-    util.fit_plot(fp.spectrum, fp.x, fp.fit_result, title=file, bkgForm=fit_config.bkg_form, fit_range=fit_config.fit_range, save_path=f"{op.op.save_fig_path}/{file}.png")
+    plot.fit_plot(fp.spectrum, fp.x, fp.fit_result, title=file, bkgForm=fit_config.bkg_form, fit_range=fit_config.fit_range, save_path=f"{op.op.save_fig_path}/{file}.png")
     fp.save(os.path.join(op.op.save_path,f'{file}.pickle'))

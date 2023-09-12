@@ -147,7 +147,7 @@ python3 -m grid_calibration.process07.ec_fit                   # 使用ec_prepro
 - [x] 命令行接口重写，批量生成
 - [ ] 处理数据包中，没有4 channel的数据
 - [x] 保持不同配置文件中，key的一致性
-- [ ] 拆分util_lib中的绘图函数
+- [x] 拆分util_lib中的绘图函数
 - [ ] operation 拆分
 - [ ] 确认07 数据点与拟合线偏离原因
 - [ ] 07 15p0能谱暗噪声

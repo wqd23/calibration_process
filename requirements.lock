@@ -7,6 +7,7 @@
 #   all-features: false
 
 -e file:.
+-e file:lib_plot
 -e file:lib_reader
 asteval==0.9.31
 contourpy==1.1.0

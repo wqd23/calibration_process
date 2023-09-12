@@ -1,4 +1,5 @@
 import lib_reader as ver
+import lib_plot as plot
 from . import util_lib as util
 from lib_reader.reader05.my_type import *
 from dataclasses import dataclass, field
@@ -187,7 +188,7 @@ def raw_plot(file:str, bin_width=2, bkg='', ending='normal', config=''):
     spectrum_config = Spectrum_config(bin_width=bin_width)
     fp = File_operation_05b(file, read_config, bkg_read_config, spectrum_config)
     fp.get_spectrum()
-    util.raw_plot(fp.spectrum, fp.x, title=f'{os.path.basename(file)}')
+    plot.raw_plot(fp.spectrum, fp.x, title=f'{os.path.basename(file)}')
 
 def corr_plot(file:str, tb_corr, bin_width=2, bkg='', ending='normal', config='', ref_temp = 25, ref_bias = 28.5):
     read_config = Read_config(file, ending=ending, config_file=config)
@@ -197,7 +198,7 @@ def corr_plot(file:str, tb_corr, bin_width=2, bkg='', ending='normal', config=''
     spectrum_config = Spectrum_config(corr=corr, bin_width=bin_width)
     fp = File_operation_05b(file, read_config, bkg_read_config, spectrum_config)
     fp.get_spectrum()
-    util.raw_plot(fp.spectrum, fp.x, title=f'{os.path.basename(file)}')
+    plot.raw_plot(fp.spectrum, fp.x, title=f'{os.path.basename(file)}')
 
 def fit_plot(file:str, tb_corr,fit_range,time_cut=None, bkg_time_cut = None, bkg_form='lin', bin_width=2, bkg='', ending='normal', config='', ref_temp = 25, ref_bias = 28.5):
     read_config = Read_config(file, ending=ending, config_file=config, time_cut=time_cut)
@@ -209,7 +210,7 @@ def fit_plot(file:str, tb_corr,fit_range,time_cut=None, bkg_time_cut = None, bkg
     fp = File_operation_05b(file, read_config, bkg_read_config, spectrum_config, fit_config)
     fp.get_spectrum()
     fp.peak_fit()
-    util.fit_plot(fp.spectrum, fp.x, fp.fit_result, title=f'{os.path.basename(file)}', bkgForm=bkg_form, fit_range=fit_range)
+    plot.fit_plot(fp.spectrum, fp.x, fp.fit_result, title=f'{os.path.basename(file)}', bkgForm=bkg_form, fit_range=fit_range)
 
 if __name__ == '__main__':
     plt.ioff()

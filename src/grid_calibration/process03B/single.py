@@ -1,3 +1,4 @@
+from lib_plot import plot
 from ..import file_lib
 from .. import util_lib as util
 import os
@@ -8,7 +9,7 @@ spectrum_config = file_lib.Spectrum_config()
 fit_config = file_lib.Fit_config([None, None, [197, 393], [221, 468]])
 fp = file_lib.File_operation_05b(path,reader_config, bkg_reader_config, spectrum_config, fit_config)
 fp.get_spectrum()
-util.raw_plot(fp.spectrum, fp.x, title=f'{os.path.basename(path)}', save_path='raw.png')
+plot.raw_plot(fp.spectrum, fp.x, title=f'{os.path.basename(path)}', save_path='raw.png')
 fp.peak_fit()
-util.fit_plot(fp.spectrum, fp.x, fp.fit_result, title=f'{os.path.basename(path)}',bkgForm='lin', save_path='fit.png')
+plot.fit_plot(fp.spectrum, fp.x, fp.fit_result, title=f'{os.path.basename(path)}',bkgForm='lin', save_path='fit.png')
 fp.save('.')
