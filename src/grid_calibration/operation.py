@@ -1,8 +1,7 @@
 import lib_reader as ver
-import lib_plot as plot
 from . import util_lib as util
 from lib_reader.reader05.my_type import *
-from lib_plot import *
+from lib_plot import plot
 import os
 import numpy as np
 from dataclasses import dataclass

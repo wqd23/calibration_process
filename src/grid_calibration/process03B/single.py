@@ -1,4 +1,4 @@
-import lib_plot as plot
+from lib_plot import plot
 from ..import file_lib
 from .. import util_lib as util
 import os
