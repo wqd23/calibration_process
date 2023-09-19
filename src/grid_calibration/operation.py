@@ -305,7 +305,7 @@ class EC_operation_07B(EC_operation_05B):
         self.save_path = save_path
         self.save_fig_path = save_fig_path
         self.result_path = result_path
-        self.x_ch = [f for f in os.listdir(self.x_path) if '_ch' in f and '40p0' not in f and '15p0' not in f and '12p0' not in f]
+        self.x_ch = [f for f in os.listdir(self.x_path) if '_ch' in f and '40p0' not in f and '15p0' not in f and '12p0' not in f and '99p9' not in f and '90p1' not in f]
         
         self.x_list = list(set([f.split('_')[2] for f in self.x_ch]))
         self.x_list.sort()
