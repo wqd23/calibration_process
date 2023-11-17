@@ -88,6 +88,8 @@ class File_operation_05b():
             data = ver.src_read03b(config.path, config.config_file)
         elif config.ending == "07":
             data = ver.single_read07(config.path)
+        elif config.ending == "04":
+            data = ver.single_read04(config.path)
         else:
             raise ValueError(f"ending {config.ending} not supported")
         if config.time_cut != None:

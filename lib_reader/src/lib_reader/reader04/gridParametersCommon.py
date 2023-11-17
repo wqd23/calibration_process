@@ -83,7 +83,7 @@ pattrenRef = {
 internalFreq = 24.05e6
 
 #Resistance of internal voltage and current monitor circuit, in kOhm
-internalResistance = 1.0
+internalResistance = 2.1
 
 #Check temperature data for error
 tempCheck = False
