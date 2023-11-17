@@ -1397,7 +1397,7 @@ def dataReadout(filename, isHex = False, isCi = 0, isScan = False, scanRange = [
                         curtemp = float(lineFloat[31 + 2 * ich + 70 * it] * 256 + lineFloat[32 + 2 * ich + 70 * it])
                         tempAdc[ich].append((curtemp - 4096) / 16.0 if curtemp > 2048 else curtemp / 16.0)
                         vMon[ich].append(float(lineFloat[39 + 2 * ich + 70 * it] * 256 + lineFloat[40 + 2 * ich + 70 * it]) / 4096.0 * 3.3 * 11.0)
-                        iMon[ich].append(float(lineFloat[47 + 2 * ich + 70 * it] * 256 + lineFloat[48 + 2 * ich + 70 * it]) / 4096.0 * 3.3)
+                        iMon[ich].append(float(lineFloat[47 + 2 * ich + 70 * it] * 256 + lineFloat[48 + 2 * ich + 70 * it]) / 4096.0 * 3.3 / 1.0)
                         bias[ich].append(vMon[ich][-1] - iMon[ich][-1] * parameters.internalResistance)
 
         #--------------------------------------------------Non-hexprint(normal) format files--------------------------------------------------

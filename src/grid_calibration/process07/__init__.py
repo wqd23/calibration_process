@@ -7,7 +7,7 @@ tb_op = TB_operation_07B(**{
     "result_path": "data/07/tb_logs"
 })
 ec_op = EC_operation_07B(**{
-    'tb_result_path' : 'data/07/single_process/temp_bias_fit.json',
+    'tb_result_path' : 'data/07/tb_logs/20231012175611_temp_bias_fit.json',
     'fit_range' : "data/07/single_process/fit_range.json",
     'energy' : 'data/07/single_process/ec_energy.json',
     'bkg_form' : 'data/07/single_process/bkg_form.json',
