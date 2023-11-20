@@ -410,6 +410,9 @@ class EC_operation_04(EC_operation_05B):
         spectrum_config = file_lib.Spectrum_config(corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width)
         fit_config = file_lib.Fit_config(self.fit_range[basename],self.bkg_form[basename])
         return [read_config, bkg_read_config, spectrum_config, fit_config]
+    def resolution_fit(self, energy, resolution, resolution_err):
+        popt, perr = util.resolution_ExprFit(energy, resolution, resolution_err)
+        return popt, perr
 def __get_fp05B(config) -> file_lib.File_operation_05b:
     return file_lib.File_operation_05b(config[0].path, *config)
 def __dict_4ch_reconstruct(dict_4ch):

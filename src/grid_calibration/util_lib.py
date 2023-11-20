@@ -319,6 +319,18 @@ def resolution_polyfit(energy:Float1D, resolution:Float1D, resolution_err:Float1
     popt = list(p0)
     perr = list(perr)
     return p0, pcov
+def resolution_ExprFit(energy:Float1D, resolution:Float1D, resolution_err:Float1D):
+    p0, pcov = resolution_polyfit(energy, resolution, resolution_err)
+    mod = lmfit.models.ExpressionModel(expr="sqrt(a*x*x+b*x+c)/x",independent_vars=['x'])
+    param = mod.make_params()
+    param['a'].min,param['b'].min,param['c'].min = 0,0,0
+    xOr01 = lambda x: x if x>0 else 0.1
+    param['a'].value,param['b'].value,param['c'].value = xOr01(p0[0]),xOr01(p0[1]),xOr01(p0[2])
+    result = mod.fit(resolution, param, weights=1./resolution_err, x= energy)
+    popt = [result.best_values['a'], result.best_values['b'], result.best_values['c']]
+    perr = [param['a'].stderr, param['b'].stderr, param['c'].stderr]
+    return popt, perr
+
 def resolution_lmfit(energy:Float1D, resolution:Float1D, resolution_err:Float1D):
     # initial value
     p0, pcov = resolution_polyfit(energy, resolution, resolution_err)
