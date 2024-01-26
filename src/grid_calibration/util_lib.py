@@ -17,6 +17,7 @@ import json
 import os
 import datetime
 import re
+from pathlib import Path
 def count_spectrum(amp, nbins, spec_range, bin_width, adc_max):
     spectrum, x = basic.getSpectrum(
         amp, nbins=nbins, specRange=spec_range, binWidth=bin_width, adcMax=adc_max)
@@ -272,7 +273,9 @@ def json_save(data, path:str):
     with open(path, 'w') as f:
         f.write(json.dumps(data))
 
-def json_time_save(data, path:str):
+def timestamp(format='%Y%m%d%H%M%S'):
+    return datetime.datetime.now().strftime(format)
+def json_time_save(data, path:str, forward = False):
     """save data with a time appended file name, wrapper for json_save
 
     Parameters
@@ -281,26 +284,22 @@ def json_time_save(data, path:str):
         data object
     path : str
         full path, time info will be appended to it
-    """    
-    json_save(data, f"{os.path.splitext(path)[0]}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json")
+    forward : bool
+        add time stamp before 
+    """
+    new = headtime(path, forward)
+    json_save(data, new)
 
 def json_headtime_save(data, path:str):
-    """save data with a time appended file name, wrapper for json_save
+    json_time_save(data, path, forward = True)
 
-    Parameters
-    ----------
-    data : Any
-        data object
-    path : str
-        full path, time info will be appended to it
-    """    
-    json_save(data, f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{os.path.splitext(path)[0]}.json")
-
-def time_save(path):
-
-    return f"{os.path.splitext(path)[0]}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}{os.path.splitext(path)[1]}"
-def headtime(path):
-    return f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{path}"
+def headtime(path, forward=True):
+    path = Path(path)
+    if forward:
+        new = path.parent / f"{timestamp()}_{path.stem}{path.suffix}"
+    else:
+        new = path.parent / f"{path.stem}_{timestamp()}{path.suffix}"
+    return new
 def json_load(path:str):
     with open(path, 'r') as f:
         return json.loads(f.read())
