@@ -9,27 +9,36 @@
 -e file:.
 -e file:lib_plot
 -e file:lib_reader
+addict==2.4.0
 asteval==0.9.31
 contourpy==1.1.0
 crc16==0.1.1
+crcmod==1.7
 cycler==0.11.0
 dill==0.3.7
 fire==0.5.0
 fonttools==4.42.0
 future==0.18.3
+h5py==3.10.0
+importlib-metadata==7.0.1
 importlib-resources==6.0.1
 kiwisolver==1.4.4
+llvmlite==0.41.1
 lmfit==1.2.2
 matplotlib==3.7.2
 nptyping==2.5.0
+numba==0.58.1
 numpy==1.24.4
 packaging==23.1
+pandas==2.0.3
 pillow==10.0.0
 pyparsing==3.0.9
 python-dateutil==2.8.2
+pytz==2023.3.post1
 scipy==1.10.1
 six==1.16.0
 termcolor==2.3.0
 typing-extensions==4.7.1
+tzdata==2023.4
 uncertainties==3.1.7
 zipp==3.16.2

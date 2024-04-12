@@ -8,11 +8,7 @@ Basic functions for different version of GRID data processing\n
 from .gridProcessFunctions import gridProcessFunctions03 as process
 from .gridParameters import gridParameters03 as specificParam
 from .my_type import *
-
-def refactor_to4chan(v):
-    return [np.array(v[i]) for i in range(4)]
-def data_refactor(sci:dict):
-    return {k:v if len(v) != 4 else refactor_to4chan(v) for k,v in sci.items()}
+from ..util import refactor_to4chan, data_refactor
 
 def single_read05b_normal(path:str)-> Tuple[Dict[str, Float_array_4channel], Dict[str, Float_array_4channel]]:
     """read all file in single temp bias experiment
