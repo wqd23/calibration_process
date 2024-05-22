@@ -1,7 +1,7 @@
 [project]
 name = "grid-calibration"
 version = "0.1.0"
-description = "Add your description here"
+description = "calibration process for GRID"
 authors = [
     { name = "wqd", email = "wqd.2019@tsinghua.org.cn" }
 ]
