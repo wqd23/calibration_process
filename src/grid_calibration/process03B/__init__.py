@@ -1,4 +1,5 @@
-from ..operation import TB_operation_03B, EC_operation_03B
+from ..operation import EC_operation_03B, TB_operation_03B
+
 tb_op = TB_operation_03B(**{
     'path': "data/03B/raw_data/20210501_tempbias_03B",
     "fit_range": "data/03B/single_process/fit_range.json",

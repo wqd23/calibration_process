@@ -1,6 +1,9 @@
-from .__init__ import ec_op
 import fire
+
 from .. import cmd
+from .__init__ import ec_op
+
+
 class ec05():
     def __init__(self) -> None:
         # sub command for xray data process

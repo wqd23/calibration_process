@@ -1,4 +1,5 @@
-from ..operation import TB_operation_05B, EC_operation_05B
+from ..operation import EC_operation_05B, TB_operation_05B
+
 tb_op = TB_operation_05B(**{
     'path': "data/05B/raw_data/温度偏压实验",
     "fit_range": "data/05B/single_process/fit_range.json",

@@ -1,4 +1,4 @@
-from ..operation import TB_operation_04, EC_operation_04
+from ..operation import EC_operation_04, TB_operation_04
 
 tb_op = TB_operation_04(**{
     'path': "data/04/raw_data/20210501_tempbias_Am241_GRID04",

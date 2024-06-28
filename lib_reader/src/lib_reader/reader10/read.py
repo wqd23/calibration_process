@@ -1,9 +1,10 @@
+import numpy as np
+from addict import Dict
+
+from ..util import data_refactor
 from .parse_grid_data import parse_grid_data_new
 from .tb_cut import tel_cut
-from addict import Dict
-from ..util import data_refactor
-import numpy as np
-import numpy as np
+
 
 def temp_rebuild(temp:np.ndarray):
     # rebuild raw temp data to unit ℃

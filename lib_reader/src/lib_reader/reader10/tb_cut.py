@@ -1,7 +1,9 @@
-import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
-import dill as pkl
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+
 def get_tb_cut(utc:np.ndarray, bias:np.ndarray, bias_set:float, tol=0.2):
     # sci collect time
     time = utc[-1] - utc[0]
