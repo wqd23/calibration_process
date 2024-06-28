@@ -61,6 +61,7 @@ def __raw_plot(spectrum:Float_array_4channel, x:Float_array_4channel,title:str, 
         ax.set_xlabel('ADC/channel')
         ax.set_ylabel('count rate/cps')
         ax.grid()
+        ax.set_ylim([0,1.2*spectrum_ich.max()])
         # ax.set_xlim((0, 1000))
         # kwargs
         # log scale
