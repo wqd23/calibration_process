@@ -1,8 +1,10 @@
 from .parse_grid_data import parse_grid_data_new
+from .tb_cut import tel_cut
 from addict import Dict
 from ..util import data_refactor
 import numpy as np
 import numpy as np
+
 def temp_rebuild(temp:np.ndarray):
     # rebuild raw temp data to unit ℃
     t = temp/16/16
@@ -39,5 +41,7 @@ def single_read10(path:str):
     telExtracted.vMon = [20.57*2.5*telExtracted[f'sipm_voltage{i}']/4096 for i in range(4)]
     telExtracted.bias = [20.57*2.5*telExtracted[f'sipm_voltage{i}']/4096 - 499*2.5*telExtracted[f'sipm_current{i}']/4096/548.88 for i in range(4)]
 
+    # time cut
+    telExtracted = tel_cut(sciExtracted, telExtracted, path)
 
     return sciExtracted, telExtracted
