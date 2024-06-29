@@ -1,9 +1,9 @@
 [project]
 name = "lib-reader"
 version = "0.1.0"
-description = "Add your description here"
+description = "Reader for GRID 03B, 04, 05B, 07, 10B calibration data"
 authors = [
-    { name = "wqd", email = "2798730887@qq.com" }
+    { name = "wqd", email = "wqd.2019@tsinghua.org.cn" }
 ]
 dependencies = []
 readme = "README.md"
