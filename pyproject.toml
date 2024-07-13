@@ -21,6 +21,7 @@ dependencies = [
     "pandas>=2.0.3",
     "numba>=0.58.1",
     "addict>=2.4.0",
+    "cachier>=3.0.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

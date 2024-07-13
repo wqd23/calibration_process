@@ -17,6 +17,9 @@ raw_data
 *.png
 *.pickle
 
+# cache data
+.cache
+
 # result
 tb_logs/
 ec_logs/
