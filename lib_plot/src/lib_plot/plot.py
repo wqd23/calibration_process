@@ -187,7 +187,7 @@ def __fit_plot(spectrum:Float_array_4channel, x:Float_array_4channel, fit_result
             ax.set_xlim(plot_range[0]-3*sigma, plot_range[1]+3*sigma)
             ax.set_ylim(0, 1.2 * np.max(spectrum_ich[qplot]))
         else:
-            plt.text(x_ich[np.where(spectrum_ich==np.max(spectrum_ich))],max(spectrum_ich),"None fit range offered\n no fit for this channel")
+            plt.text(x_ich[np.where(spectrum_ich==np.max(spectrum_ich))][0],max(spectrum_ich),"None fit range offered\n no fit for this channel")
 
         ax.set_xlabel('ADC/channel')
         ax.set_ylabel('count rante/cps')

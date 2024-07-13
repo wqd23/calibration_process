@@ -16,8 +16,12 @@ def get_tb_cut(utc:np.ndarray, bias:np.ndarray, bias_set:float, tol=0.2):
     return q
 
 def extract_bias(file:str):
-    t = file.split('_')[-1].split('.')[0]
-    return int(t)/10.
+    if 'C_' in file:
+        # 温度偏压实验数据
+        t = file.split('_')[-1].split('.')[0]
+        return int(t)/10.
+    else:
+        return 28.5
 
 def tel_cut(sci, tel, file:str):
     bias_set = extract_bias(file)

@@ -41,6 +41,8 @@ def single_read10(path:str):
     # bias monitor, unit V
     telExtracted.vMon = [20.57*2.5*telExtracted[f'sipm_voltage{i}']/4096 for i in range(4)]
     telExtracted.bias = [20.57*2.5*telExtracted[f'sipm_voltage{i}']/4096 - 499*2.5*telExtracted[f'sipm_current{i}']/4096/548.88 for i in range(4)]
+    
+    sciExtracted['timestampEvt'] = sciExtracted.timestamp
 
     # time cut
     telExtracted = tel_cut(sciExtracted, telExtracted, path)

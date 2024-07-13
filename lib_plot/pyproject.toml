@@ -1,9 +1,9 @@
 [project]
 name = "lib-plot"
 version = "0.1.0"
-description = "Add your description here"
+description = "Plot librarry for GRID calibration"
 authors = [
-    { name = "wqd", email = "2798730887@qq.com" }
+    { name = "wqd", email = "wqd.2019@tsinghua.org.cn" }
 ]
 dependencies = []
 readme = "README.md"
