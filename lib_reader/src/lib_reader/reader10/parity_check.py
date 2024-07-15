@@ -22,8 +22,7 @@ crc16_ccitt_table = np.array([
 0xEF1F, 0xFF3E, 0xCF5D, 0xDF7C, 0xAF9B, 0xBFBA, 0x8FD9, 0x9FF8, 0x6E17, 0x7E36, 0x4E55, 0x5E74, 0x2E93, 0x3EB2, 0x0ED1, 0x1EF0
 ])
 
-# https://blog.csdn.net/weixin_47409662/article/details/120098915
-@jit
+@jit(forceobj=True)
 def crc16_xmodem_nd(data):
     '''
     data: must be numpy array and no more than 2 axis, dtype=np.uint8
@@ -35,7 +34,7 @@ def crc16_xmodem_nd(data):
             crc_result[i] = (crc_result[i]<<8) ^ crc16_ccitt_table[(crc_result[i]>>8) ^ data[i,j]]
     return crc_result
 
-@jit
+@jit(forceobj=True)
 def bcc_nd(data):
     '''
     data: must be numpy array and no more than 2 axis, dtype=np.uint8
