@@ -12,13 +12,13 @@ ec ver *flags:
 ecfit ver:
   python3 -m grid_calibration.process {{ver}} ecfit
 
-test ver:
+test ver n:
   @just tb {{ver}} list
-  @just tb {{ver}} run 0
+  @just tb {{ver}} run {{n}}
   @just ec {{ver}} x list
-  @just ec {{ver}} x run 0
+  @just ec {{ver}} x run {{n}}
   @just ec {{ver}} src list
-  @just ec {{ver}} src run 0
+  @just ec {{ver}} src run {{n}}
 
 init ver path:
   ln -s {{path}} ./data/{{ver}}/raw_data

@@ -37,7 +37,10 @@ class file_list_op:
 
     def __process_list(self, n_list: list):
         for n in n_list:
-            process(self.op, self.__get_file(n), fp_method=self.fp_method)
+            file = self.__get_file(n)
+            print(f"processing {file}", end=" ")
+            process(self.op, file, fp_method=self.fp_method)
+            print("done")
 
     # process the {n}th file of list, or "all" file
     def run(self, n, end=None):
