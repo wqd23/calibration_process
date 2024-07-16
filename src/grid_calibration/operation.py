@@ -431,7 +431,7 @@ class EC_operation_03B(EC_operation_05B):
         return [read_config, bkg_read_config, spectrum_config, fit_config]
 
 
-class TB_operation_07B(TB_operation_05B):
+class TB_operation_07(TB_operation_05B):
     def __init__(self, path, fit_range, save_path, save_fig_path, result_path) -> None:
         self.path = path
         #
@@ -461,7 +461,7 @@ class TB_operation_07B(TB_operation_05B):
         return [read_config, bkg_read_config, spectrum_config, fit_config]
 
 
-class EC_operation_07B(EC_operation_05B):
+class EC_operation_07(EC_operation_05B):
     def __init__(
         self,
         tb_result_path: str,

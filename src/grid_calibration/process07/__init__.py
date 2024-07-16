@@ -1,6 +1,6 @@
-from ..operation import EC_operation_07B, TB_operation_07B
+from ..operation import EC_operation_07, TB_operation_07
 
-tb_op = TB_operation_07B(
+tb_op = TB_operation_07(
     **{
         "path": "data/07/raw_data/北师大正样温度偏压标定数据-20211124",
         "fit_range": "data/07/single_process/fit_range.json",
@@ -9,7 +9,7 @@ tb_op = TB_operation_07B(
         "result_path": "data/07/tb_logs",
     }
 )
-ec_op = EC_operation_07B(
+ec_op = EC_operation_07(
     **{
         "tb_result_path": "data/07/single_process/20231120143925_temp_bias_fit.json",
         "fit_range": "data/07/single_process/fit_range.json",
