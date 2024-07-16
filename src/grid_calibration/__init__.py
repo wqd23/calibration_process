@@ -1,3 +1,6 @@
-
-def hello():
-    return "Hello from grid-calibration!"
+# -*- coding:utf-8 -*-
+"""
+process lib for GRID
+----------
+"""
+CFG_PATH = "src/grid_calibration/config.json"
