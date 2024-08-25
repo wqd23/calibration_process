@@ -21,6 +21,7 @@ process04 = VersionProcessOp(
     op.TB_operation_04(**cfg["04"]["tb"]),
     op.EC_operation_04(**cfg["04"]["ec"]),
     fp_method="04",
+    suffix='txt'
 )
 process05B = VersionProcessOp(
     op.TB_operation_05B(**cfg["05B"]["tb"]),
@@ -32,6 +33,7 @@ process07 = VersionProcessOp(
     op.TB_operation_07(**cfg["07"]["tb"]),
     op.EC_operation_07(**cfg["07"]["ec"]),
     fp_method="07",
+    suffix='txt'
 )
 
 process10B = VersionProcessOp(

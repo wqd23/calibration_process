@@ -56,18 +56,19 @@ class VersionProcessOp:
     '''
     commandline warpper for different payload
     '''
-    def __init__(self, tb_op, ec_op, fp_method) -> None:
+    def __init__(self, tb_op, ec_op, fp_method, suffix:str='dat') -> None:
         self.tb = file_list_op(tb_op.to_op())
         self.ec = {
             "x": file_list_op(ec_op.to_x_op(), fp_method=fp_method), 
             "src":file_list_op(ec_op.to_src_op())}
         self.__tb_op = tb_op
         self.__ec_op = ec_op
+        self.__suf = suffix
     def tbfit(self):
         data_all = self.__tb_op.load_data()
         self.__tb_op.temp_bias_fit(data_all)
     def ecfit(self):
-        x_res, src_res = util.get_fit_dict(self.__ec_op.save_path, self.__ec_op.energy)
+        x_res, src_res = util.get_fit_dict(self.__ec_op.save_path, self.__ec_op.energy, suffix=self.__suf)
 
         src_result = list(src_res.values())
         src_energy = list(src_res.keys())

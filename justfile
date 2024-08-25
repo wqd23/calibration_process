@@ -20,6 +20,14 @@ test ver n:
   @just ec {{ver}} src list
   @just ec {{ver}} src run {{n}}
 
+all ver:
+  @just tb {{ver}} run all
+  @just ec {{ver}} src run all
+  @just ec {{ver}} x run all
+
+cover:
+  coverage run --source src/ -m pytest tests/ && coverage report -m
+
 init ver path:
   ln -s {{path}} ./data/{{ver}}/raw_data
   mkdir ./data/{{ver}}/ec_logs

@@ -54,6 +54,7 @@ comm==0.2.1
     # via ipywidgets
 contourpy==1.1.0
     # via matplotlib
+coverage==7.6.1
 crc16==0.1.1
     # via grid-calibration
 crcmod==1.7
@@ -70,12 +71,14 @@ dill==0.3.7
     # via grid-calibration
 exceptiongroup==1.2.1
     # via anyio
+    # via pytest
 executing==2.0.1
     # via stack-data
 fastjsonschema==2.19.1
     # via nbformat
 fire==0.5.0
     # via grid-calibration
+flameprof==0.4
 fonttools==4.42.0
     # via matplotlib
 fqdn==1.5.1
@@ -96,6 +99,8 @@ importlib-metadata==8.0.0
     # via nbconvert
 importlib-resources==6.4.0
     # via matplotlib
+iniconfig==2.0.0
+    # via pytest
 ipykernel==6.29.0
     # via jupyter
     # via jupyter-console
@@ -221,6 +226,7 @@ packaging==23.1
     # via jupyterlab-server
     # via matplotlib
     # via nbconvert
+    # via pytest
     # via qtconsole
     # via qtpy
 pandas==2.0.3
@@ -237,6 +243,8 @@ pillow==10.0.0
     # via matplotlib
 platformdirs==4.1.0
     # via jupyter-core
+pluggy==1.5.0
+    # via pytest
 portalocker==2.10.0
     # via cachier
 prometheus-client==0.19.0
@@ -260,6 +268,7 @@ pygments==2.17.2
     # via qtconsole
 pyparsing==3.0.9
     # via matplotlib
+pytest==8.3.2
 python-dateutil==2.8.2
     # via arrow
     # via jupyter-client
@@ -324,6 +333,7 @@ tinycss2==1.2.1
     # via nbconvert
 tomli==2.0.1
     # via jupyterlab
+    # via pytest
 tornado==6.4
     # via ipykernel
     # via jupyter-client

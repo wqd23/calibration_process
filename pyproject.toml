@@ -34,6 +34,9 @@ build-backend = "hatchling.build"
 managed = true
 dev-dependencies = [
     "jupyter>=1.0.0",
+    "pytest>=8.3.2",
+    "coverage>=7.6.1",
+    "flameprof>=0.4",
 ]
 
 [tool.hatch.metadata]

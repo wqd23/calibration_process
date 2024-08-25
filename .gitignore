@@ -19,6 +19,8 @@ raw_data
 
 # cache data
 .cache
+.coverage
+.pytest_cache
 
 # result
 tb_logs/
