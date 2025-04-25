@@ -5,6 +5,7 @@ GRID version independent Functions Library
 
 Basic functions for GRID data processing\n
 """
+
 import lib_reader.reader05.gridBasicFunctions as basic
 from lib_reader.reader05.my_type import *
 
@@ -216,7 +217,6 @@ def temp_bias_lmfit(
     bias: Float1D,
     bias_err: Float1D,
 ):
-
     data = np.stack([temp, bias, center], axis=1)
     error = np.stack([temp_err, bias_err, center_err], axis=1)
     model = lmfit.Model(tempbias2DFunctionInternal)

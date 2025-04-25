@@ -3,8 +3,11 @@
 command line interface for calibration function
 ----------
 """
+
 from .operation import Operation, process
 from . import util_lib as util
+
+
 class file_list_op:
     def __init__(self, op: Operation, fp_method=None) -> None:
         self.files = op.files
@@ -52,23 +55,30 @@ class file_list_op:
             else:
                 self.__process_list(range(n, end + 1))
 
+
 class VersionProcessOp:
-    '''
+    """
     commandline warpper for different payload
-    '''
-    def __init__(self, tb_op, ec_op, fp_method, suffix:str='dat') -> None:
+    """
+
+    def __init__(self, tb_op, ec_op, fp_method, suffix: str = "dat") -> None:
         self.tb = file_list_op(tb_op.to_op())
         self.ec = {
-            "x": file_list_op(ec_op.to_x_op(), fp_method=fp_method), 
-            "src":file_list_op(ec_op.to_src_op())}
+            "x": file_list_op(ec_op.to_x_op(), fp_method=fp_method),
+            "src": file_list_op(ec_op.to_src_op()),
+        }
         self.__tb_op = tb_op
         self.__ec_op = ec_op
         self.__suf = suffix
+
     def tbfit(self):
         data_all = self.__tb_op.load_data()
         self.__tb_op.temp_bias_fit(data_all)
+
     def ecfit(self):
-        x_res, src_res = util.get_fit_dict(self.__ec_op.save_path, self.__ec_op.energy, suffix=self.__suf)
+        x_res, src_res = util.get_fit_dict(
+            self.__ec_op.save_path, self.__ec_op.energy, suffix=self.__suf
+        )
 
         src_result = list(src_res.values())
         src_energy = list(src_res.keys())
