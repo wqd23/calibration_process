@@ -3,4 +3,4 @@
 process lib for GRID
 ----------
 """
-CFG_PATH = "src/grid_calibration/config.json"
+CFG_PATH = "src/calibration_process/config.json"

@@ -25,3 +25,6 @@ raw_data
 # result
 tb_logs/
 ec_logs/
+*.zip
+
+.vscode

@@ -1,5 +1,5 @@
 [project]
-name = "grid-calibration"
+name = "calibration_process"
 version = "0.1.0"
 description = "calibration process for GRID"
 authors = [
@@ -30,26 +30,23 @@ requires-python = ">= 3.8"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.rye]
-managed = true
-dev-dependencies = [
-    "jupyter>=1.0.0",
-    "pytest>=8.3.2",
+[dependency-groups]
+dev = [
     "coverage>=7.6.1",
     "flameprof>=0.4",
+    "jupyter>=1.1.1",
+    "pytest>=8.3.5",
 ]
-
 [tool.hatch.metadata]
 allow-direct-references = true
 
-[tool.rye.scripts]
-main = {call = "grid_calibration.main:main", help = "Main entry point."}
-tb07 = {call = "grid_calibration.process07.temp_bias"}
-tbfit07 = {call = "grid_calibration.process07.temp_fit"}
-[[tool.rye.sources]]
-name = "tuna_source"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+[tool.uv.sources]
+lib_reader = { workspace = true }
+lib_plot = { workspace = true }
 
-[tool.rye.workspace]
-members = ["*"]
+[tool.uv.workspace]
+members = ["lib_plot", "lib_reader"]
 
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/calibration_process"]

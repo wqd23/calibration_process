@@ -20,7 +20,7 @@ import lib_reader.reader05.gridBasicFunctions as basic
 from lib_reader.reader05.my_type import *
 import nptyping as npt
 
-from grid_calibration.util_lib import resolutionFunction, headtime
+from calibration_process.util_lib import resolutionFunction, headtime
 
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -249,7 +249,7 @@ def fit_err_plot_2d(data:npt.NDArray[npt.Shape["*,2"], npt.Floating], zdata:Floa
     y = np.arange(np.min(ydata)-1, np.max(ydata)+1)
     xx,yy = np.meshgrid(x,y)
     zz = func(np.stack((xx,yy), axis=1))
-    fig = plt.figure(figsize=(10, 5))
+    fig = plt.figure(figsize=(20, 10))
     if title != None:
         fig.suptitle(title)
     # 3d plot

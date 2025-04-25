@@ -1,13 +1,13 @@
 # 如何使用
 
-本仓库使用[rye](https://rye-up.com/)管理python环境，并使用[just](https://github.com/casey/just)展示使用方法。但是实际使用的python版本与依赖可以在`.python-version`与`pyproject.toml`中查看并手动配置；下文中介绍的just命令也可以在`justfile`中查看其实际命令。
+本仓库使用[uv](https://docs.astral.sh/uv/)管理python环境，并使用[just](https://github.com/casey/just)展示使用方法。但是实际使用的python版本与依赖可以在`.python-version`与`pyproject.toml`中查看并手动配置；下文中介绍的just命令也可以在`justfile`中查看其实际命令。
 
 ## 初次使用
 
 初次使用时需要先完成python环境配置与标定数据软链接及目录创建，请注意`just init`中`ver`为载荷版本号，使用`just`命令查看可选版本，`path`为载荷标定数据文件路径。
 
 ```bash
-rye sync                 # 可能耗时较长，请耐心等待
+uv sync
 just init {ver} {path}
 ```
 
@@ -73,5 +73,4 @@ just ec {ver} src run {idx}
 其中`./data/{ver}/raw_data`指向实际标定数据。
 
 # TODO
-- [ ] 处理数据包中，没有4 channel的数据
-- [ ] operation 拆分
+- [ ] 10B, 11B简易EC关系
