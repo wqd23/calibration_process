@@ -715,7 +715,7 @@ class TB_operation_10B(TB_operation_05B):
             if "observe" in file and "50C_265" not in file
         ]
         self.adc_max = 16384.0
-        self.source = "Am241"
+        self.source = "Na22"
 
         self.fit_range = util.json_load(fit_range)
         self.bin_width = 6

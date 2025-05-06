@@ -25,7 +25,6 @@ def single_read10(path:str):
         amp = sciExtracted.data_max - sciExtracted.data_base/4.
     else:
         assert False, f'{path} data_max.len != data_base.len'
-        amp = sciExtracted.data_max - np.mean(sciExtracted.data_base/4.)
     sciExtracted.amp = amp
 
     n = sciExtracted.data_max.shape[0]

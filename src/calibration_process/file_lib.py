@@ -122,6 +122,8 @@ class File_operation_05b:
             data = ver.single_read04(config.path)
         elif config.ending == "10b":
             data = ver.single_read10(config.path)
+        elif config.ending == "11b":
+            data = ver.single_read11(config.path, config.kwarg.get("mode", "wf"))
         else:
             raise ValueError(f"ending {config.ending} not supported")
         if config.time_cut != None:
@@ -129,7 +131,7 @@ class File_operation_05b:
         return data
 
     def read_out(self):
-        if self.bkg_read_config.path != "":
+        if self.bkg_read_config.path:
             self.bkg_sci, self.bkg_tel = self.__read(self.bkg_read_config)
         return self.__read(self.read_config)
 
@@ -174,7 +176,7 @@ class File_operation_05b:
             spectrum, spectrum_err, self.sci["timestampEvt"]
         )
 
-        if self.bkg_read_config.path != "":
+        if self.bkg_read_config.path:
             bkg_corr = util.tb_corr(
                 self.spectrum_config.corr,
                 self.bkg_tel["tempSipm"],
