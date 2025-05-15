@@ -84,13 +84,13 @@ def raw_plot(
     title: str,
     save_path: Optional[str] = None,
     **kwargs,
-):
+) -> Optional[plt.Figure]:
     fig, axs = __raw_plot(spectrum, x, title, **kwargs)
     if save_path != None:
         fig.savefig(save_path)
         plt.close(fig)
     else:
-        plt.show()
+        return fig
 
 
 def fit_plot_single_channel(
