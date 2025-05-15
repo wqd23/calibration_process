@@ -896,6 +896,7 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
     read_config, bkg_read_config, spectrum_config, fit_config = config
     fp = fp_method(config)
     fp.get_spectrum()
+    # plot raw spectrum
     if kw_args.get("x_lim", None) is not None:
         plot.raw_plot(
             fp.spectrum,
@@ -905,6 +906,7 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
             save_path=kw_args.get("save_path", None),
         )
         return
+    # fit and save fit result
     fp.peak_fit()
     file = os.path.splitext(file)[0]
     plot.fit_plot(
