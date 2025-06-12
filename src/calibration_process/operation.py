@@ -58,7 +58,7 @@ class TB_operation_05B:
             )
             for file in self.files
         )
-        data_all = [[], [], []]
+        data_all = [[], [], [], []]
         for tb in data:
             fit_4ch = tb["fit_result"]
             tel_4ch = [
@@ -872,7 +872,6 @@ def __get_fp03B(config) -> file_lib.File_operation_05b:
     fp.sci, fp.tel = sci, tel
     fp.bkg_sci, fp.bkg_tel = bkg_sci, bkg_tel
     return fp
-
 
 def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
     """process file in sinlge experiment, like specific temp bias or photon energy
