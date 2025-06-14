@@ -9,10 +9,14 @@ import matplotlib.pyplot as plt
 
 
 def config_import(type, config):
-    if isinstance(config, type):
+    if isinstance(config, dict):
+        return type(**config)
+    elif isinstance(config, type):
         return config
     else:
-        return type(config)
+        raise TypeError(
+            f"config should be dict or {type.__name__}, but got {type(config).__name__}"
+        )
 
 
 @dataclass
@@ -46,7 +50,7 @@ class Spectrum_config:
 
 @dataclass
 class Fit_config:
-    fit_range: List[List[float]]
+    fit_range: List[List[float]] = field(default_factory=lambda: [[None, None]] * 4)
     bkg_form: str = "lin"
 
 

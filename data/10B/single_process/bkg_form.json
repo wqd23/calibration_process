@@ -5,7 +5,7 @@
     "077_observe_Co60.dat": "lin",
     "100": "gaus",
     "110": "gaus",
-    "15": null,
+    "15": "lin",
     "20": null,
     "25": null,
     "30": null,

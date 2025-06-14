@@ -6,7 +6,7 @@ command line interface for calibration function
 
 from .operation import Operation, process
 from . import util_lib as util
-
+from pathlib import Path
 
 class file_list_op:
     def __init__(self, op: Operation, fp_method=None) -> None:
@@ -84,4 +84,24 @@ class VersionProcessOp:
         src_energy = list(src_res.keys())
         x_result = list(x_res.values())
         x_energy = list(x_res.keys())
+        self.__ec_op.ec_fit(src_result, src_energy, x_result, x_energy)
+
+class VersionProcessOp10B(VersionProcessOp):
+    """
+    commandline warpper for 10B payload
+    """
+    def __init__(self, tb_op, ec_op, fp_method, suffix: str = "dat") -> None:
+        super().__init__(tb_op, ec_op, fp_method, suffix)
+        self.__tb_op = tb_op
+        self.__ec_op = ec_op
+        self.__suf = suffix
+    def ecfit(self):
+        energy = self.__ec_op.energy
+        save_path = Path(self.__ec_op.save_path)
+        x_file = [k for k in energy.keys() if "observe" not in k]
+        x_energy = [energy[k] for k in x_file]
+        x_result = [util.pickle_load(save_path / f"{x}.pickle")["fit_result"] for x in x_file]
+        src_file = [k for k in energy.keys() if "observe" in k]
+        src_energy = [energy[k] for k in src_file]
+        src_result = [util.pickle_load((save_path / src).with_suffix('.pickle'))["fit_result"] for src in src_file]
         self.__ec_op.ec_fit(src_result, src_energy, x_result, x_energy)

@@ -90,7 +90,7 @@
             "result_path": "data/10B/tb_logs"
         },
         "ec": {
-            "tb_result_path": "data/10B/tb_logs/20240629150801_temp_bias_fit.json",
+            "tb_result_path": "data/10B/single_process/20250612172538_temp_bias_fit.json",
             "fit_range": "data/10B/single_process/fit_range.json",
             "energy": "data/10B/single_process/ec_energy.json",
             "bkg_form": "data/10B/single_process/bkg_form.json",

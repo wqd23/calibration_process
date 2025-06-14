@@ -58,7 +58,7 @@ class TB_operation_05B:
             )
             for file in self.files
         )
-        data_all = [[], [], []]
+        data_all = [[], [], [], []]
         for tb in data:
             fit_4ch = tb["fit_result"]
             tel_4ch = [
@@ -218,7 +218,7 @@ class EC_operation_05B:
     def to_src_op(self):
         return Operation(self.src_list, lambda file: self.src_config(file), self)
 
-    def __center_fit(self, energy: Float1D, center: Float1D, center_err: Float1D):
+    def center_fit(self, energy: Float1D, center: Float1D, center_err: Float1D):
         popt, pcov = np.polyfit(
             center, energy, deg=2, full=False, cov=True, w=1.0 / center_err
         )
@@ -250,10 +250,10 @@ class EC_operation_05B:
         q_high = energy >= self.energy_split_high
         result = [{}, {}, {}, {}]
         for i in range(4):
-            ec_low, ec_low_err = self.__center_fit(
+            ec_low, ec_low_err = self.center_fit(
                 energy[q_low], center[i][q_low], center_err[i][q_low]
             )
-            ec_high, ec_high_err = self.__center_fit(
+            ec_high, ec_high_err = self.center_fit(
                 energy[q_high], center[i][q_high], center_err[i][q_high]
             )
             resolution_low, resolution_low_err = self.resolution_fit(
@@ -807,8 +807,9 @@ class EC_operation_10B(EC_operation_05B):
             file_lib.Read_config(ch_file, ending="10b")
             for ch_file in self.__get_x_files(energy_name)
         ]
-        bkg_read_config = read_config[1:4]
-        bkg_read_config.append(read_config[0])
+        # bkg_read_config = read_config[1:4]
+        # bkg_read_config.append(read_config[0])
+        bkg_read_config = [read_config[1], read_config[2], read_config[0], read_config[0]]
         spectrum_config = file_lib.Spectrum_config(
             corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
         )
@@ -833,6 +834,72 @@ class EC_operation_10B(EC_operation_05B):
             self.fit_range[basename], self.bkg_form[basename]
         )
         return [read_config, bkg_read_config, spectrum_config, fit_config]
+    
+    def ec_fit(self, src_result, src_energy, x_result, x_energy):
+        result = src_result + x_result
+        energy = src_energy + x_energy
+        CHN_NUM = 3
+        data = sorted(list(zip(energy, result)), key=lambda x: x[0])
+        energy = np.array(list(map(lambda x: x[0], data)))
+        center = [np.array([fit[i]["b"] for _, fit in data]) for i in range(CHN_NUM)]
+        center_err = [np.array([fit[i]["b_err"] for _, fit in data]) for i in range(CHN_NUM)]
+        resolution = [
+            np.array([fit[i]["resolution"] for _, fit in data]) for i in range(CHN_NUM)
+        ]
+        resolution_err = [
+            np.array([fit[i]["resolution_err"] for _, fit in data]) for i in range(CHN_NUM)
+        ]
+        q_low = energy < self.energy_split_low
+        q_high = energy >= self.energy_split_high
+        result = [{}, {}, {}, {}]
+        for i in range(CHN_NUM):
+            ec_low, ec_low_err = self.center_fit(
+                energy[q_low], center[i][q_low], center_err[i][q_low]
+            )
+            ec_high, ec_high_err = self.center_fit(
+                energy[q_high], center[i][q_high], center_err[i][q_high]
+            )
+            resolution_low, resolution_low_err = self.resolution_fit(
+                energy[q_low], resolution[i][q_low], resolution_err[i][q_low]
+            )
+            resolution_high, resolution_high_err = self.resolution_fit(
+                energy[q_high], resolution[i][q_high], resolution_err[i][q_high]
+            )
+
+            result[i] = {
+                "channel": i,
+                "EC_low": ec_low,
+                "EC_low_err": ec_low_err,
+                "EC_high": ec_high,
+                "EC_high_err": ec_high_err,
+                "resolution_low": resolution_low,
+                "resolution_low_err": resolution_low_err,
+                "resolution_high": resolution_high,
+                "resolution_high_err": resolution_high_err,
+            }
+            fit_name = f"ec_coef_sci_ch{i}.json"
+            util.json_save(result[i], f"{self.result_path}/{util.headtime(fit_name)}")
+            save_data = np.array([energy, center[i]], dtype=np.float64)
+            data_name = f"ec_data_ch{i}.npy"
+            np.save(f"{self.result_path}/{util.headtime(data_name)}", arr=save_data)
+        # 临时补丁，让数据为四通道
+        center = [center[0], center[1], center[2], center[0]]
+        result = [result[0], result[1], result[2], result[0]]
+        src_result = [[s[0], s[1], s[2], s[0]] for s in src_result]
+        x_result = [[s[0], s[1], s[2], s[0]] for s in x_result]
+        plot.ec_plot(
+            energy,
+            center,
+            result,
+            src_energy,
+            x_energy,
+            src_result,
+            x_result,
+            self.result_path,
+            self.energy_split_low,
+            self.energy_split_high,
+        )
+        return result
 
 
 def __get_fp05B(config) -> file_lib.File_operation_05b:
@@ -873,7 +940,6 @@ def __get_fp03B(config) -> file_lib.File_operation_05b:
     fp.bkg_sci, fp.bkg_tel = bkg_sci, bkg_tel
     return fp
 
-
 def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
     """process file in sinlge experiment, like specific temp bias or photon energy
 
@@ -896,6 +962,7 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
     read_config, bkg_read_config, spectrum_config, fit_config = config
     fp = fp_method(config)
     fp.get_spectrum()
+    # plot raw spectrum
     if kw_args.get("x_lim", None) is not None:
         plot.raw_plot(
             fp.spectrum,
@@ -905,6 +972,7 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
             save_path=kw_args.get("save_path", None),
         )
         return
+    # fit and save fit result
     fp.peak_fit()
     file = os.path.splitext(file)[0]
     plot.fit_plot(
