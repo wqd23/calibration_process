@@ -279,101 +279,77 @@ class File_operation_05b:
         util.pickle_save(data, path)
 
 
-def raw_plot(file: str, bin_width=2, bkg="", ending="normal", config=""):
-    read_config = Read_config(file, ending=ending, config_file=config)
-    bkg_read_config = Read_config(bkg, ending=ending)
-    spectrum_config = Spectrum_config(bin_width=bin_width)
-    fp = File_operation_05b(file, read_config, bkg_read_config, spectrum_config)
-    fp.get_spectrum()
-    plot.raw_plot(fp.spectrum, fp.x, title=f"{os.path.basename(file)}")
-
-
-def corr_plot(
-    file: str,
-    tb_corr,
-    bin_width=2,
-    bkg="",
-    ending="normal",
-    config="",
-    ref_temp=25,
-    ref_bias=28.5,
-):
-    read_config = Read_config(file, ending=ending, config_file=config)
-    bkg_read_config = Read_config(bkg, ending=ending, config_file=config)
-    ref_func = [
-        lambda t, b: util.tempbias2DFunction(
-            ref_temp, ref_bias, c["G0"], c["k"], c["V0"], c["b"], c["c"]
-        )
-        for c in tb_corr
-    ]
-    corr = [lambda t, b: f(ref_temp, ref_bias) / f(t, b) for f in ref_func]
-    spectrum_config = Spectrum_config(corr=corr, bin_width=bin_width)
-    fp = File_operation_05b(file, read_config, bkg_read_config, spectrum_config)
-    fp.get_spectrum()
-    plot.raw_plot(fp.spectrum, fp.x, title=f"{os.path.basename(file)}")
-
-
-def fit_plot(
-    file: str,
-    tb_corr,
-    fit_range,
-    time_cut=None,
-    bkg_time_cut=None,
-    bkg_form="lin",
-    bin_width=2,
-    bkg="",
-    ending="normal",
-    config="",
-    ref_temp=25,
-    ref_bias=28.5,
-):
-    read_config = Read_config(
-        file, ending=ending, config_file=config, time_cut=time_cut
+@dataclass
+class Fit_cfg4ch:
+    """settings for 4 channel fit"""
+    fit_range: List[List[float]] = field(default_factory=lambda: [[None, None]] * 4)
+    bkg_form: List[str] = field(
+        default_factory=lambda: ["lin"] * 4
     )
-    bkg_read_config = Read_config(
-        bkg, ending=ending, config_file=config, time_cut=bkg_time_cut
-    )
-    ref_func = [
-        lambda t, b: util.tempbias2DFunction(
-            ref_temp, ref_bias, c["G0"], c["k"], c["V0"], c["b"], c["c"]
-        )
-        for c in tb_corr
-    ]
-    corr = [lambda t, b: f(ref_temp, ref_bias) / f(t, b) for f in ref_func]
-    spectrum_config = Spectrum_config(corr=corr, bin_width=bin_width)
-    fit_config = Fit_config(fit_range, bkg_form=bkg_form)
-    fp = File_operation_05b(
-        file, read_config, bkg_read_config, spectrum_config, fit_config
-    )
-    fp.get_spectrum()
-    fp.peak_fit()
-    plot.fit_plot(
-        fp.spectrum,
-        fp.x,
-        fp.fit_result,
-        title=f"{os.path.basename(file)}",
-        bkgForm=bkg_form,
-        fit_range=fit_range,
+    peak_form: List[str] = field(
+        default_factory=lambda: ["gaus"] * 4
     )
 
+class File_operation_10b(File_operation_05b):
+    """settings and functions for transfer 4 channel data file into data point with error, with compton fitting ability"""
+    def __init__(
+        self,
+        read_config: Union[Read_config, Dict[str, Any]] = {},
+        bkg_read_config: Union[Read_config, Dict[str, Any]] = {},
+        spectrum_config: Union[Spectrum_config, Dict[str, Any]] = {},
+        fit_config: Union[Fit_cfg4ch, Dict[str, Any]] = {}):
+        path = read_config.path if isinstance(read_config, Read_config) else read_config["path"]
+        super().__init__(path, read_config, bkg_read_config, spectrum_config)
+        self.fit_config = config_import(Fit_cfg4ch, fit_config)
+        # read_config use a mutable {} as default value, read_config should never be changed
+        del read_config, bkg_read_config, spectrum_config, fit_config
+        self.sci, self.tel = self.read_out()
+    
+    def peak_fit(self, **kwargs):
+        fit_result = []
+        for ich, (x, spectrum, spectrum_err, x_range, time, bkg, peak) in enumerate(
+            zip(
+                self.x,
+                self.spectrum,
+                self.spectrum_err,
+                self.fit_config.fit_range,
+                self.time,
+                self.fit_config.bkg_form,
+                self.fit_config.peak_form
+            )
+        ):
+            if x_range == None:
+                fit_result.append(None)
+                continue
+            q = (x >= x_range[0]) * (x <= x_range[1])
 
-if __name__ == "__main__":
-    plt.ioff()
-    path = "../GRID05B标定数据/X光机实验-天格_reset/src_Am241_10cm_rundata2022-04-18-17-03-30.dat"
-    bkg = "../GRID05B标定数据/X光机实验-天格_reset/XM_100_026_observe.dat"
-    config = ""
-    tb_corr = util.json_load("logs/tb_result_20230214191431.json")
-    range_file = util.json_load("fit_range.json")
-    time_file = util.json_load("time_cut.json")
-    bkg_time = {k: [v[1], v[2], v[3], v[0]] for k, v in time_file.items()}
-    basename = os.path.basename(path)
-    fit_plot(
-        path,
-        tb_corr=tb_corr,
-        bkg=bkg,
-        ending="xray",
-        config=config,
-        fit_range=range_file[basename],
-        time_cut=time_file[basename],
-        bkg_time_cut=bkg_time[basename],
-    )
+            try:
+                result = peak_fit(
+                    x[q],
+                    spectrum[q],
+                    spectrum_err[q],
+                    peak_form=peak,
+                    bkg_form=bkg,
+                    **kwargs
+                )
+            except Exception as e:
+                print(e)
+                raise util.FitError(f"failed to fit {self.path} channel {ich}")
+            rate = result["peak_amplitude"]
+            rate_err = np.sqrt(rate / time)
+            fit_result.append(
+                {
+                    "a": result["peak_amplitude"],
+                    "b": result["peak_center"],
+                    "c": result["peak_sigma"],
+                    "a_err": result["peak_amplitude_err"],
+                    "b_err": result["peak_center_err"],
+                    "c_err": result["peak_sigma_err"],
+                    "rate": rate,
+                    "rate_err": rate_err,
+                    "resolution": result["peak_resolution"],
+                    "resolution_err": result["peak_resolution_err"],
+                    "bkg": result["bkg"]
+                }
+            )
+        self.fit_result = fit_result
