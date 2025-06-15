@@ -1,12 +1,9 @@
 import lib_reader as ver
-import lib_plot as plot
 from . import util_lib as util
 from lib_reader.reader05.my_type import *
 from dataclasses import dataclass, field
-import os
-
-import matplotlib.pyplot as plt
-
+from .fitting import peak_fit
+import numpy as np
 
 def config_import(type, config):
     if isinstance(config, dict):
@@ -64,7 +61,7 @@ class File_operation_05b:
         bkg_read_config: Union[Read_config, Dict[str, Any]] = {},
         spectrum_config: Union[Spectrum_config, Dict[str, Any]] = {},
         fit_config: Union[Fit_config, Dict[str, Any]] = {},
-        from_npy=None,
+        nocache=False,
     ) -> None:
         self.path = path
         # config import
@@ -76,12 +73,8 @@ class File_operation_05b:
         # read_config use a mutable {} as default value, read_config should never be changed
         del read_config, bkg_read_config, spectrum_config, fit_config
 
-        # data readout
-        if from_npy is None:
-            self.sci, self.tel = self.read_out()
-        else:
-            # not test
-            self.sci, self.tel = util.data_load(from_npy)
+        # data readout=
+        self.sci, self.tel = self.read_out(nocache=nocache)
         # # get spectrum
         # self.get_spectrum()
         # # peak fit
@@ -110,34 +103,34 @@ class File_operation_05b:
         return sci, tel
 
     def __read(
-        self, config: Read_config
+        self, config: Read_config, nocache: bool = False
     ) -> Tuple[Dict[str, Float_array_4channel], Dict[str, Float_array_4channel]]:
         if config.ending == "normal":
-            data = ver.single_read05b_normal(config.path)
+            data = ver.single_read05b_normal(config.path, overwrite_cache=nocache)
         elif config.ending == "xray":
-            data = ver.single_read05b_xray(config.path, config.config_file)
+            data = ver.single_read05b_xray(config.path, config.config_file, overwrite_cache=nocache)
         elif config.ending == "03b":
-            data = ver.single_read03b(config.path, config.config_file)
+            data = ver.single_read03b(config.path, config.config_file, overwrite_cache=nocache)
         elif config.ending == "03b-src":
-            data = ver.src_read03b(config.path, config.config_file)
+            data = ver.src_read03b(config.path, config.config_file, overwrite_cache=nocache)
         elif config.ending == "07":
-            data = ver.single_read07(config.path)
+            data = ver.single_read07(config.path, overwrite_cache=nocache)
         elif config.ending == "04":
-            data = ver.single_read04(config.path)
+            data = ver.single_read04(config.path, overwrite_cache=nocache)
         elif config.ending == "10b":
-            data = ver.single_read10(config.path)
+            data = ver.single_read10(config.path, overwrite_cache=nocache)
         elif config.ending == "11b":
-            data = ver.single_read11(config.path, config.kwarg.get("mode", "wf"))
+            data = ver.single_read11(config.path, config.kwarg.get("mode", "wf"), overwrite_cache=nocache)
         else:
             raise ValueError(f"ending {config.ending} not supported")
         if config.time_cut != None:
             data = self.__time_cut(data, config.time_cut)
         return data
 
-    def read_out(self):
+    def read_out(self, nocache=False):
         if self.bkg_read_config.path:
-            self.bkg_sci, self.bkg_tel = self.__read(self.bkg_read_config)
-        return self.__read(self.read_config)
+            self.bkg_sci, self.bkg_tel = self.__read(self.bkg_read_config, nocache=nocache)
+        return self.__read(self.read_config, nocache=nocache)
 
     def __raw_spectrum(self, amp, bin_width, spec_range):
         spectrum, spectrum_err, x = util.count(

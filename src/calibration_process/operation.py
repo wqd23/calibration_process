@@ -4,11 +4,8 @@ from lib_reader.reader05.my_type import *
 from lib_plot import plot
 import os
 import numpy as np
-from dataclasses import dataclass
-import json
-import matplotlib.pyplot as plt
 from . import file_lib
-
+from pathlib import Path
 
 class Operation:
     """wrapper for tb_op, x of ec_op, and src of ec_op"""
@@ -760,7 +757,7 @@ class EC_operation_10B(EC_operation_05B):
             for c in tb_result
         ]
         self.corr = [lambda t, b: f(ref_temp, ref_bias) / f(t, b) for f in ref_func]
-        self.adc_max = 65535.0
+        self.adc_max = 16384.0
         self.bin_width = 4
         # fit config
         self.fit_range = util.json_load(fit_range)
@@ -901,9 +898,8 @@ class EC_operation_10B(EC_operation_05B):
         )
         return result
 
-
-def __get_fp05B(config) -> file_lib.File_operation_05b:
-    return file_lib.File_operation_05b(config[0].path, *config)
+def __get_fp05B(config, nocache=False) -> file_lib.File_operation_05b:
+    return file_lib.File_operation_05b(config[0].path, *config, nocache=nocache)
 
 
 def __dict_4ch_reconstruct(dict_4ch):
@@ -919,7 +915,7 @@ def __dict_4ch_reconstruct(dict_4ch):
     return dict_4ch_re
 
 
-def __get_fp03B(config) -> file_lib.File_operation_05b:
+def __get_fp03B(config, nocache=False) -> file_lib.File_operation_05b:
     read_config, bkg_read_config, spectrum_config, fit_config = config
     fps = [
         file_lib.File_operation_05b(
@@ -928,6 +924,7 @@ def __get_fp03B(config) -> file_lib.File_operation_05b:
             bkg_read_config[i],
             spectrum_config,
             fit_config,
+            nocache=nocache
         )
         for i in range(4)
     ]
@@ -960,7 +957,7 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
     fp_method = __get_fp05B if fp_method is None else __get_fp03B
     config = op.file_config(file)
     read_config, bkg_read_config, spectrum_config, fit_config = config
-    fp = fp_method(config)
+    fp = fp_method(config, nocache=kw_args.get("nocache", False))
     fp.get_spectrum()
     # plot raw spectrum
     if kw_args.get("x_lim", None) is not None:

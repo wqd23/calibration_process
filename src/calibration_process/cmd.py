@@ -29,31 +29,32 @@ class file_list_op:
             print(i, file)
 
     # plot the raw figure of {n}th file, within(left, right)
-    def raw(self, n, left, right, save_path=None):
+    def raw(self, n, left, right, save_path=None, nocache=False):
         process(
             self.op,
             self.__get_file(n),
             fp_method=self.fp_method,
             x_lim=[left, right],
             save_path=save_path,
+            nocache=nocache
         )
 
-    def __process_list(self, n_list: list):
+    def __process_list(self, n_list: list, nocache=False):
         for n in n_list:
             file = self.__get_file(n)
             print(f"processing {file}", end=" ")
-            process(self.op, file, fp_method=self.fp_method)
+            process(self.op, file, fp_method=self.fp_method, nocache=nocache)
             print("done")
 
     # process the {n}th file of list, or "all" file
-    def run(self, n, end=None):
+    def run(self, n, end=None, nocache=False):
         if n == "all":
-            self.__process_list(range(len(self.files)))
+            self.__process_list(range(len(self.files)), nocache=nocache)
         else:
             if end is None:
-                self.__process_list([n])
+                self.__process_list([n], nocache=nocache)
             else:
-                self.__process_list(range(n, end + 1))
+                self.__process_list(range(n, end + 1), nocache=nocache)
 
 
 class VersionProcessOp:
@@ -67,24 +68,24 @@ class VersionProcessOp:
             "x": file_list_op(ec_op.to_x_op(), fp_method=fp_method),
             "src": file_list_op(ec_op.to_src_op()),
         }
-        self.__tb_op = tb_op
-        self.__ec_op = ec_op
-        self.__suf = suffix
+        self.tb_op = tb_op
+        self.ec_op = ec_op
+        self.suf = suffix
 
     def tbfit(self):
-        data_all = self.__tb_op.load_data()
-        self.__tb_op.temp_bias_fit(data_all)
+        data_all = self.tb_op.load_data()
+        self.tb_op.temp_bias_fit(data_all)
 
     def ecfit(self):
         x_res, src_res = util.get_fit_dict(
-            self.__ec_op.save_path, self.__ec_op.energy, suffix=self.__suf
+            self.ec_op.save_path, self.ec_op.energy, suffix=self.suf
         )
 
         src_result = list(src_res.values())
         src_energy = list(src_res.keys())
         x_result = list(x_res.values())
         x_energy = list(x_res.keys())
-        self.__ec_op.ec_fit(src_result, src_energy, x_result, x_energy)
+        self.ec_op.ec_fit(src_result, src_energy, x_result, x_energy)
 
 class VersionProcessOp10B(VersionProcessOp):
     """

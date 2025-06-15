@@ -331,7 +331,7 @@ def json_save(data, path: str):
         full path "path/to/file.json"
     """
     with open(path, "w") as f:
-        f.write(json.dumps(data))
+        f.write(json.dumps(data, ensure_ascii=False))
 
 
 def timestamp(format="%Y%m%d%H%M%S"):
@@ -546,3 +546,7 @@ def data_load(path):
         else:
             print(f"key {header} not found")
     return sci, tel
+
+def not_contain(path, *keyword):
+    """检查路径是否不包含指定的关键字"""
+    return not any(k in str(path) for k in keyword)
