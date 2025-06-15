@@ -898,6 +898,51 @@ class EC_operation_10B(EC_operation_05B):
         )
         return result
 
+class TB_operation_11B(TB_operation_05B):
+    def __init__(self, path, fit_range, save_path, save_fig_path, result_path) -> None:
+        self.path = path
+        # 全路径
+        self.tb_files = self.get_tb_files(self.path)
+        # 文件名
+        self.files = [Path(f).name for f in self.tb_files]
+        self.adc_max = 16384.0
+        self.source = "Cs137"
+
+        self.fit_range = util.json_load(fit_range)
+        self.bin_width = 6
+        self.save_path = save_path
+        self.save_fig_path = save_fig_path
+        self.result_path = result_path
+    def get_tb_files(self, path):
+        path = Path(path)
+        paths = [path / r"温度-偏压实验-20~-10℃", path / r"温度偏压0～10摄氏度", path / r"温度偏压20～30摄氏度", path / r"温度偏压40～50摄氏度"]
+        tb_files = [list(Path(p).glob("*_observe*.dat")) for p in paths]
+        tb_files = [str(item) for sublist in tb_files for item in sublist if util.not_contain(item, "on", "off")]
+        tb_files.remove(str(path / r'温度偏压0～10摄氏度/247_0_Cs137_27.5_observe_1.dat'))
+        tb_files.remove(str(path / r'温度偏压0～10摄氏度/004_10_Cs137_26.5_1_observe.dat'))
+        tb_files.remove(str(path / r'温度偏压40～50摄氏度/039_Cs_40_26.5_observe.dat'))
+        tb_files.remove(str(path / r'温度-偏压实验-20~-10℃/232_Cs_-10_observe.dat'))
+        tb_files.remove(str(path / r'温度-偏压实验-20~-10℃/233_Cs_-10_26.5_observe.dat'))
+        # hk 文件错误，偏压值不符，怀疑为保存错误
+
+        return tb_files
+    def get_key(self, file:str):
+        return Path(file).stem
+    def get_path(self, file:str):
+        key = self.get_key(file)
+        files = [f for f in self.tb_files if self.get_key(f) == key]
+        if len(files) == 0:
+            raise FileNotFoundError(f"File with key {key} not found.")
+        return files[0]
+    def file_config(self, file):
+        path = self.get_path(file)
+        key = self.get_key(file)
+        read_config = file_lib.Read_config(path, ending="11b")
+        bkg_read_config = file_lib.Read_config()
+        spectrum_config = file_lib.Spectrum_config(bin_width=self.bin_width, adc_max=self.adc_max)
+        fit_config = file_lib.Fit_config(self.fit_range[key])
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
+
 def __get_fp05B(config, nocache=False) -> file_lib.File_operation_05b:
     return file_lib.File_operation_05b(config[0].path, *config, nocache=nocache)
 
