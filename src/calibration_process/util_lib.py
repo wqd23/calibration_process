@@ -222,11 +222,11 @@ def temp_bias_lmfit(
     model = lmfit.Model(tempbias2DFunctionInternal)
     # param = model.guess(data[:,2], data[:,0:2])
 
-    model.set_param_hint("G0", value=0.030317363114139174, min=1e-5, max=100.0)
-    model.set_param_hint("k", value=18.9e-3, min=1e-3, max=50e-3)
-    model.set_param_hint("V0", value=24.6, min=23.0, max=25.0)
-    model.set_param_hint("b", value=0.0, min=-500.0, max=500.0)
-    model.set_param_hint("c", value=1e4, min=1e3, max=1e8)
+    model.set_param_hint("G0", value=0.012, min=1e-5, max=100.0)
+    model.set_param_hint("k", value=0.0184, min=1e-3, max=50e-3)
+    model.set_param_hint("V0", value=24.11, min=23.0, max=25.0)
+    model.set_param_hint("b", value=54.31, min=-500.0, max=500.0)
+    model.set_param_hint("c", value=23459.83, min=1e3, max=1e8)
     param = model.make_params()
     result = model.fit(
         data[:, 2],
@@ -248,15 +248,16 @@ def temp_bias_lmfit(
         "c_err": param["c"].stderr,
         "chisquare": result.chisqr,
     }
-    if not result.success or any(map(lambda x: x == None, fitResult.values())):
+    if not result.success:
         raise FitError(result, "faled to do temp bias 2d fit")
+    return fitResult
 
 
 def temp_bias_fit_curvefit(
     center: Float1D, center_err: Float1D, temp: Float1D, bias: Float1D
 ) -> Dict[str, float]:
     data = np.stack([temp, bias], axis=1)
-    initial_guess = [0.00078, 18.9e-3, 24.6, 0, 1e4]
+    initial_guess = [0.012, 0.0184, 24.11, 54.31, 23459.83]
     try:
         popt, pcov = curve_fit(
             tempbias2DFunctionInternal,
@@ -265,6 +266,7 @@ def temp_bias_fit_curvefit(
             sigma=center_err,
             absolute_sigma=True,
             p0=initial_guess,
+            maxfev=10000,
         )
     except RuntimeError as e:
         raise FitError(e.args[0])

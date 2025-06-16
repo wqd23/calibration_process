@@ -923,8 +923,10 @@ class TB_operation_11B(TB_operation_05B):
         tb_files.remove(str(path / r'温度偏压40～50摄氏度/039_Cs_40_26.5_observe.dat'))
         tb_files.remove(str(path / r'温度-偏压实验-20~-10℃/232_Cs_-10_observe.dat'))
         tb_files.remove(str(path / r'温度-偏压实验-20~-10℃/233_Cs_-10_26.5_observe.dat'))
-        # hk 文件错误，偏压值不符，怀疑为保存错误
-
+        tb_files = [f for f in tb_files if "_50_Cs_2" not in f]
+        tb_files.remove(str(path / r'温度偏压0～10摄氏度/013_10_Cs137_29_observe .dat'))
+        tb_files.sort()
+        
         return tb_files
     def get_key(self, file:str):
         return Path(file).stem
@@ -942,6 +944,40 @@ class TB_operation_11B(TB_operation_05B):
         spectrum_config = file_lib.Spectrum_config(bin_width=self.bin_width, adc_max=self.adc_max)
         fit_config = file_lib.Fit_config(self.fit_range[key])
         return [read_config, bkg_read_config, spectrum_config, fit_config]
+    def temp_bias_fit(self, data_all):
+        result = []
+        for ich, data in enumerate(data_all):
+            center, center_err, temp, temp_err, bias, bias_err = (
+                data[:, 0],
+                data[:, 1],
+                data[:, 2],
+                data[:, 3],
+                data[:, 4],
+                data[:, 5],
+            )
+            try:
+                res = util.temp_bias_lmfit(center, center_err, temp, temp_err, bias, bias_err)
+            except util.FitError as e:
+                print(f"chan {ich} fit failed: {e.args[-1]}")
+                raise util.FitError(f"failed to do temp bias fit")
+            result.append(res)
+
+            data = np.stack([temp, bias], axis=1)
+            name = f"temp_bias_fit_{ich}.png"
+            plot.fit_err_plot_2d(
+                data,
+                center,
+                lambda x: util.tempbias2DFunctionInternal(x, *(list(res.values())[:5])),
+                ("temp$^\\circ$C", "bias/V", "center"),
+                title=f"temp bias fit: channel {ich}",
+                save_path=os.path.join(self.result_path, f"{util.headtime(name)}"),
+            )
+        util.json_save(
+            result,
+            os.path.join(self.result_path, f"{util.headtime('temp_bias_fit.json')}"),
+        )
+        return result
+
 
 def __get_fp05B(config, nocache=False) -> file_lib.File_operation_05b:
     return file_lib.File_operation_05b(config[0].path, *config, nocache=nocache)
@@ -1021,7 +1057,7 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
         fp.spectrum,
         fp.x,
         fp.fit_result,
-        title=file,
+        title=f"{file}: {np.mean(fp.tel['bias'][0]):.2f}V, {np.mean(fp.tel['tempSipm']):.2f}C",
         bkgForm=fit_config.bkg_form,
         fit_range=fit_config.fit_range,
         save_path=f"{op.op.save_fig_path}/{file}.png",

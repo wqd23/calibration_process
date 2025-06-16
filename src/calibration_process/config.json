@@ -110,7 +110,7 @@
             "result_path": "data/11B/tb_logs"
         },
         "ec": {
-            "tb_result_path": "data/11B/single_process/20250612172538_temp_bias_fit.json",
+            "tb_result_path": "data/11B/single_process/20250616215123_temp_bias_fit.json",
             "fit_range": "data/11B/single_process/fit_range.json",
             "energy": "data/11B/single_process/ec_energy.json",
             "bkg_form": "data/11B/single_process/bkg_form.json",
