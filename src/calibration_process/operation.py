@@ -978,6 +978,175 @@ class TB_operation_11B(TB_operation_05B):
         )
         return result
 
+class EC_operation_11B(EC_operation_05B):
+    def __init__(
+        self,
+        tb_result_path: str,
+        fit_range: str,
+        energy: str,
+        bkg_form: str,
+        x_path,
+        src_path,
+        save_path,
+        save_fig_path,
+        result_path,
+    ) -> None:
+        # read config
+        self.x_config = ""
+
+        # spectrum config
+        ref_temp = 25
+        ref_bias = 28.5
+        tb_result: List[Dict[str, Any]] = util.json_load(tb_result_path)
+        ref_func = [
+            lambda t, b: util.tempbias2DFunction(
+                t, b, c["G0"], c["k"], c["V0"], c["b"], c["c"]
+            )
+            for c in tb_result
+        ]
+        self.corr = [lambda t, b: f(ref_temp, ref_bias) / f(t, b) for f in ref_func]
+        self.adc_max = 16384.0
+        self.bin_width = 4
+        # fit config
+        self.fit_range = util.json_load(fit_range)
+        self.bkg_form = util.json_load(bkg_form)
+        # ec file process
+        self.x_path = x_path
+        self.src_path = src_path
+        self.save_path = save_path
+        self.save_fig_path = save_fig_path
+        self.result_path = result_path
+        self.x_ch = [f for f in os.listdir(self.x_path) if "_ch" in f and "hk" not in f]
+        self.x_list = list(set([f.split("_")[2] for f in self.x_ch]))
+        # 道址异常高，暂时去除
+        self.x_list.remove("20")
+        self.x_list.sort()
+
+        self.src_list = [
+            "182_Ba133_20min_observe.dat",
+            "187_Cs137_ch012_3min_observe.dat",
+            "189_Eu152_2min_observe.dat",
+            "191_Co60_2min_observe.dat"
+        ]
+        self.src_bkg = [
+            "",
+            "188_Cs137_ch3_15min_observe.dat",
+            "190_Eu152_15min_ch3_observe.dat",
+            "192_Co60_15min_ch3_observe.dat",
+        ]
+        self.energy = util.json_load(energy)
+        # self.energy_split = 50.2 # keV, absorption edges of Gd
+        self.energy_split_high = 55
+        self.energy_split_low = 49
+    def __get_x_files(self, energy_name: str):
+        return [
+            [
+                os.path.join(self.x_path, f)
+                for f in self.x_ch
+                if f"{energy_name}_ch{i}" in f
+            ][0]
+            for i in range(4)
+        ]
+
+    def xray_config(self, energy_name: str):
+        read_config = [
+            file_lib.Read_config(ch_file, ending="11b")
+            for ch_file in self.__get_x_files(energy_name)
+        ]
+        # bkg_read_config = read_config[1:4]
+        # bkg_read_config.append(read_config[0])
+        bkg_read_config = [read_config[1], read_config[2], read_config[0], read_config[0]]
+        spectrum_config = file_lib.Spectrum_config(
+            corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
+        )
+        fit_config = file_lib.Fit_config(
+            self.fit_range[energy_name], self.bkg_form[energy_name]
+        )
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
+    def __get_src_bkg(self, name: str):
+        return self.src_bkg[self.src_list.index(name)]
+    def src_config(self, file):
+        bkg_name = self.__get_src_bkg(file)
+        file = os.path.join(self.src_path, file)
+        basename = os.path.basename(file)
+        read_config = file_lib.Read_config(file, ending="11b")
+        if bkg_name == "":
+            bkg_read_config = file_lib.Read_config("", ending="11b")
+        else:
+            bkg_read_config = file_lib.Read_config(os.path.join(self.src_path, bkg_name), ending="11b")
+        spectrum_config = file_lib.Spectrum_config(
+            corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
+        )
+        fit_config = file_lib.Fit_config(
+            self.fit_range[basename], self.bkg_form[basename]
+        )
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
+
+    def ec_fit(self, src_result, src_energy, x_result, x_energy):
+        result = src_result + x_result
+        energy = src_energy + x_energy
+        CHN_NUM = 3
+        data = sorted(list(zip(energy, result)), key=lambda x: x[0])
+        energy = np.array(list(map(lambda x: x[0], data)))
+        center = [np.array([fit[i]["b"] for _, fit in data]) for i in range(CHN_NUM)]
+        center_err = [np.array([fit[i]["b_err"] for _, fit in data]) for i in range(CHN_NUM)]
+        resolution = [
+            np.array([fit[i]["resolution"] for _, fit in data]) for i in range(CHN_NUM)
+        ]
+        resolution_err = [
+            np.array([fit[i]["resolution_err"] for _, fit in data]) for i in range(CHN_NUM)
+        ]
+        q_low = energy < self.energy_split_low
+        q_high = energy >= self.energy_split_high
+        result = [{}, {}, {}, {}]
+        for i in range(CHN_NUM):
+            ec_low, ec_low_err = self.center_fit(
+                energy[q_low], center[i][q_low], center_err[i][q_low]
+            )
+            ec_high, ec_high_err = self.center_fit(
+                energy[q_high], center[i][q_high], center_err[i][q_high]
+            )
+            resolution_low, resolution_low_err = self.resolution_fit(
+                energy[q_low], resolution[i][q_low], resolution_err[i][q_low]
+            )
+            resolution_high, resolution_high_err = self.resolution_fit(
+                energy[q_high], resolution[i][q_high], resolution_err[i][q_high]
+            )
+
+            result[i] = {
+                "channel": i,
+                "EC_low": ec_low,
+                "EC_low_err": ec_low_err,
+                "EC_high": ec_high,
+                "EC_high_err": ec_high_err,
+                "resolution_low": resolution_low,
+                "resolution_low_err": resolution_low_err,
+                "resolution_high": resolution_high,
+                "resolution_high_err": resolution_high_err,
+            }
+            fit_name = f"ec_coef_sci_ch{i}.json"
+            util.json_save(result[i], f"{self.result_path}/{util.headtime(fit_name)}")
+            save_data = np.array([energy, center[i]], dtype=np.float64)
+            data_name = f"ec_data_ch{i}.npy"
+            np.save(f"{self.result_path}/{util.headtime(data_name)}", arr=save_data)
+        # 临时补丁，让数据为四通道
+        center = [center[0], center[1], center[2], center[0]]
+        result = [result[0], result[1], result[2], result[0]]
+        src_result = [[s[0], s[1], s[2], s[0]] for s in src_result]
+        x_result = [[s[0], s[1], s[2], s[0]] for s in x_result]
+        plot.ec_plot(
+            energy,
+            center,
+            result,
+            src_energy,
+            x_energy,
+            src_result,
+            x_result,
+            self.result_path,
+            self.energy_split_low,
+            self.energy_split_high,
+        )
+        return result
 
 def __get_fp05B(config, nocache=False) -> file_lib.File_operation_05b:
     return file_lib.File_operation_05b(config[0].path, *config, nocache=nocache)
@@ -1057,7 +1226,7 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
         fp.spectrum,
         fp.x,
         fp.fit_result,
-        title=f"{file}: {np.mean(fp.tel['bias'][0]):.2f}V, {np.mean(fp.tel['tempSipm']):.2f}C",
+        title=f"{file}: {np.mean(fp.tel['bias'][0]):.2f}V, {np.mean(fp.tel['tempSipm'][0]):.2f}C",
         bkgForm=fit_config.bkg_form,
         fit_range=fit_config.fit_range,
         save_path=f"{op.op.save_fig_path}/{file}.png",

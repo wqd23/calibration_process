@@ -43,9 +43,9 @@ process10B = VersionProcessOp10B(
     fp_method="10",
 )
 
-process11B = VersionProcessOp(
+process11B = VersionProcessOp10B(
     op.TB_operation_11B(**cfg["11B"]["tb"]),
-    op.EC_operation_10B(**cfg["10B"]["ec"]),
+    op.EC_operation_11B(**cfg["11B"]["ec"]),
     fp_method="11",
 )
 

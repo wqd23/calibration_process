@@ -1,11 +1,8 @@
 {
-    "073_observe_Cs137.dat": "gaus",
-    "085_observe_Na22.dat": "exp",
-    "089_observe_Am241.dat": null,
-    "077_observe_Co60.dat": "lin",
-    "100": "gaus",
-    "110": "gaus",
-    "15": "lin",
+    "100": null,
+    "110": null,
+    "120": null,
+    "15": null,
     "20": null,
     "25": null,
     "30": null,
@@ -17,11 +14,15 @@
     "50": null,
     "51": null,
     "53": null,
-    "55p1": null,
+    "55": null,
     "60": null,
     "65": null,
     "70": null,
     "75": null,
     "80": null,
-    "90": "gaus"
+    "90": null,
+ "182_Ba133_20min_observe.dat": null,
+ "187_Cs137_ch012_3min_observe.dat": null,
+ "189_Eu152_2min_observe.dat": null,
+ "191_Co60_2min_observe.dat": null
 }

@@ -32,10 +32,10 @@ def cut_with_bias(utc:np.ndarray, bias:list[np.ndarray], bias_set:float, tol=0.2
     q = slice(left, right)
     return q
 def tel_cut(sci, tel, file:str):
-    bias_set = extract_bias(file)
     utc_sci, utc_tel = sci['utc'], tel['utc_time']
     q = get_tb_cut(utc_sci, utc_tel)
     if not np.any(q):
+        bias_set = extract_bias(file)
         q = cut_with_bias(utc_tel, tel['bias'], bias_set)
         print(f"Warning: no utc cut found, using bias cut for {file}")
         raise ValueError(f"no utc cut found for {file}, using bias cut")

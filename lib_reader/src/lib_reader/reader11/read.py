@@ -19,9 +19,12 @@ def readHK(path):
 def getHK(sciFile):
     sciFile = Path(sciFile)
     idx = sciFile.stem.split('_')[0]
-    hkFile = list(sciFile.parent.glob(f'{idx}_*hk'))[0]
-    if not hkFile.exists():
+    # temp-bias, src data
+    Files = [f for f in sciFile.parent.glob(f'*')]
+    hkFile = [f for f in Files if f.stem.startswith(idx) and 'hk' in f.name]
+    if len(hkFile) == 0:
         raise FileNotFoundError(f"HK file {hkFile} does not exist.")
+    hkFile = hkFile[0]
     return hkFile
 
 def single_read11(path:str, mode='wf', **kwargs):

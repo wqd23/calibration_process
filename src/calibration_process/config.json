@@ -114,8 +114,8 @@
             "fit_range": "data/11B/single_process/fit_range.json",
             "energy": "data/11B/single_process/ec_energy.json",
             "bkg_form": "data/11B/single_process/bkg_form.json",
-            "x_path": "data/11B/raw_data/x_data",
-            "src_path": "data/11B/raw_data/src_data",
+            "x_path": "data/11B/raw_data/GRID-11B_x_data",
+            "src_path": "data/11B/raw_data/src/能量道址实验——1.15/数据/",
             "save_path": "data/11B/single_process/EC_fit_result",
             "save_fig_path": "data/11B/single_process/single_fit_fig",
             "result_path": "data/11B/ec_logs"
