@@ -4,10 +4,8 @@ from lib_reader.reader05.my_type import *
 from lib_plot import plot
 import os
 import numpy as np
-from dataclasses import dataclass
-import json
-import matplotlib.pyplot as plt
 from . import file_lib
+from pathlib import Path
 
 
 class Operation:
@@ -760,7 +758,7 @@ class EC_operation_10B(EC_operation_05B):
             for c in tb_result
         ]
         self.corr = [lambda t, b: f(ref_temp, ref_bias) / f(t, b) for f in ref_func]
-        self.adc_max = 65535.0
+        self.adc_max = 16384.0
         self.bin_width = 4
         # fit config
         self.fit_range = util.json_load(fit_range)
@@ -809,7 +807,12 @@ class EC_operation_10B(EC_operation_05B):
         ]
         # bkg_read_config = read_config[1:4]
         # bkg_read_config.append(read_config[0])
-        bkg_read_config = [read_config[1], read_config[2], read_config[0], read_config[0]]
+        bkg_read_config = [
+            read_config[1],
+            read_config[2],
+            read_config[0],
+            read_config[0],
+        ]
         spectrum_config = file_lib.Spectrum_config(
             corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
         )
@@ -834,7 +837,7 @@ class EC_operation_10B(EC_operation_05B):
             self.fit_range[basename], self.bkg_form[basename]
         )
         return [read_config, bkg_read_config, spectrum_config, fit_config]
-    
+
     def ec_fit(self, src_result, src_energy, x_result, x_energy):
         result = src_result + x_result
         energy = src_energy + x_energy
@@ -842,12 +845,15 @@ class EC_operation_10B(EC_operation_05B):
         data = sorted(list(zip(energy, result)), key=lambda x: x[0])
         energy = np.array(list(map(lambda x: x[0], data)))
         center = [np.array([fit[i]["b"] for _, fit in data]) for i in range(CHN_NUM)]
-        center_err = [np.array([fit[i]["b_err"] for _, fit in data]) for i in range(CHN_NUM)]
+        center_err = [
+            np.array([fit[i]["b_err"] for _, fit in data]) for i in range(CHN_NUM)
+        ]
         resolution = [
             np.array([fit[i]["resolution"] for _, fit in data]) for i in range(CHN_NUM)
         ]
         resolution_err = [
-            np.array([fit[i]["resolution_err"] for _, fit in data]) for i in range(CHN_NUM)
+            np.array([fit[i]["resolution_err"] for _, fit in data])
+            for i in range(CHN_NUM)
         ]
         q_low = energy < self.energy_split_low
         q_high = energy >= self.energy_split_high
@@ -902,8 +908,298 @@ class EC_operation_10B(EC_operation_05B):
         return result
 
 
-def __get_fp05B(config) -> file_lib.File_operation_05b:
-    return file_lib.File_operation_05b(config[0].path, *config)
+class TB_operation_11B(TB_operation_05B):
+    def __init__(self, path, fit_range, save_path, save_fig_path, result_path) -> None:
+        self.path = path
+        # 全路径
+        self.tb_files = self.get_tb_files(self.path)
+        # 文件名
+        self.files = [Path(f).name for f in self.tb_files]
+        self.adc_max = 16384.0
+        self.source = "Cs137"
+
+        self.fit_range = util.json_load(fit_range)
+        self.bin_width = 6
+        self.save_path = save_path
+        self.save_fig_path = save_fig_path
+        self.result_path = result_path
+
+    def get_tb_files(self, path):
+        path = Path(path)
+        paths = [
+            path / r"温度-偏压实验-20~-10℃",
+            path / r"温度偏压0～10摄氏度",
+            path / r"温度偏压20～30摄氏度",
+            path / r"温度偏压40～50摄氏度",
+        ]
+        tb_files = [list(Path(p).glob("*_observe*.dat")) for p in paths]
+        tb_files = [
+            str(item)
+            for sublist in tb_files
+            for item in sublist
+            if util.not_contain(item, "on", "off")
+        ]
+        tb_files.remove(
+            str(path / r"温度偏压0～10摄氏度/247_0_Cs137_27.5_observe_1.dat")
+        )
+        tb_files.remove(
+            str(path / r"温度偏压0～10摄氏度/004_10_Cs137_26.5_1_observe.dat")
+        )
+        tb_files.remove(str(path / r"温度偏压40～50摄氏度/039_Cs_40_26.5_observe.dat"))
+        tb_files.remove(str(path / r"温度-偏压实验-20~-10℃/232_Cs_-10_observe.dat"))
+        tb_files.remove(
+            str(path / r"温度-偏压实验-20~-10℃/233_Cs_-10_26.5_observe.dat")
+        )
+        tb_files = [f for f in tb_files if "_50_Cs_2" not in f]
+        tb_files.remove(str(path / r"温度偏压0～10摄氏度/013_10_Cs137_29_observe .dat"))
+        tb_files.sort()
+
+        return tb_files
+
+    def get_key(self, file: str):
+        return Path(file).stem
+
+    def get_path(self, file: str):
+        key = self.get_key(file)
+        files = [f for f in self.tb_files if self.get_key(f) == key]
+        if len(files) == 0:
+            raise FileNotFoundError(f"File with key {key} not found.")
+        return files[0]
+
+    def file_config(self, file):
+        path = self.get_path(file)
+        key = self.get_key(file)
+        read_config = file_lib.Read_config(path, ending="11b")
+        bkg_read_config = file_lib.Read_config()
+        spectrum_config = file_lib.Spectrum_config(
+            bin_width=self.bin_width, adc_max=self.adc_max
+        )
+        fit_config = file_lib.Fit_config(self.fit_range[key])
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
+
+    def temp_bias_fit(self, data_all):
+        result = []
+        for ich, data in enumerate(data_all):
+            center, center_err, temp, temp_err, bias, bias_err = (
+                data[:, 0],
+                data[:, 1],
+                data[:, 2],
+                data[:, 3],
+                data[:, 4],
+                data[:, 5],
+            )
+            try:
+                res = util.temp_bias_lmfit(
+                    center, center_err, temp, temp_err, bias, bias_err
+                )
+            except util.FitError as e:
+                print(f"chan {ich} fit failed: {e.args[-1]}")
+                raise util.FitError(f"failed to do temp bias fit")
+            result.append(res)
+
+            data = np.stack([temp, bias], axis=1)
+            name = f"temp_bias_fit_{ich}.png"
+            plot.fit_err_plot_2d(
+                data,
+                center,
+                lambda x: util.tempbias2DFunctionInternal(x, *(list(res.values())[:5])),
+                ("temp$^\\circ$C", "bias/V", "center"),
+                title=f"temp bias fit: channel {ich}",
+                save_path=os.path.join(self.result_path, f"{util.headtime(name)}"),
+            )
+        util.json_save(
+            result,
+            os.path.join(self.result_path, f"{util.headtime('temp_bias_fit.json')}"),
+        )
+        return result
+
+
+class EC_operation_11B(EC_operation_05B):
+    def __init__(
+        self,
+        tb_result_path: str,
+        fit_range: str,
+        energy: str,
+        bkg_form: str,
+        x_path,
+        src_path,
+        save_path,
+        save_fig_path,
+        result_path,
+    ) -> None:
+        # read config
+        self.x_config = ""
+
+        # spectrum config
+        ref_temp = 25
+        ref_bias = 28.5
+        tb_result: List[Dict[str, Any]] = util.json_load(tb_result_path)
+        ref_func = [
+            lambda t, b: util.tempbias2DFunction(
+                t, b, c["G0"], c["k"], c["V0"], c["b"], c["c"]
+            )
+            for c in tb_result
+        ]
+        self.corr = [lambda t, b: f(ref_temp, ref_bias) / f(t, b) for f in ref_func]
+        self.adc_max = 16384.0
+        self.bin_width = 4
+        # fit config
+        self.fit_range = util.json_load(fit_range)
+        self.bkg_form = util.json_load(bkg_form)
+        # ec file process
+        self.x_path = x_path
+        self.src_path = src_path
+        self.save_path = save_path
+        self.save_fig_path = save_fig_path
+        self.result_path = result_path
+        self.x_ch = [f for f in os.listdir(self.x_path) if "_ch" in f and "hk" not in f]
+        self.x_list = list(set([f.split("_")[2] for f in self.x_ch]))
+        # 道址异常高，暂时去除
+        self.x_list.remove("20")
+        self.x_list.sort()
+
+        self.src_list = [
+            "182_Ba133_20min_observe.dat",
+            "187_Cs137_ch012_3min_observe.dat",
+            "189_Eu152_2min_observe.dat",
+            "191_Co60_2min_observe.dat",
+        ]
+        self.src_bkg = [
+            "",
+            "188_Cs137_ch3_15min_observe.dat",
+            "190_Eu152_15min_ch3_observe.dat",
+            "192_Co60_15min_ch3_observe.dat",
+        ]
+        self.energy = util.json_load(energy)
+        # self.energy_split = 50.2 # keV, absorption edges of Gd
+        self.energy_split_high = 55
+        self.energy_split_low = 49
+
+    def __get_x_files(self, energy_name: str):
+        return [
+            [
+                os.path.join(self.x_path, f)
+                for f in self.x_ch
+                if f"{energy_name}_ch{i}" in f
+            ][0]
+            for i in range(4)
+        ]
+
+    def xray_config(self, energy_name: str):
+        read_config = [
+            file_lib.Read_config(ch_file, ending="11b")
+            for ch_file in self.__get_x_files(energy_name)
+        ]
+        # bkg_read_config = read_config[1:4]
+        # bkg_read_config.append(read_config[0])
+        bkg_read_config = [
+            read_config[1],
+            read_config[2],
+            read_config[0],
+            read_config[0],
+        ]
+        spectrum_config = file_lib.Spectrum_config(
+            corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
+        )
+        fit_config = file_lib.Fit_config(
+            self.fit_range[energy_name], self.bkg_form[energy_name]
+        )
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
+
+    def __get_src_bkg(self, name: str):
+        return self.src_bkg[self.src_list.index(name)]
+
+    def src_config(self, file):
+        bkg_name = self.__get_src_bkg(file)
+        file = os.path.join(self.src_path, file)
+        basename = os.path.basename(file)
+        read_config = file_lib.Read_config(file, ending="11b")
+        if bkg_name == "":
+            bkg_read_config = file_lib.Read_config("", ending="11b")
+        else:
+            bkg_read_config = file_lib.Read_config(
+                os.path.join(self.src_path, bkg_name), ending="11b"
+            )
+        spectrum_config = file_lib.Spectrum_config(
+            corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
+        )
+        fit_config = file_lib.Fit_config(
+            self.fit_range[basename], self.bkg_form[basename]
+        )
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
+
+    def ec_fit(self, src_result, src_energy, x_result, x_energy):
+        result = src_result + x_result
+        energy = src_energy + x_energy
+        CHN_NUM = 3
+        data = sorted(list(zip(energy, result)), key=lambda x: x[0])
+        energy = np.array(list(map(lambda x: x[0], data)))
+        center = [np.array([fit[i]["b"] for _, fit in data]) for i in range(CHN_NUM)]
+        center_err = [
+            np.array([fit[i]["b_err"] for _, fit in data]) for i in range(CHN_NUM)
+        ]
+        resolution = [
+            np.array([fit[i]["resolution"] for _, fit in data]) for i in range(CHN_NUM)
+        ]
+        resolution_err = [
+            np.array([fit[i]["resolution_err"] for _, fit in data])
+            for i in range(CHN_NUM)
+        ]
+        q_low = energy < self.energy_split_low
+        q_high = energy >= self.energy_split_high
+        result = [{}, {}, {}, {}]
+        for i in range(CHN_NUM):
+            ec_low, ec_low_err = self.center_fit(
+                energy[q_low], center[i][q_low], center_err[i][q_low]
+            )
+            ec_high, ec_high_err = self.center_fit(
+                energy[q_high], center[i][q_high], center_err[i][q_high]
+            )
+            resolution_low, resolution_low_err = self.resolution_fit(
+                energy[q_low], resolution[i][q_low], resolution_err[i][q_low]
+            )
+            resolution_high, resolution_high_err = self.resolution_fit(
+                energy[q_high], resolution[i][q_high], resolution_err[i][q_high]
+            )
+
+            result[i] = {
+                "channel": i,
+                "EC_low": ec_low,
+                "EC_low_err": ec_low_err,
+                "EC_high": ec_high,
+                "EC_high_err": ec_high_err,
+                "resolution_low": resolution_low,
+                "resolution_low_err": resolution_low_err,
+                "resolution_high": resolution_high,
+                "resolution_high_err": resolution_high_err,
+            }
+            fit_name = f"ec_coef_sci_ch{i}.json"
+            util.json_save(result[i], f"{self.result_path}/{util.headtime(fit_name)}")
+            save_data = np.array([energy, center[i]], dtype=np.float64)
+            data_name = f"ec_data_ch{i}.npy"
+            np.save(f"{self.result_path}/{util.headtime(data_name)}", arr=save_data)
+        # 临时补丁，让数据为四通道
+        center = [center[0], center[1], center[2], center[0]]
+        result = [result[0], result[1], result[2], result[0]]
+        src_result = [[s[0], s[1], s[2], s[0]] for s in src_result]
+        x_result = [[s[0], s[1], s[2], s[0]] for s in x_result]
+        plot.ec_plot(
+            energy,
+            center,
+            result,
+            src_energy,
+            x_energy,
+            src_result,
+            x_result,
+            self.result_path,
+            self.energy_split_low,
+            self.energy_split_high,
+        )
+        return result
+
+
+def __get_fp05B(config, nocache=False) -> file_lib.File_operation_05b:
+    return file_lib.File_operation_05b(config[0].path, *config, nocache=nocache)
 
 
 def __dict_4ch_reconstruct(dict_4ch):
@@ -919,7 +1215,7 @@ def __dict_4ch_reconstruct(dict_4ch):
     return dict_4ch_re
 
 
-def __get_fp03B(config) -> file_lib.File_operation_05b:
+def __get_fp03B(config, nocache=False) -> file_lib.File_operation_05b:
     read_config, bkg_read_config, spectrum_config, fit_config = config
     fps = [
         file_lib.File_operation_05b(
@@ -928,6 +1224,7 @@ def __get_fp03B(config) -> file_lib.File_operation_05b:
             bkg_read_config[i],
             spectrum_config,
             fit_config,
+            nocache=nocache,
         )
         for i in range(4)
     ]
@@ -939,6 +1236,7 @@ def __get_fp03B(config) -> file_lib.File_operation_05b:
     fp.sci, fp.tel = sci, tel
     fp.bkg_sci, fp.bkg_tel = bkg_sci, bkg_tel
     return fp
+
 
 def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
     """process file in sinlge experiment, like specific temp bias or photon energy
@@ -960,7 +1258,7 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
     fp_method = __get_fp05B if fp_method is None else __get_fp03B
     config = op.file_config(file)
     read_config, bkg_read_config, spectrum_config, fit_config = config
-    fp = fp_method(config)
+    fp = fp_method(config, nocache=kw_args.get("nocache", False))
     fp.get_spectrum()
     # plot raw spectrum
     if kw_args.get("x_lim", None) is not None:
@@ -979,7 +1277,7 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
         fp.spectrum,
         fp.x,
         fp.fit_result,
-        title=file,
+        title=f"{file}: {np.mean(fp.tel['bias'][0]):.2f}V, {np.mean(fp.tel['tempSipm'][0]):.2f}C",
         bkgForm=fit_config.bkg_form,
         fit_range=fit_config.fit_range,
         save_path=f"{op.op.save_fig_path}/{file}.png",

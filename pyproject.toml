@@ -34,7 +34,9 @@ build-backend = "hatchling.build"
 dev = [
     "coverage>=7.6.1",
     "flameprof>=0.4",
+    "ipywidgets>=8.1.7",
     "jupyter>=1.1.1",
+    "plotly>=6.1.2",
     "pytest>=8.3.5",
     "ruff>=0.11.7",
 ]

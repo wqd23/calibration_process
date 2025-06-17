@@ -100,5 +100,25 @@
             "save_fig_path": "data/10B/single_process/single_fit_fig",
             "result_path": "data/10B/ec_logs"
         }
+    },
+    "11B": {
+        "tb": {
+            "path": "data/11B/raw_data/tempbias",
+            "fit_range": "data/11B/single_process/fit_range.json",
+            "save_path": "data/11B/single_process/TB_fit_result",
+            "save_fig_path": "data/11B/single_process/single_fit_fig",
+            "result_path": "data/11B/tb_logs"
+        },
+        "ec": {
+            "tb_result_path": "data/11B/single_process/20250616215123_temp_bias_fit.json",
+            "fit_range": "data/11B/single_process/fit_range.json",
+            "energy": "data/11B/single_process/ec_energy.json",
+            "bkg_form": "data/11B/single_process/bkg_form.json",
+            "x_path": "data/11B/raw_data/GRID-11B_x_data",
+            "src_path": "data/11B/raw_data/src/能量道址实验——1.15/数据/",
+            "save_path": "data/11B/single_process/EC_fit_result",
+            "save_fig_path": "data/11B/single_process/single_fit_fig",
+            "result_path": "data/11B/ec_logs"
+        }
     }
 }
