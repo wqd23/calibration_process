@@ -88,7 +88,7 @@ def peak_fit(
     error: Float1D,
     peak_form: str,
     bkg_form: Optional[str] = None,
-    **kwargs
+    **kwargs,
 ) -> Dict[str, Any]:
     peak_mod = get_peak_mod(peak_form, prefix="peak_")
     param = peak_mod.guess(data, x)
@@ -121,7 +121,7 @@ def peak_fit(
             "bkg_info": bkg_form,
             "bkg_func": lambda x: bkg_mod.eval(x=x, **result.best_values),
         }
-        bkg.update({k:v for k, v in result.values.items() if k.startswith("bk_")})
+        bkg.update({k: v for k, v in result.values.items() if k.startswith("bk_")})
     fit_result["bkg"] = bkg
     fit_result["peak_func"] = lambda x: peak_mod.eval(x=x, **result.best_values)
     return fit_result

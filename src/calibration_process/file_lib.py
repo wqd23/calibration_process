@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from .fitting import peak_fit
 import numpy as np
 
+
 def config_import(type, config):
     if isinstance(config, dict):
         return type(**config)
@@ -108,11 +109,17 @@ class File_operation_05b:
         if config.ending == "normal":
             data = ver.single_read05b_normal(config.path, overwrite_cache=nocache)
         elif config.ending == "xray":
-            data = ver.single_read05b_xray(config.path, config.config_file, overwrite_cache=nocache)
+            data = ver.single_read05b_xray(
+                config.path, config.config_file, overwrite_cache=nocache
+            )
         elif config.ending == "03b":
-            data = ver.single_read03b(config.path, config.config_file, overwrite_cache=nocache)
+            data = ver.single_read03b(
+                config.path, config.config_file, overwrite_cache=nocache
+            )
         elif config.ending == "03b-src":
-            data = ver.src_read03b(config.path, config.config_file, overwrite_cache=nocache)
+            data = ver.src_read03b(
+                config.path, config.config_file, overwrite_cache=nocache
+            )
         elif config.ending == "07":
             data = ver.single_read07(config.path, overwrite_cache=nocache)
         elif config.ending == "04":
@@ -120,7 +127,9 @@ class File_operation_05b:
         elif config.ending == "10b":
             data = ver.single_read10(config.path, overwrite_cache=nocache)
         elif config.ending == "11b":
-            data = ver.single_read11(config.path, config.kwarg.get("mode", "wf"), overwrite_cache=nocache)
+            data = ver.single_read11(
+                config.path, config.kwarg.get("mode", "wf"), overwrite_cache=nocache
+            )
         else:
             raise ValueError(f"ending {config.ending} not supported")
         if config.time_cut != None:
@@ -129,7 +138,9 @@ class File_operation_05b:
 
     def read_out(self, nocache=False):
         if self.bkg_read_config.path:
-            self.bkg_sci, self.bkg_tel = self.__read(self.bkg_read_config, nocache=nocache)
+            self.bkg_sci, self.bkg_tel = self.__read(
+                self.bkg_read_config, nocache=nocache
+            )
         return self.__read(self.read_config, nocache=nocache)
 
     def __raw_spectrum(self, amp, bin_width, spec_range):
@@ -282,29 +293,33 @@ class File_operation_05b:
 @dataclass
 class Fit_cfg4ch:
     """settings for 4 channel fit"""
+
     fit_range: List[List[float]] = field(default_factory=lambda: [[None, None]] * 4)
-    bkg_form: List[str] = field(
-        default_factory=lambda: ["lin"] * 4
-    )
-    peak_form: List[str] = field(
-        default_factory=lambda: ["gaus"] * 4
-    )
+    bkg_form: List[str] = field(default_factory=lambda: ["lin"] * 4)
+    peak_form: List[str] = field(default_factory=lambda: ["gaus"] * 4)
+
 
 class File_operation_10b(File_operation_05b):
     """settings and functions for transfer 4 channel data file into data point with error, with compton fitting ability"""
+
     def __init__(
         self,
         read_config: Union[Read_config, Dict[str, Any]] = {},
         bkg_read_config: Union[Read_config, Dict[str, Any]] = {},
         spectrum_config: Union[Spectrum_config, Dict[str, Any]] = {},
-        fit_config: Union[Fit_cfg4ch, Dict[str, Any]] = {}):
-        path = read_config.path if isinstance(read_config, Read_config) else read_config["path"]
+        fit_config: Union[Fit_cfg4ch, Dict[str, Any]] = {},
+    ):
+        path = (
+            read_config.path
+            if isinstance(read_config, Read_config)
+            else read_config["path"]
+        )
         super().__init__(path, read_config, bkg_read_config, spectrum_config)
         self.fit_config = config_import(Fit_cfg4ch, fit_config)
         # read_config use a mutable {} as default value, read_config should never be changed
         del read_config, bkg_read_config, spectrum_config, fit_config
         self.sci, self.tel = self.read_out()
-    
+
     def peak_fit(self, **kwargs):
         fit_result = []
         for ich, (x, spectrum, spectrum_err, x_range, time, bkg, peak) in enumerate(
@@ -315,7 +330,7 @@ class File_operation_10b(File_operation_05b):
                 self.fit_config.fit_range,
                 self.time,
                 self.fit_config.bkg_form,
-                self.fit_config.peak_form
+                self.fit_config.peak_form,
             )
         ):
             if x_range == None:
@@ -330,7 +345,7 @@ class File_operation_10b(File_operation_05b):
                     spectrum_err[q],
                     peak_form=peak,
                     bkg_form=bkg,
-                    **kwargs
+                    **kwargs,
                 )
             except Exception as e:
                 print(e)
@@ -349,7 +364,7 @@ class File_operation_10b(File_operation_05b):
                     "rate_err": rate_err,
                     "resolution": result["peak_resolution"],
                     "resolution_err": result["peak_resolution_err"],
-                    "bkg": result["bkg"]
+                    "bkg": result["bkg"],
                 }
             )
         self.fit_result = fit_result

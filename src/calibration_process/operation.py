@@ -7,6 +7,7 @@ import numpy as np
 from . import file_lib
 from pathlib import Path
 
+
 class Operation:
     """wrapper for tb_op, x of ec_op, and src of ec_op"""
 
@@ -806,7 +807,12 @@ class EC_operation_10B(EC_operation_05B):
         ]
         # bkg_read_config = read_config[1:4]
         # bkg_read_config.append(read_config[0])
-        bkg_read_config = [read_config[1], read_config[2], read_config[0], read_config[0]]
+        bkg_read_config = [
+            read_config[1],
+            read_config[2],
+            read_config[0],
+            read_config[0],
+        ]
         spectrum_config = file_lib.Spectrum_config(
             corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
         )
@@ -831,7 +837,7 @@ class EC_operation_10B(EC_operation_05B):
             self.fit_range[basename], self.bkg_form[basename]
         )
         return [read_config, bkg_read_config, spectrum_config, fit_config]
-    
+
     def ec_fit(self, src_result, src_energy, x_result, x_energy):
         result = src_result + x_result
         energy = src_energy + x_energy
@@ -839,12 +845,15 @@ class EC_operation_10B(EC_operation_05B):
         data = sorted(list(zip(energy, result)), key=lambda x: x[0])
         energy = np.array(list(map(lambda x: x[0], data)))
         center = [np.array([fit[i]["b"] for _, fit in data]) for i in range(CHN_NUM)]
-        center_err = [np.array([fit[i]["b_err"] for _, fit in data]) for i in range(CHN_NUM)]
+        center_err = [
+            np.array([fit[i]["b_err"] for _, fit in data]) for i in range(CHN_NUM)
+        ]
         resolution = [
             np.array([fit[i]["resolution"] for _, fit in data]) for i in range(CHN_NUM)
         ]
         resolution_err = [
-            np.array([fit[i]["resolution_err"] for _, fit in data]) for i in range(CHN_NUM)
+            np.array([fit[i]["resolution_err"] for _, fit in data])
+            for i in range(CHN_NUM)
         ]
         q_low = energy < self.energy_split_low
         q_high = energy >= self.energy_split_high
@@ -898,6 +907,7 @@ class EC_operation_10B(EC_operation_05B):
         )
         return result
 
+
 class TB_operation_11B(TB_operation_05B):
     def __init__(self, path, fit_range, save_path, save_fig_path, result_path) -> None:
         self.path = path
@@ -913,37 +923,60 @@ class TB_operation_11B(TB_operation_05B):
         self.save_path = save_path
         self.save_fig_path = save_fig_path
         self.result_path = result_path
+
     def get_tb_files(self, path):
         path = Path(path)
-        paths = [path / r"温度-偏压实验-20~-10℃", path / r"温度偏压0～10摄氏度", path / r"温度偏压20～30摄氏度", path / r"温度偏压40～50摄氏度"]
+        paths = [
+            path / r"温度-偏压实验-20~-10℃",
+            path / r"温度偏压0～10摄氏度",
+            path / r"温度偏压20～30摄氏度",
+            path / r"温度偏压40～50摄氏度",
+        ]
         tb_files = [list(Path(p).glob("*_observe*.dat")) for p in paths]
-        tb_files = [str(item) for sublist in tb_files for item in sublist if util.not_contain(item, "on", "off")]
-        tb_files.remove(str(path / r'温度偏压0～10摄氏度/247_0_Cs137_27.5_observe_1.dat'))
-        tb_files.remove(str(path / r'温度偏压0～10摄氏度/004_10_Cs137_26.5_1_observe.dat'))
-        tb_files.remove(str(path / r'温度偏压40～50摄氏度/039_Cs_40_26.5_observe.dat'))
-        tb_files.remove(str(path / r'温度-偏压实验-20~-10℃/232_Cs_-10_observe.dat'))
-        tb_files.remove(str(path / r'温度-偏压实验-20~-10℃/233_Cs_-10_26.5_observe.dat'))
+        tb_files = [
+            str(item)
+            for sublist in tb_files
+            for item in sublist
+            if util.not_contain(item, "on", "off")
+        ]
+        tb_files.remove(
+            str(path / r"温度偏压0～10摄氏度/247_0_Cs137_27.5_observe_1.dat")
+        )
+        tb_files.remove(
+            str(path / r"温度偏压0～10摄氏度/004_10_Cs137_26.5_1_observe.dat")
+        )
+        tb_files.remove(str(path / r"温度偏压40～50摄氏度/039_Cs_40_26.5_observe.dat"))
+        tb_files.remove(str(path / r"温度-偏压实验-20~-10℃/232_Cs_-10_observe.dat"))
+        tb_files.remove(
+            str(path / r"温度-偏压实验-20~-10℃/233_Cs_-10_26.5_observe.dat")
+        )
         tb_files = [f for f in tb_files if "_50_Cs_2" not in f]
-        tb_files.remove(str(path / r'温度偏压0～10摄氏度/013_10_Cs137_29_observe .dat'))
+        tb_files.remove(str(path / r"温度偏压0～10摄氏度/013_10_Cs137_29_observe .dat"))
         tb_files.sort()
-        
+
         return tb_files
-    def get_key(self, file:str):
+
+    def get_key(self, file: str):
         return Path(file).stem
-    def get_path(self, file:str):
+
+    def get_path(self, file: str):
         key = self.get_key(file)
         files = [f for f in self.tb_files if self.get_key(f) == key]
         if len(files) == 0:
             raise FileNotFoundError(f"File with key {key} not found.")
         return files[0]
+
     def file_config(self, file):
         path = self.get_path(file)
         key = self.get_key(file)
         read_config = file_lib.Read_config(path, ending="11b")
         bkg_read_config = file_lib.Read_config()
-        spectrum_config = file_lib.Spectrum_config(bin_width=self.bin_width, adc_max=self.adc_max)
+        spectrum_config = file_lib.Spectrum_config(
+            bin_width=self.bin_width, adc_max=self.adc_max
+        )
         fit_config = file_lib.Fit_config(self.fit_range[key])
         return [read_config, bkg_read_config, spectrum_config, fit_config]
+
     def temp_bias_fit(self, data_all):
         result = []
         for ich, data in enumerate(data_all):
@@ -956,7 +989,9 @@ class TB_operation_11B(TB_operation_05B):
                 data[:, 5],
             )
             try:
-                res = util.temp_bias_lmfit(center, center_err, temp, temp_err, bias, bias_err)
+                res = util.temp_bias_lmfit(
+                    center, center_err, temp, temp_err, bias, bias_err
+                )
             except util.FitError as e:
                 print(f"chan {ich} fit failed: {e.args[-1]}")
                 raise util.FitError(f"failed to do temp bias fit")
@@ -977,6 +1012,7 @@ class TB_operation_11B(TB_operation_05B):
             os.path.join(self.result_path, f"{util.headtime('temp_bias_fit.json')}"),
         )
         return result
+
 
 class EC_operation_11B(EC_operation_05B):
     def __init__(
@@ -1026,7 +1062,7 @@ class EC_operation_11B(EC_operation_05B):
             "182_Ba133_20min_observe.dat",
             "187_Cs137_ch012_3min_observe.dat",
             "189_Eu152_2min_observe.dat",
-            "191_Co60_2min_observe.dat"
+            "191_Co60_2min_observe.dat",
         ]
         self.src_bkg = [
             "",
@@ -1038,6 +1074,7 @@ class EC_operation_11B(EC_operation_05B):
         # self.energy_split = 50.2 # keV, absorption edges of Gd
         self.energy_split_high = 55
         self.energy_split_low = 49
+
     def __get_x_files(self, energy_name: str):
         return [
             [
@@ -1055,7 +1092,12 @@ class EC_operation_11B(EC_operation_05B):
         ]
         # bkg_read_config = read_config[1:4]
         # bkg_read_config.append(read_config[0])
-        bkg_read_config = [read_config[1], read_config[2], read_config[0], read_config[0]]
+        bkg_read_config = [
+            read_config[1],
+            read_config[2],
+            read_config[0],
+            read_config[0],
+        ]
         spectrum_config = file_lib.Spectrum_config(
             corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
         )
@@ -1063,8 +1105,10 @@ class EC_operation_11B(EC_operation_05B):
             self.fit_range[energy_name], self.bkg_form[energy_name]
         )
         return [read_config, bkg_read_config, spectrum_config, fit_config]
+
     def __get_src_bkg(self, name: str):
         return self.src_bkg[self.src_list.index(name)]
+
     def src_config(self, file):
         bkg_name = self.__get_src_bkg(file)
         file = os.path.join(self.src_path, file)
@@ -1073,7 +1117,9 @@ class EC_operation_11B(EC_operation_05B):
         if bkg_name == "":
             bkg_read_config = file_lib.Read_config("", ending="11b")
         else:
-            bkg_read_config = file_lib.Read_config(os.path.join(self.src_path, bkg_name), ending="11b")
+            bkg_read_config = file_lib.Read_config(
+                os.path.join(self.src_path, bkg_name), ending="11b"
+            )
         spectrum_config = file_lib.Spectrum_config(
             corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
         )
@@ -1089,12 +1135,15 @@ class EC_operation_11B(EC_operation_05B):
         data = sorted(list(zip(energy, result)), key=lambda x: x[0])
         energy = np.array(list(map(lambda x: x[0], data)))
         center = [np.array([fit[i]["b"] for _, fit in data]) for i in range(CHN_NUM)]
-        center_err = [np.array([fit[i]["b_err"] for _, fit in data]) for i in range(CHN_NUM)]
+        center_err = [
+            np.array([fit[i]["b_err"] for _, fit in data]) for i in range(CHN_NUM)
+        ]
         resolution = [
             np.array([fit[i]["resolution"] for _, fit in data]) for i in range(CHN_NUM)
         ]
         resolution_err = [
-            np.array([fit[i]["resolution_err"] for _, fit in data]) for i in range(CHN_NUM)
+            np.array([fit[i]["resolution_err"] for _, fit in data])
+            for i in range(CHN_NUM)
         ]
         q_low = energy < self.energy_split_low
         q_high = energy >= self.energy_split_high
@@ -1148,6 +1197,7 @@ class EC_operation_11B(EC_operation_05B):
         )
         return result
 
+
 def __get_fp05B(config, nocache=False) -> file_lib.File_operation_05b:
     return file_lib.File_operation_05b(config[0].path, *config, nocache=nocache)
 
@@ -1174,7 +1224,7 @@ def __get_fp03B(config, nocache=False) -> file_lib.File_operation_05b:
             bkg_read_config[i],
             spectrum_config,
             fit_config,
-            nocache=nocache
+            nocache=nocache,
         )
         for i in range(4)
     ]
@@ -1186,6 +1236,7 @@ def __get_fp03B(config, nocache=False) -> file_lib.File_operation_05b:
     fp.sci, fp.tel = sci, tel
     fp.bkg_sci, fp.bkg_tel = bkg_sci, bkg_tel
     return fp
+
 
 def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
     """process file in sinlge experiment, like specific temp bias or photon energy

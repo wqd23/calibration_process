@@ -549,6 +549,7 @@ def data_load(path):
             print(f"key {header} not found")
     return sci, tel
 
+
 def not_contain(path, *keyword):
     """检查路径是否不包含指定的关键字"""
     return not any(k in str(path) for k in keyword)
