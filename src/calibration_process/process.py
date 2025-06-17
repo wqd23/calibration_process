@@ -43,6 +43,12 @@ process10B = VersionProcessOp10B(
     fp_method="10",
 )
 
+process11B = VersionProcessOp10B(
+    op.TB_operation_11B(**cfg["11B"]["tb"]),
+    op.EC_operation_11B(**cfg["11B"]["ec"]),
+    fp_method="11",
+)
+
 if __name__ == "__main__":
     fire.Fire(
         {
@@ -51,5 +57,6 @@ if __name__ == "__main__":
             "05B": process05B,
             "07": process07,
             "10B": process10B,
+            "11B": process11B,
         }
     )
