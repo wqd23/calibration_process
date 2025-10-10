@@ -73,5 +73,9 @@ just ec {ver} src run {idx}
 其中`./data/{ver}/raw_data`指向实际标定数据。
 
 # TODO
-- [ ] 11B简易结果
-- [ ] 10B, 11B完整结果
+- [x] 12B简易结果
+- [ ] 12B, 13B完整结果
+- [ ] 10B, 11B塑闪结果
+
+# Contributor
+- wqd
