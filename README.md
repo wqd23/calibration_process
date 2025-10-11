@@ -79,6 +79,4 @@ just ec {ver} src run {idx}
 
 # Contributor
 - wqd
-
-
-# GRID 作业-1 丘智勇
+- 丘智勇
