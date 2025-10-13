@@ -80,3 +80,4 @@ just ec {ver} src run {idx}
 # Contributor
 - wqd
 - 丘智勇
+- Lee
