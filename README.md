@@ -82,3 +82,4 @@ just ec {ver} src run {idx}
 - 丘智勇
 - Lee
 - yhl
+- xsq(Haruka Kujo)
