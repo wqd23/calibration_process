@@ -1197,6 +1197,143 @@ class EC_operation_11B(EC_operation_05B):
         )
         return result
 
+class TB_operation_09(TB_operation_05B):
+    def __init__(self, path, fit_range, save_path, save_fig_path, result_path) -> None:
+        self.path = path
+        self.files = [
+            file
+            for file in os.listdir(self.path)
+            if os.path.splitext(file)[1] == ".txt"
+        ]
+        self.files.remove("0826_30C_265_5m_0x0090.txt")
+        self.files.remove("0826_30C_265_5m_0x00A0.txt")
+        self.files.remove("0826_30C_265_5m_0x00B0.txt")
+        self.files.remove("0826_30C_265_5m_0x00BB.txt")
+        self.files.remove("0826_20C_290_5m_0x01F0 (1).txt")
+        self.files.remove("0825_0C_290_4m_0x00C5.txt")
+
+        
+        self.adc_max = 65535.0
+        self.source = "Am241"
+
+        self.fit_range = util.json_load(fit_range)
+        self.bin_width = 6
+        self.save_path = save_path
+        self.save_fig_path = save_fig_path
+        self.result_path = result_path
+
+    def file_config(self, file):
+        file = os.path.join(self.path, file)
+        basename = os.path.basename(file)
+        read_config = file_lib.Read_config(file, ending="09")
+        bkg_read_config = file_lib.Read_config()
+        spectrum_config = file_lib.Spectrum_config(
+            bin_width=self.bin_width, adc_max=self.adc_max
+        )
+        fit_config = file_lib.Fit_config(self.fit_range[basename])
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
+    
+class EC_operation_09(EC_operation_05B):
+    def __init__(
+        self,
+        tb_result_path: str,
+        fit_range: str,
+        energy: str,
+        bkg_form: str,
+        x_path,
+        src_path,
+        save_path,
+        save_fig_path,
+        result_path,
+    ) -> None:
+        # read config
+        self.x_config = ""
+
+        # spectrum config
+        ref_temp = 25
+        ref_bias = 28.5
+        tb_result: List[Dict[str, Any]] = util.json_load(tb_result_path)
+        ref_func = [
+            lambda t, b: util.tempbias2DFunction(
+                t, b, c["G0"], c["k"], c["V0"], c["b"], c["c"]
+            )
+            for c in tb_result
+        ]
+        self.corr = [lambda t, b: f(ref_temp, ref_bias) / f(t, b) for f in ref_func]
+        self.adc_max = 65535.0
+        self.bin_width = 10
+        # fit config
+        self.fit_range = util.json_load(fit_range)
+        self.bkg_form = util.json_load(bkg_form)
+        # ec file process
+        self.x_path = x_path
+        self.src_path = src_path
+        self.save_path = save_path
+        self.save_fig_path = save_fig_path
+        self.result_path = result_path
+        self.x_ch = [
+            f for f in os.listdir(self.x_path) if "_ch" in f and "65keV_" not in f
+        ]
+        self.x_list = list(set([f.split("_")[0] for f in self.x_ch]))
+        self.x_list.sort()
+
+        self.src_list = [
+            "0826_10C_285_Na22_20m_0x00CF.txt",
+            "0827_10C_285_Co60_20m_0x010F.txt",
+            "0827_10C_285_Cs137_20m_0x010F.txt"
+
+        ]
+        self.src_bkg = [
+            "0826_10C_285_Na22_bkg_20m.txt",
+            "0827_10C_285_bkg_20m_0x00CF.txt",
+            "0827_10C_285_bkg_20m_0x00CF.txt",
+        ]
+        self.energy = util.json_load(energy)
+        # self.energy_split = 50.2 # keV, absorption edges of Gd
+        self.energy_split_high = 55
+        self.energy_split_low = 49
+
+    def __get_x_files(self, energy_name: str):
+        return [
+            [
+                os.path.join(self.x_path, f)
+                for f in self.x_ch
+                if f"{energy_name}_ch{i}" in f
+            ][0]
+            for i in range(4)
+        ]
+
+    def xray_config(self, energy_name: str):
+        read_config = [
+            file_lib.Read_config(ch_file, ending="09", config_file=self.x_config)
+            for ch_file in self.__get_x_files(energy_name)
+        ]
+        bkg_read_config = read_config[1:4]
+        bkg_read_config.append(read_config[0])
+        spectrum_config = file_lib.Spectrum_config(
+            corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
+        )
+        fit_config = file_lib.Fit_config(
+            self.fit_range.get(energy_name, [[None, None]]*4), self.bkg_form.get(energy_name, "lin")
+        )
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
+
+    def __get_src_bkg(self, name: str):
+        return self.src_bkg[self.src_list.index(name)]
+
+    def src_config(self, file):
+        bkg = os.path.join(self.src_path, self.__get_src_bkg(file))
+        file = os.path.join(self.src_path, file)
+        basename = os.path.basename(file)
+        read_config = file_lib.Read_config(file, ending="09")
+        bkg_read_config = file_lib.Read_config(bkg, ending="09")
+        spectrum_config = file_lib.Spectrum_config(
+            corr=self.corr, adc_max=self.adc_max, bin_width=self.bin_width
+        )
+        fit_config = file_lib.Fit_config(
+            self.fit_range.get(basename, [[None, None]]*4), self.bkg_form.get(basename, "lin")
+        )
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
 
 def __get_fp05B(config, nocache=False) -> file_lib.File_operation_05b:
     return file_lib.File_operation_05b(config[0].path, *config, nocache=nocache)

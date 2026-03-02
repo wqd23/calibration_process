@@ -1,6 +1,6 @@
 default:
   just --list
-  @echo "Available ver: 03B 04 05B 07"
+  @echo "Available ver: 03B 04 05B 07 09"
 run any:
   python3 -m calibration_process.{{any}}
 tb ver *flags:

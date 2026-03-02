@@ -120,5 +120,26 @@
             "save_fig_path": "data/11B/single_process/single_fit_fig",
             "result_path": "data/11B/ec_logs"
         }
+    },
+    "09": {
+        "tb": {
+            "path": "data/09/raw_data/temp_bias",
+            "fit_range": "data/09/single_process/fit_range.json",
+            "save_path": "data/09/single_process/TB_fit_result",
+            "save_fig_path": "data/09/single_process/single_fit_fig",
+            "result_path": "data/09/tb_logs"
+        },
+        "ec": {
+            "tb_result_path": "data/09/tb_logs/20260301164328_temp_bias_fit.json",
+            "fit_range": "data/09/single_process/fit_range.json",
+            "energy": "data/09/single_process/ec_energy.json",
+            "bkg_form": "data/09/single_process/bkg_form.json",
+            "x_path": "data/09/raw_data/Xray",
+            "src_path": "data/09/raw_data/src",
+            "save_path": "data/09/single_process/EC_fit_result",
+            "save_fig_path": "data/09/single_process/single_fit_fig",
+            "result_path": "data/09/ec_logs"
+        }
     }
+        
 }

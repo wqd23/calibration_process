@@ -37,3 +37,4 @@ single_read10 = cachier(cache_dir=CACHE_DIR / "10B", separate_files=True)(
     original_single_read10
 )
 single_read11 = original_single_read11
+single_read09 = cachier(cache_dir=CACHE_DIR / "09", separate_files=True)(original_single_read07)

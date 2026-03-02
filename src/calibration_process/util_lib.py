@@ -493,6 +493,21 @@ def get_fit_dict(path: str, ec_energy, suffix="dat"):
             energy = ec_energy[f_name]
             data = pickle_load(os.path.join(path, f))
             src_result[energy] = data["fit_result"]
+        else:
+            # fallback: try multiple keys to map pickle name -> ec_energy key
+            f_base = re.sub("\\.pickle$", f".{suffix}", f)
+            f_stem = Path(f).stem
+            candidates = [f_base, f_stem, f]
+            key = next((c for c in candidates if c in ec_energy), None)
+            if key is None:
+                continue
+            energy = ec_energy[key]
+            data = pickle_load(os.path.join(path, f))
+            # heuristic: src if name contains src or energy very high; otherwise x
+            if "src" in key.lower() or energy > 200:
+                src_result[energy] = data["fit_result"]
+            else:
+                x_result[energy] = data["fit_result"]
     return x_result, src_result
 
 
