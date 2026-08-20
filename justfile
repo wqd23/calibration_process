@@ -1,6 +1,6 @@
 default:
   just --list
-  @echo "Available ver: 03B 04 05B 07 09"
+  @echo "Available ver: $(python3 -c "import json; print(' '.join(json.load(open('src/calibration_process/config.json')).keys()))")"
 run any:
   python3 -m calibration_process.{{any}}
 tb ver *flags:
