@@ -1396,6 +1396,11 @@ def process(op: Operation, file: str, fp_method=None, **kw_args) -> None:
     config = op.file_config(file)
     read_config, bkg_read_config, spectrum_config, fit_config = config
     fp = fp_method(config, nocache=kw_args.get("nocache", False))
+    # inject QA thresholds so peak_fit can classify results
+    save_path = op.op.save_path
+    ver = Path(save_path).parts[1]  # e.g. "data/03B/single_process/..." -> "03B"
+    category = "tb" if "TB_fit" in save_path else "ec"
+    fp.qa_thresholds = util.load_qa_thresholds(ver, category)
     fp.get_spectrum()
     # plot raw spectrum
     if kw_args.get("x_lim", None) is not None:

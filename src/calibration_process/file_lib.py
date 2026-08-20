@@ -244,10 +244,21 @@ class File_operation_05b:
                 print(
                     f"WARNING: fit failed for {self.path} channel {ich}: {e.args[-1]}"
                 )
-                fit_result.append({"success": False, "error": str(e.args[-1])})
+                fit_result.append({"success": False, "error": str(e.args[-1]), "qa_flag": "fail"})
                 continue
             rate = result["peak_amplitude"]
             rate_err = np.sqrt(rate / time)
+            # determine qa_flag from thresholds (injected by process())
+            redchi = result["redchi"]
+            thresholds = getattr(self, "qa_thresholds", {})
+            if not result["success"]:
+                qa_flag = "fail"
+            elif thresholds and redchi > thresholds.get("redchi_fail", float("inf")):
+                qa_flag = "fail"
+            elif thresholds and redchi > thresholds.get("redchi_warn", float("inf")):
+                qa_flag = "warn"
+            else:
+                qa_flag = "ok"
             fit_result.append(
                 {
                     "a": result["peak_amplitude"],
@@ -274,10 +285,11 @@ class File_operation_05b:
                         ** 2
                     ),
                     "bkg": result["bkg"],
-                    "redchi": result["redchi"],
+                    "redchi": redchi,
                     "ndf": result["ndf"],
                     "success": True,
                     "boundary_hit": result["boundary_hit"],
+                    "qa_flag": qa_flag,
                 }
             )
         self.fit_result = fit_result

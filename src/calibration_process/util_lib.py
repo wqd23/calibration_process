@@ -21,6 +21,31 @@ import re
 from pathlib import Path
 
 
+# QA thresholds: per-version file at data/{ver}/single_process/qa_thresholds.json
+# Falls back to these defaults when the file is absent.
+_DEFAULT_QA_THRESHOLDS = {
+    "tb": {"redchi_warn": 2.0, "redchi_fail": 5.0},
+    "ec": {"redchi_warn": 5.0, "redchi_fail": 50.0},
+}
+
+
+def load_qa_thresholds(ver: str, category: str) -> dict:
+    """Load QA thresholds for a payload version and category (tb/ec).
+
+    Reads data/{ver}/single_process/qa_thresholds.json if it exists,
+    otherwise returns the built-in defaults.  Per-version file only needs
+    to specify the keys that differ from the defaults.
+    """
+    path = f"data/{ver}/single_process/qa_thresholds.json"
+    overrides = {}
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            overrides = json.load(f)
+    base = _DEFAULT_QA_THRESHOLDS.get(category, _DEFAULT_QA_THRESHOLDS["tb"])
+    merged = {**base, **overrides.get(category, {})}
+    return merged
+
+
 def count_spectrum(amp, nbins, spec_range, bin_width, adc_max):
     spectrum, x = basic.getSpectrum(
         amp, nbins=nbins, specRange=spec_range, binWidth=bin_width, adcMax=adc_max
