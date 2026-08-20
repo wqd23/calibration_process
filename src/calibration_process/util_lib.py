@@ -56,6 +56,22 @@ class FitError(Exception):
         self.message = args[-1]
 
 
+def boundary_hits(params) -> List[str]:
+    """Names of fitted parameters sitting on their min/max bound.
+
+    A parameter pinned to its bound usually indicates a suspicious fit
+    (e.g. peak center pushed to the edge of the fit range).
+    """
+    hits = []
+    for name, par in params.items():
+        for bound_name, bound in (("min", par.min), ("max", par.max)):
+            if bound is None or not np.isfinite(bound):
+                continue
+            if np.isclose(par.value, bound, rtol=1e-3, atol=1e-12):
+                hits.append(f"{name}@{bound_name}")
+    return hits
+
+
 def peak_fit(
     x: Float1D, data: Float1D, error: Float1D, bkg_form: Optional[str] = None
 ) -> Dict[str, Any]:
@@ -131,6 +147,10 @@ def peak_fit(
             "peak_amplitude_err": result.params["peak_amplitude"].stderr,
             "peak_center_err": result.params["peak_center"].stderr,
             "peak_sigma_err": result.params["peak_sigma"].stderr,
+            "redchi": result.redchi,
+            "ndf": result.nfree,
+            "success": result.success,
+            "boundary_hit": boundary_hits(result.params),
         }
     )
 
@@ -246,7 +266,8 @@ def temp_bias_lmfit(
         "V0_err": param["V0"].stderr,
         "b_err": param["b"].stderr,
         "c_err": param["c"].stderr,
-        "chisquare": result.chisqr,
+        "redchi": result.redchi,
+        "ndf": result.nfree,
     }
     if not result.success:
         raise FitError(result, "faled to do temp bias 2d fit")
@@ -272,9 +293,10 @@ def temp_bias_fit_curvefit(
         raise FitError(e.args[0])
     perr = np.sqrt(np.diag(pcov))
     param = popt.tolist()
-    chisq = sum(
+    ndf = len(center_err) - len(param)
+    redchi = sum(
         (basic.residualTempbias2D(param, temp, bias, center) / center_err) ** 2
-    ) / (len(center_err) - len(param))
+    ) / ndf
     fitResult = {
         "G0": param[0],
         "k": param[1],
@@ -286,7 +308,8 @@ def temp_bias_fit_curvefit(
         "V0_err": perr[2],
         "b_err": perr[3],
         "c_err": perr[4],
-        "chisquare": chisq,
+        "redchi": redchi,
+        "ndf": ndf,
     }
     return fitResult
 
