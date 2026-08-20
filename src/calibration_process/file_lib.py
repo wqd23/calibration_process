@@ -239,10 +239,13 @@ class File_operation_05b:
                     bkg_form=self.fit_config.bkg_form,
                 )
             except util.FitError as e:
-                print(e.args[0].fit_report())
-                print(e.args[1])
-                e.args[0].plot()
-                raise util.FitError(f"failed to fit {self.path} channel {ich}")
+                # record the failure and keep batch processing going instead of
+                # aborting the whole run; QA reads the "success" flag downstream
+                print(
+                    f"WARNING: fit failed for {self.path} channel {ich}: {e.args[-1]}"
+                )
+                fit_result.append({"success": False, "error": str(e.args[-1])})
+                continue
             rate = result["peak_amplitude"]
             rate_err = np.sqrt(rate / time)
             fit_result.append(
@@ -271,6 +274,10 @@ class File_operation_05b:
                         ** 2
                     ),
                     "bkg": result["bkg"],
+                    "redchi": result["redchi"],
+                    "ndf": result["ndf"],
+                    "success": True,
+                    "boundary_hit": result["boundary_hit"],
                 }
             )
         self.fit_result = fit_result

@@ -105,6 +105,13 @@ def fit_plot_single_channel(
             "None fit range offered\n no fit for this channel",
         )
         return ax
+    if isinstance(fit_result, dict) and not fit_result.get("success", True):
+        ax.text(
+            x[np.where(spectrum == np.max(spectrum))],
+            max(spectrum),
+            f"fit FAILED:\n{fit_result.get('error', '')}",
+        )
+        return ax
     raw_plot_single_channel(spectrum, x, title, ax=ax, **kwargs)
     amplitude = fit_result["a"]
     center = fit_result["b"]
