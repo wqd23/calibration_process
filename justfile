@@ -15,6 +15,9 @@ ecfit ver:
 check ver *flags:
   python3 -m calibration_process.check {{ver}} {{flags}}
 
+new-payload ver *flags:
+  python3 -m calibration_process.scaffold {{ver}} {{flags}}
+
 test ver n:
   @just tb {{ver}} list
   @just tb {{ver}} run {{n}}
