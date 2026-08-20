@@ -12,6 +12,9 @@ ec ver *flags:
 ecfit ver:
   python3 -m calibration_process.process {{ver}} ecfit
 
+check ver *flags:
+  python3 -m calibration_process.check {{ver}} {{flags}}
+
 test ver n:
   @just tb {{ver}} list
   @just tb {{ver}} run {{n}}
