@@ -11,7 +11,7 @@ from . import util_lib as util
 from .__init__ import CFG_PATH
 from . import operation as op
 
-cfg = util.json_load(CFG_PATH)
+cfg = util.load_config(CFG_PATH)
 
 # (wrapper class, tb operation class, ec operation class, extra kwargs)
 OPERATION_SPEC = {

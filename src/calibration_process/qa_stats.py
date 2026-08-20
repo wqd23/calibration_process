@@ -20,7 +20,7 @@ import numpy as np
 from . import util_lib as util
 from .__init__ import CFG_PATH
 
-cfg = util.json_load(CFG_PATH)
+cfg = util.load_config(CFG_PATH)
 
 
 def _single_fit_stats(root: Path):

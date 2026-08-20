@@ -46,6 +46,41 @@ def load_qa_thresholds(ver: str, category: str) -> dict:
     return merged
 
 
+def _deep_merge(base: dict, override: dict) -> dict:
+    """Recursively merge override into base (non-destructive)."""
+    result = base.copy()
+    for key, val in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(val, dict):
+            result[key] = _deep_merge(result[key], val)
+        else:
+            result[key] = val
+    return result
+
+
+def load_config(path: str) -> dict:
+    """Load config.json and expand _defaults template for each version.
+
+    Each version's tb/ec sections are merged with the corresponding
+    _defaults section, with {ver} replaced by the version key.
+    Version-specific keys override defaults; extra keys are preserved.
+    """
+    raw = json_load(path)
+    defaults = raw.pop("_defaults", {})
+    cfg = {}
+    for ver, sections in raw.items():
+        cfg[ver] = {}
+        for section in ("tb", "ec"):
+            template = defaults.get(section, {})
+            # replace {ver} placeholder in template values
+            expanded = {
+                k: v.replace("{ver}", ver) if isinstance(v, str) else v
+                for k, v in template.items()
+            }
+            override = sections.get(section, {})
+            cfg[ver][section] = _deep_merge(expanded, override)
+    return cfg
+
+
 def count_spectrum(amp, nbins, spec_range, bin_width, adc_max):
     spectrum, x = basic.getSpectrum(
         amp, nbins=nbins, specRange=spec_range, binWidth=bin_width, adcMax=adc_max

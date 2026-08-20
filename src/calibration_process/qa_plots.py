@@ -20,7 +20,7 @@ import numpy as np
 from . import util_lib as util
 from .__init__ import CFG_PATH
 
-cfg = util.json_load(CFG_PATH)
+cfg = util.load_config(CFG_PATH)
 
 CHANNEL_COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
 CHANNEL_LABELS = ["ch0", "ch1", "ch2", "ch3"]

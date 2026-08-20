@@ -23,7 +23,7 @@ import sys
 from . import util_lib as util
 from .__init__ import CFG_PATH
 
-cfg = util.json_load(CFG_PATH)
+cfg = util.load_config(CFG_PATH)
 
 # config keys pointing to input files/dirs that must exist before processing
 INPUT_KEYS = (
