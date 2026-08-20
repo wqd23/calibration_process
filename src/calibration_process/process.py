@@ -13,58 +13,60 @@ from . import operation as op
 
 cfg = util.json_load(CFG_PATH)
 
-process03B = VersionProcessOp(
-    op.TB_operation_03B(**cfg["03B"]["tb"]),
-    op.EC_operation_03B(**cfg["03B"]["ec"]),
-    fp_method="03",
-)
-process04 = VersionProcessOp(
-    op.TB_operation_04(**cfg["04"]["tb"]),
-    op.EC_operation_04(**cfg["04"]["ec"]),
-    fp_method="04",
-    suffix="txt",
-)
-process05B = VersionProcessOp(
-    op.TB_operation_05B(**cfg["05B"]["tb"]),
-    op.EC_operation_05B(**cfg["05B"]["ec"]),
-    fp_method=None,
-)
+# (wrapper class, tb operation class, ec operation class, extra kwargs)
+OPERATION_SPEC = {
+    "03B": (VersionProcessOp, op.TB_operation_03B, op.EC_operation_03B,
+            {"fp_method": "03"}),
+    "04": (VersionProcessOp, op.TB_operation_04, op.EC_operation_04,
+           {"fp_method": "04", "suffix": "txt"}),
+    "05B": (VersionProcessOp, op.TB_operation_05B, op.EC_operation_05B,
+            {"fp_method": None}),
+    "07": (VersionProcessOp, op.TB_operation_07, op.EC_operation_07,
+           {"fp_method": "07", "suffix": "txt"}),
+    "10B": (VersionProcessOp10B, op.TB_operation_10B, op.EC_operation_10B,
+            {"fp_method": "10"}),
+    "11B": (VersionProcessOp10B, op.TB_operation_11B, op.EC_operation_11B,
+            {"fp_method": "11"}),
+    "09": (VersionProcessOp, op.TB_operation_09, op.EC_operation_09,
+           {"fp_method": "09", "suffix": "txt"}),
+}
 
-process07 = VersionProcessOp(
-    op.TB_operation_07(**cfg["07"]["tb"]),
-    op.EC_operation_07(**cfg["07"]["ec"]),
-    fp_method="07",
-    suffix="txt",
-)
 
-process10B = VersionProcessOp10B(
-    op.TB_operation_10B(**cfg["10B"]["tb"]),
-    op.EC_operation_10B(**cfg["10B"]["ec"]),
-    fp_method="10",
-)
+def build_process(ver: str) -> VersionProcessOp:
+    """Instantiate the process operation for a single payload version.
 
-process11B = VersionProcessOp10B(
-    op.TB_operation_11B(**cfg["11B"]["tb"]),
-    op.EC_operation_11B(**cfg["11B"]["ec"]),
-    fp_method="11",
-)
+    Operations read data directories on construction, so they are only
+    created here on demand instead of at import time.
+    """
+    wrapper_cls, tb_cls, ec_cls, kwargs = OPERATION_SPEC[ver]
+    return wrapper_cls(
+        tb_cls(**cfg[ver]["tb"]),
+        ec_cls(**cfg[ver]["ec"]),
+        **kwargs,
+    )
 
-process09 = VersionProcessOp(
-    op.TB_operation_09(**cfg["09"]["tb"]),
-    op.EC_operation_09(**cfg["09"]["ec"]),
-    fp_method="09",
-    suffix="txt",
-)
+
+class _LazyProcess:
+    """Proxy that only builds the process operation on first attribute access."""
+
+    def __init__(self, ver: str) -> None:
+        self._ver = ver
+        self._instance = None
+
+    def _get_instance(self) -> VersionProcessOp:
+        if self._instance is None:
+            self._instance = build_process(self._ver)
+        return self._instance
+
+    def __getattr__(self, name: str):
+        if name.startswith("_"):
+            raise AttributeError(name)
+        return getattr(self._get_instance(), name)
+
+    def __dir__(self):
+        # fire discovers members via dir(); trigger instantiation lazily here
+        return sorted(set(super().__dir__()) | set(dir(self._get_instance())))
+
 
 if __name__ == "__main__":
-    fire.Fire(
-        {
-            "03B": process03B,
-            "04": process04,
-            "05B": process05B,
-            "07": process07,
-            "10B": process10B,
-            "11B": process11B,
-            "09": process09,
-        }
-    )
+    fire.Fire({ver: _LazyProcess(ver) for ver in OPERATION_SPEC})
