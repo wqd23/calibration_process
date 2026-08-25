@@ -25,7 +25,18 @@ just tbfit {ver}                     # TB 二维面拟合
 just ecfit {ver}                     # E-C 关系拟合
 ```
 
-详细文档见 [docs/](docs/) 目录。
+## 文档
+
+详细文档在 [docs/](docs/) 目录（清单与写作约定见 [docs/README.md](docs/README.md)）：
+
+| 文档 | 内容 |
+|------|------|
+| [docs/deploy.md](docs/deploy.md) | 部署指南：新机器上装环境、挂数据、验证部署 |
+| [docs/data.md](docs/data.md) | 数据准备与目录约定：配置文件格式、新版本载荷接入流程与方法论 |
+| [docs/results.md](docs/results.md) | 结果产物与 QA 指标说明 |
+| [docs/12B_13B/data.md](docs/12B_13B/data.md) | 12B/13B 类载荷的数据说明（点位对照表、各文件的特殊情况） |
+
+每类载荷的数据说明单独放一个目录（如 `docs/12B_13B/`），新增载荷时仿照添加。
 
 ## 命令速查
 
@@ -47,10 +58,13 @@ just ecfit {ver}                     # E-C 关系拟合
 ```
 .
 ├── README.md
-├── docs/                           # 详细文档
+├── docs/                           # 详细文档（清单见 docs/README.md）
+│   ├── README.md                   # 文档目录说明与清单
 │   ├── deploy.md                   # 部署指南
-│   ├── data.md                     # 数据准备与目录约定
-│   └── results.md                  # 结果产物与 QA 指标
+│   ├── data.md                     # 数据准备与目录约定、接入方法论
+│   ├── results.md                  # 结果产物与 QA 指标
+│   └── 12B_13B/                    # 12B/13B 类载荷的数据说明（每类载荷一个目录）
+│       └── data.md                 # 点位对照表、各数据文件的特殊情况
 ├── data/{ver}/                     # 各版本数据目录
 │   ├── raw_data -> /path/to/data   # 原始数据软链
 │   ├── single_process/             # 配置文件和拟合产物
@@ -76,7 +90,8 @@ just ecfit {ver}                     # E-C 关系拟合
 ## TODO
 
 - [x] 12B 简易结果
-- [ ] 12B, 13B 完整结果
+- [x] 12B 完整结果（TB: 备份目录全 54 点位温偏面拟合，适用偏压 ≥27.5V 内残差 <3.5%；EC: 与其他载荷相同的 K 边拆段二次拟合（EC_low/EC_high 输出 schema 一致），锚点为 Am241/Na22/Cs137/Co60（双高斯拟合 1332 keV）+ X光机 20-100 kV（低管压点的能量按管压赋值、有已知系统偏差，仅作参考；见 docs/12B_13B/data.md））
+- [ ] 13B 完整结果
 - [ ] 10B, 11B 塑闪结果
 
 ## Contributor
