@@ -21,6 +21,66 @@ import re
 from pathlib import Path
 
 
+# QA thresholds: per-version file at data/{ver}/single_process/qa_thresholds.json
+# Falls back to these defaults when the file is absent.
+_DEFAULT_QA_THRESHOLDS = {
+    "tb": {"redchi_warn": 2.0, "redchi_fail": 5.0},
+    "ec": {"redchi_warn": 5.0, "redchi_fail": 50.0},
+}
+
+
+def load_qa_thresholds(ver: str, category: str) -> dict:
+    """Load QA thresholds for a payload version and category (tb/ec).
+
+    Reads data/{ver}/single_process/qa_thresholds.json if it exists,
+    otherwise returns the built-in defaults.  Per-version file only needs
+    to specify the keys that differ from the defaults.
+    """
+    path = f"data/{ver}/single_process/qa_thresholds.json"
+    overrides = {}
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            overrides = json.load(f)
+    base = _DEFAULT_QA_THRESHOLDS.get(category, _DEFAULT_QA_THRESHOLDS["tb"])
+    merged = {**base, **overrides.get(category, {})}
+    return merged
+
+
+def _deep_merge(base: dict, override: dict) -> dict:
+    """Recursively merge override into base (non-destructive)."""
+    result = base.copy()
+    for key, val in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(val, dict):
+            result[key] = _deep_merge(result[key], val)
+        else:
+            result[key] = val
+    return result
+
+
+def load_config(path: str) -> dict:
+    """Load config.json and expand _defaults template for each version.
+
+    Each version's tb/ec sections are merged with the corresponding
+    _defaults section, with {ver} replaced by the version key.
+    Version-specific keys override defaults; extra keys are preserved.
+    """
+    raw = json_load(path)
+    defaults = raw.pop("_defaults", {})
+    cfg = {}
+    for ver, sections in raw.items():
+        cfg[ver] = {}
+        for section in ("tb", "ec"):
+            template = defaults.get(section, {})
+            # replace {ver} placeholder in template values
+            expanded = {
+                k: v.replace("{ver}", ver) if isinstance(v, str) else v
+                for k, v in template.items()
+            }
+            override = sections.get(section, {})
+            cfg[ver][section] = _deep_merge(expanded, override)
+    return cfg
+
+
 def count_spectrum(amp, nbins, spec_range, bin_width, adc_max):
     spectrum, x = basic.getSpectrum(
         amp, nbins=nbins, specRange=spec_range, binWidth=bin_width, adcMax=adc_max
@@ -54,6 +114,22 @@ class FitError(Exception):
         super().__init__(*args)
         # message for print
         self.message = args[-1]
+
+
+def boundary_hits(params) -> List[str]:
+    """Names of fitted parameters sitting on their min/max bound.
+
+    A parameter pinned to its bound usually indicates a suspicious fit
+    (e.g. peak center pushed to the edge of the fit range).
+    """
+    hits = []
+    for name, par in params.items():
+        for bound_name, bound in (("min", par.min), ("max", par.max)):
+            if bound is None or not np.isfinite(bound):
+                continue
+            if np.isclose(par.value, bound, rtol=1e-3, atol=1e-12):
+                hits.append(f"{name}@{bound_name}")
+    return hits
 
 
 def peak_fit(
@@ -131,6 +207,10 @@ def peak_fit(
             "peak_amplitude_err": result.params["peak_amplitude"].stderr,
             "peak_center_err": result.params["peak_center"].stderr,
             "peak_sigma_err": result.params["peak_sigma"].stderr,
+            "redchi": result.redchi,
+            "ndf": result.nfree,
+            "success": result.success,
+            "boundary_hit": boundary_hits(result.params),
         }
     )
 
@@ -246,7 +326,8 @@ def temp_bias_lmfit(
         "V0_err": param["V0"].stderr,
         "b_err": param["b"].stderr,
         "c_err": param["c"].stderr,
-        "chisquare": result.chisqr,
+        "redchi": result.redchi,
+        "ndf": result.nfree,
     }
     if not result.success:
         raise FitError(result, "faled to do temp bias 2d fit")
@@ -254,10 +335,17 @@ def temp_bias_lmfit(
 
 
 def temp_bias_fit_curvefit(
-    center: Float1D, center_err: Float1D, temp: Float1D, bias: Float1D
+    center: Float1D,
+    center_err: Float1D,
+    temp: Float1D,
+    bias: Float1D,
+    p0: Optional[List[float]] = None,
+    maxfev: int = 10000,
 ) -> Dict[str, float]:
     data = np.stack([temp, bias], axis=1)
-    initial_guess = [0.012, 0.0184, 24.11, 54.31, 23459.83]
+    initial_guess = (
+        p0 if p0 is not None else [0.012, 0.0184, 24.11, 54.31, 23459.83]
+    )
     try:
         popt, pcov = curve_fit(
             tempbias2DFunctionInternal,
@@ -266,15 +354,16 @@ def temp_bias_fit_curvefit(
             sigma=center_err,
             absolute_sigma=True,
             p0=initial_guess,
-            maxfev=10000,
+            maxfev=maxfev,
         )
     except RuntimeError as e:
         raise FitError(e.args[0])
     perr = np.sqrt(np.diag(pcov))
     param = popt.tolist()
-    chisq = sum(
+    ndf = len(center_err) - len(param)
+    redchi = sum(
         (basic.residualTempbias2D(param, temp, bias, center) / center_err) ** 2
-    ) / (len(center_err) - len(param))
+    ) / ndf
     fitResult = {
         "G0": param[0],
         "k": param[1],
@@ -286,7 +375,8 @@ def temp_bias_fit_curvefit(
         "V0_err": perr[2],
         "b_err": perr[3],
         "c_err": perr[4],
-        "chisquare": chisq,
+        "redchi": redchi,
+        "ndf": ndf,
     }
     return fitResult
 

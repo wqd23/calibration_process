@@ -1,0 +1,10 @@
+{
+  "tb": {
+    "redchi_warn": 2.0,
+    "redchi_fail": 5.0
+  },
+  "ec": {
+    "redchi_warn": 5.0,
+    "redchi_fail": 50.0
+  }
+}

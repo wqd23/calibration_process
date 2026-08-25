@@ -1,83 +1,101 @@
-# 如何使用
+# GRID 标定数据处理
 
-本仓库使用[uv](https://docs.astral.sh/uv/)管理python环境，并使用[just](https://github.com/casey/just)展示使用方法。但是实际使用的python版本与依赖可以在`.python-version`与`pyproject.toml`中查看并手动配置；下文中介绍的just命令也可以在`justfile`中查看其实际命令。
+本仓库用于 GRID 载荷标定数据的处理、拟合与质量检验。
 
-## 初次使用
+## 快速上手
 
-初次使用时需要先完成python环境配置与标定数据软链接及目录创建，请注意`just init`中`ver`为载荷版本号，使用`just`命令查看可选版本，`path`为载荷标定数据文件路径。
-
+**前置依赖：** [uv](https://docs.astral.sh/uv/)（Python 环境管理）和 [just](https://github.com/casey/just)（命令运行器）。
 ```bash
-uv sync
-just init {ver} {path}
-```
- 
-## 数据处理
-
-对特定载荷的标定数据进行处理
-```bash
-just tb {ver} run all   #处理该载荷全部温度偏压实验数据
-just tbfit {ver}        #拟合温度偏压响应
-just ec {ver} x run all   #处理该载荷全部X光机实验数据
-just ec {ver} src run all   #处理该载荷全部放射源实验数据
-just ecfit {ver}        #拟合E-C关系
-```
-要重新处理特定一次实验数据，先通过
-```bash
-just tb {ver} list
-just ec {ver} x list
-just ec {ver} src list
-```
-得到文件对应编号`idx`，例如
-```
-0 src_Na22_20m_10cm_rundata2021-05-05-15-29-56.dat
-1 src_Am241_5m_10cm_rundata2021-05-05-15-15-48.dat
-2 src_Cs137_12m_10cm_rundata2021-05-05-12-12-27.dat
-```
-再使用下列命令处理对应数据
-```bash
-just tb {ver} run {idx}
-just ec {ver} x run {idx}
-just ec {ver} src run {idx}
+curl -LsSf https://astral.sh/uv/install.sh | sh   # 安装 uv
+cargo install just                                  # 安装 just（或 brew install just）
 ```
 
-# 仓库结构
+**部署：**
+```bash
+git clone <repo-url> && cd calibration_process
+uv sync                              # 安装依赖
+just init {ver} {data-path}          # 软链数据 + 创建目录（ver 用 just 查看）
+just check {ver}                     # 验证部署
+```
 
-对原有标定代码进行重构，代码仓库主体结构如下
+**跑数据：**
+```bash
+just all {ver}                       # 处理全部 TB + EC 数据
+just tbfit {ver}                     # TB 二维面拟合
+just ecfit {ver}                     # E-C 关系拟合
+```
+
+## 文档
+
+详细文档在 [docs/](docs/) 目录（清单与写作约定见 [docs/README.md](docs/README.md)）：
+
+| 文档 | 内容 |
+|------|------|
+| [docs/deploy.md](docs/deploy.md) | 部署指南：新机器上装环境、挂数据、验证部署 |
+| [docs/data.md](docs/data.md) | 数据准备与目录约定：配置文件格式、新版本载荷接入流程与方法论 |
+| [docs/results.md](docs/results.md) | 结果产物与 QA 指标说明 |
+| [docs/12B_13B/data.md](docs/12B_13B/data.md) | 12B/13B 类载荷的数据说明（点位对照表、各文件的特殊情况） |
+
+每类载荷的数据说明单独放一个目录（如 `docs/12B_13B/`），新增载荷时仿照添加。
+
+## 命令速查
+
+| 命令 | 说明 |
+|------|------|
+| `just` | 查看所有命令和可用版本 |
+| `just init {ver} {path}` | 初始化版本：软链数据 + 建目录 |
+| `just check {ver}` | 验证部署完整性（`--fix` 自动创建缺失目录） |
+| `just all {ver}` | 处理该版本全部数据 |
+| `just tb {ver} run {idx}` | 处理单个 TB 文件 |
+| `just ec {ver} x run {idx}` | 处理单个 EC X光机文件 |
+| `just ec {ver} src run {idx}` | 处理单个 EC 放射源文件 |
+| `just tbfit {ver}` | TB 二维面拟合 |
+| `just ecfit {ver}` | E-C 关系拟合 |
+| `just new-payload {ver}` | 为新载荷生成配置和目录骨架 |
+
+## 仓库结构
+
 ```
 .
 ├── README.md
-├── data
-│   ├── {ver}
-│   │   ├── ec_logs
-│   │   ├── raw_data
-│   │   ├── single_process
-│   │   └── tb_logs
-├── lib_reader
-├── lib_plot
+├── docs/                           # 详细文档（清单见 docs/README.md）
+│   ├── README.md                   # 文档目录说明与清单
+│   ├── deploy.md                   # 部署指南
+│   ├── data.md                     # 数据准备与目录约定、接入方法论
+│   ├── results.md                  # 结果产物与 QA 指标
+│   └── 12B_13B/                    # 12B/13B 类载荷的数据说明（每类载荷一个目录）
+│       └── data.md                 # 点位对照表、各数据文件的特殊情况
+├── data/{ver}/                     # 各版本数据目录
+│   ├── raw_data -> /path/to/data   # 原始数据软链
+│   ├── single_process/             # 配置文件和拟合产物
+│   ├── tb_logs/                    # TB 面拟合产物
+│   └── ec_logs/                    # E-C 拟合产物
+├── lib_reader/                     # 各版本数据读取库（workspace 子包）
+├── lib_plot/                       # 绘图库（workspace 子包）
+├── src/calibration_process/
+│   ├── process.py                  # CLI 入口（惰性加载）
+│   ├── cmd.py                      # 命令行包装
+│   ├── operation.py                # TB/EC 操作类
+│   ├── file_lib.py                 # 单文件读取与拟合
+│   ├── fitting.py                  # 通用峰型拟合
+│   ├── util_lib.py                 # 工具函数（拟合、缓存、阈值）
+│   ├── check.py                    # 部署校验
+│   ├── scaffold.py                 # 新版本脚手架
+│   └── config.json                 # 各版本配置（模板化）
 ├── pyproject.toml
-├── requirements-dev.lock
-├── requirements.lock
-└── src
-    └── grid_calibration
-        ├── cmd.py
-        ├── file_lib.py
-        ├── __init__.py
-        ├── main.py
-        ├── operation.py
-        ├── process03B
-        ├── process04
-        ├── process05B
-        ├── process07
-        └── util_lib.py
+├── uv.lock
+└── justfile
 ```
-其中`./data/{ver}/raw_data`指向实际标定数据。
 
-# TODO
-- [x] 12B简易结果
-- [ ] 12B, 13B完整结果
-- [ ] 10B, 11B塑闪结果
+## TODO
 
-# Contributor
+- [x] 12B 简易结果
+- [x] 12B 完整结果（TB: 备份目录全 54 点位温偏面拟合，适用偏压 ≥27.5V 内残差 <3.5%；EC: 与其他载荷相同的 K 边拆段二次拟合（EC_low/EC_high 输出 schema 一致），锚点为 Am241/Na22/Cs137/Co60（双高斯拟合 1332 keV）+ X光机 20-100 kV（低管压点的能量按管压赋值、有已知系统偏差，仅作参考；见 docs/12B_13B/data.md））
+- [ ] 13B 完整结果
+- [ ] 10B, 11B 塑闪结果
+
+## Contributor
+
 - wqd
 - 丘智勇
 - Lee

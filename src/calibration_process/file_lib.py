@@ -130,6 +130,10 @@ class File_operation_05b:
             data = ver.single_read11(
                 config.path, config.kwarg.get("mode", "wf"), overwrite_cache=nocache
             )
+        elif config.ending == "12b":
+            data = ver.single_read12(
+                config.path, overwrite_cache=nocache, **config.kwarg
+            )
         elif config.ending == "09":
             data = ver.single_read09(config.path, overwrite_cache=nocache)
         else:
@@ -239,12 +243,26 @@ class File_operation_05b:
                     bkg_form=self.fit_config.bkg_form,
                 )
             except util.FitError as e:
-                print(e.args[0].fit_report())
-                print(e.args[1])
-                e.args[0].plot()
-                raise util.FitError(f"failed to fit {self.path} channel {ich}")
+                # record the failure and keep batch processing going instead of
+                # aborting the whole run; QA reads the "success" flag downstream
+                print(
+                    f"WARNING: fit failed for {self.path} channel {ich}: {e.args[-1]}"
+                )
+                fit_result.append({"success": False, "error": str(e.args[-1]), "qa_flag": "fail"})
+                continue
             rate = result["peak_amplitude"]
             rate_err = np.sqrt(rate / time)
+            # determine qa_flag from thresholds (injected by process())
+            redchi = result["redchi"]
+            thresholds = getattr(self, "qa_thresholds", {})
+            if not result["success"]:
+                qa_flag = "fail"
+            elif thresholds and redchi > thresholds.get("redchi_fail", float("inf")):
+                qa_flag = "fail"
+            elif thresholds and redchi > thresholds.get("redchi_warn", float("inf")):
+                qa_flag = "warn"
+            else:
+                qa_flag = "ok"
             fit_result.append(
                 {
                     "a": result["peak_amplitude"],
@@ -271,6 +289,11 @@ class File_operation_05b:
                         ** 2
                     ),
                     "bkg": result["bkg"],
+                    "redchi": redchi,
+                    "ndf": result["ndf"],
+                    "success": True,
+                    "boundary_hit": result["boundary_hit"],
+                    "qa_flag": qa_flag,
                 }
             )
         self.fit_result = fit_result

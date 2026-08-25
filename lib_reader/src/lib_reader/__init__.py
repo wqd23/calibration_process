@@ -11,6 +11,7 @@ from .reader07.read import single_read07 as original_single_read07
 from .reader04.read import single_read04 as original_single_read04
 from .reader10.read import single_read10 as original_single_read10
 from .reader11.read import single_read11 as original_single_read11
+from .reader12.read import single_read12 as original_single_read12
 
 def get_project_root() -> Path:
     current_path = Path(os.getcwd())
@@ -37,4 +38,5 @@ single_read10 = cachier(cache_dir=CACHE_DIR / "10B", separate_files=True)(
     original_single_read10
 )
 single_read11 = original_single_read11
+single_read12 = original_single_read12
 single_read09 = cachier(cache_dir=CACHE_DIR / "09", separate_files=True)(original_single_read07)

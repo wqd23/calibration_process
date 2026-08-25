@@ -115,3 +115,31 @@ class VersionProcessOp10B(VersionProcessOp):
             for src in src_file
         ]
         self.__ec_op.ec_fit(src_result, src_energy, x_result, x_energy)
+
+
+class VersionProcessOp12B(VersionProcessOp10B):
+    """
+    commandline warpper for 12B payload:
+    ec energy keys are numeric kV values for X-ray files and
+    .dat filenames for source files
+    """
+
+    def __init__(self, tb_op, ec_op, fp_method, suffix: str = "dat") -> None:
+        super().__init__(tb_op, ec_op, fp_method, suffix)
+        self.__ec_op12 = ec_op
+
+    def ecfit(self):
+        energy = self.__ec_op12.energy
+        save_path = Path(self.__ec_op12.save_path)
+        x_file = [k for k in energy.keys() if k.isdigit()]
+        x_energy = [energy[k] for k in x_file]
+        x_result = [
+            util.pickle_load(save_path / f"{x}.pickle")["fit_result"] for x in x_file
+        ]
+        src_file = [k for k in energy.keys() if not k.isdigit()]
+        src_energy = [energy[k] for k in src_file]
+        src_result = [
+            util.pickle_load((save_path / src).with_suffix(".pickle"))["fit_result"]
+            for src in src_file
+        ]
+        self.__ec_op12.ec_fit(src_result, src_energy, x_result, x_energy)
