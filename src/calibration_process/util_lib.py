@@ -335,10 +335,17 @@ def temp_bias_lmfit(
 
 
 def temp_bias_fit_curvefit(
-    center: Float1D, center_err: Float1D, temp: Float1D, bias: Float1D
+    center: Float1D,
+    center_err: Float1D,
+    temp: Float1D,
+    bias: Float1D,
+    p0: Optional[List[float]] = None,
+    maxfev: int = 10000,
 ) -> Dict[str, float]:
     data = np.stack([temp, bias], axis=1)
-    initial_guess = [0.012, 0.0184, 24.11, 54.31, 23459.83]
+    initial_guess = (
+        p0 if p0 is not None else [0.012, 0.0184, 24.11, 54.31, 23459.83]
+    )
     try:
         popt, pcov = curve_fit(
             tempbias2DFunctionInternal,
@@ -347,7 +354,7 @@ def temp_bias_fit_curvefit(
             sigma=center_err,
             absolute_sigma=True,
             p0=initial_guess,
-            maxfev=10000,
+            maxfev=maxfev,
         )
     except RuntimeError as e:
         raise FitError(e.args[0])

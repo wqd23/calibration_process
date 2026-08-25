@@ -1,0 +1,450 @@
+[
+ {
+  "temp_setpoint_C": 30,
+  "bias_code": 290,
+  "bias_setpoint_V": 29.0,
+  "hk_file": "备份/072/hk/ecu_1_151.hk",
+  "observe_file": "备份/072/sample/074_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 30,
+  "bias_code": 287,
+  "bias_setpoint_V": 28.7,
+  "hk_file": "备份/072/hk/ecu_1_146.hk",
+  "observe_file": "备份/072/sample/073_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 30,
+  "bias_code": 285,
+  "bias_setpoint_V": 28.5,
+  "hk_file": "备份/072/hk/ecu_1_145.hk",
+  "observe_file": "备份/072/sample/072_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 30,
+  "bias_code": 283,
+  "bias_setpoint_V": 28.3,
+  "hk_file": "备份/072/hk/ecu_1_144.hk",
+  "observe_file": "备份/072/sample/071_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 30,
+  "bias_code": 280,
+  "bias_setpoint_V": 28.0,
+  "hk_file": "备份/072/hk/ecu_1_152.hk",
+  "observe_file": "备份/072/sample/075_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 30,
+  "bias_code": 275,
+  "bias_setpoint_V": 27.5,
+  "hk_file": "备份/072/hk/ecu_1_142.hk",
+  "observe_file": "备份/072/sample/070_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 30,
+  "bias_code": 270,
+  "bias_setpoint_V": 27.0,
+  "hk_file": "备份/072/hk/ecu_1_141.hk",
+  "observe_file": "备份/072/sample/069_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 30,
+  "bias_code": 265,
+  "bias_setpoint_V": 26.5,
+  "hk_file": "备份/072/hk/ecu_1_140.hk",
+  "observe_file": "备份/072/sample/068_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 20,
+  "bias_code": 290,
+  "bias_setpoint_V": 29.0,
+  "hk_file": "备份/072/hk/ecu_1_135.hk",
+  "observe_file": "备份/072/sample/066_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 20,
+  "bias_code": 287,
+  "bias_setpoint_V": 28.7,
+  "hk_file": "备份/072/hk/ecu_1_134.hk",
+  "observe_file": "备份/072/sample/065_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 20,
+  "bias_code": 285,
+  "bias_setpoint_V": 28.5,
+  "hk_file": "备份/072/hk/ecu_1_133.hk",
+  "observe_file": "备份/072/sample/064_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 20,
+  "bias_code": 283,
+  "bias_setpoint_V": 28.3,
+  "hk_file": "备份/072/hk/ecu_1_132.hk",
+  "observe_file": "备份/072/sample/063_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 20,
+  "bias_code": 280,
+  "bias_setpoint_V": 28.0,
+  "hk_file": "备份/072/hk/ecu_1_131.hk",
+  "observe_file": "备份/072/sample/062_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 20,
+  "bias_code": 275,
+  "bias_setpoint_V": 27.5,
+  "hk_file": "备份/072/hk/ecu_1_130.hk",
+  "observe_file": "备份/072/sample/061_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 20,
+  "bias_code": 270,
+  "bias_setpoint_V": 27.0,
+  "hk_file": "备份/072/hk/ecu_1_129.hk",
+  "observe_file": "备份/072/sample/060_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 20,
+  "bias_code": 265,
+  "bias_setpoint_V": 26.5,
+  "hk_file": "备份/072/hk/ecu_1_126.hk",
+  "observe_file": "备份/072/sample/058_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 10,
+  "bias_code": 290,
+  "bias_setpoint_V": 29.0,
+  "hk_file": "备份/072/hk/ecu_1_120.hk",
+  "observe_file": "备份/072/sample/055_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 10,
+  "bias_code": 287,
+  "bias_setpoint_V": 28.7,
+  "hk_file": "备份/072/hk/ecu_1_117.hk",
+  "observe_file": "备份/072/sample/054_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 10,
+  "bias_code": 285,
+  "bias_setpoint_V": 28.5,
+  "hk_file": "备份/072/hk/ecu_1_116.hk",
+  "observe_file": "备份/072/sample/053_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 10,
+  "bias_code": 283,
+  "bias_setpoint_V": 28.3,
+  "hk_file": "备份/072/hk/ecu_1_115.hk",
+  "observe_file": "备份/072/sample/052_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 10,
+  "bias_code": 280,
+  "bias_setpoint_V": 28.0,
+  "hk_file": "备份/072/hk/ecu_1_114.hk",
+  "observe_file": "备份/072/sample/051_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 10,
+  "bias_code": 275,
+  "bias_setpoint_V": 27.5,
+  "hk_file": "备份/072/hk/ecu_1_113.hk",
+  "observe_file": "备份/072/sample/050_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 10,
+  "bias_code": 270,
+  "bias_setpoint_V": 27.0,
+  "hk_file": "备份/072/hk/ecu_1_112.hk",
+  "observe_file": "备份/072/sample/049_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 10,
+  "bias_code": 265,
+  "bias_setpoint_V": 26.5,
+  "hk_file": "备份/072/hk/ecu_1_108.hk",
+  "observe_file": "备份/072/sample/047_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 0,
+  "bias_code": 290,
+  "bias_setpoint_V": 29.0,
+  "hk_file": "备份/072/hk/ecu_1_107.hk",
+  "observe_file": "备份/072/sample/046_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 0,
+  "bias_code": 287,
+  "bias_setpoint_V": 28.7,
+  "hk_file": "备份/072/hk/ecu_1_106.hk",
+  "observe_file": "备份/072/sample/045_observe.dat",
+  "note": "对照表原值 154/76 为补测对（温度漂移），订正为 106/45"
+ },
+ {
+  "temp_setpoint_C": 0,
+  "bias_code": 285,
+  "bias_setpoint_V": 28.5,
+  "hk_file": "备份/072/hk/ecu_1_105.hk",
+  "observe_file": "备份/072/sample/044_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 0,
+  "bias_code": 283,
+  "bias_setpoint_V": 28.3,
+  "hk_file": "备份/072/hk/ecu_1_104.hk",
+  "observe_file": "备份/072/sample/043_observe.dat",
+  "note": "对照表原值 106/45 有误（106 是 28.7V 的 hk），按 md5 与偏压平台订正"
+ },
+ {
+  "temp_setpoint_C": 0,
+  "bias_code": 280,
+  "bias_setpoint_V": 28.0,
+  "hk_file": "备份/072/hk/ecu_1_103.hk",
+  "observe_file": "备份/072/sample/042_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 0,
+  "bias_code": 275,
+  "bias_setpoint_V": 27.5,
+  "hk_file": "备份/072/hk/ecu_1_102.hk",
+  "observe_file": "备份/072/sample/041_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 0,
+  "bias_code": 270,
+  "bias_setpoint_V": 27.0,
+  "hk_file": "备份/072/hk/ecu_1_101.hk",
+  "observe_file": "备份/072/sample/040_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": 0,
+  "bias_code": 265,
+  "bias_setpoint_V": 26.5,
+  "hk_file": "备份/072/hk/ecu_1_100.hk",
+  "observe_file": "备份/072/sample/039_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -10,
+  "bias_code": 290,
+  "bias_setpoint_V": 29.0,
+  "hk_file": "备份/072/hk/ecu_1_099.hk",
+  "observe_file": "备份/072/sample/038_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -10,
+  "bias_code": 287,
+  "bias_setpoint_V": 28.7,
+  "hk_file": "备份/072/hk/ecu_1_158.hk",
+  "observe_file": "备份/072/sample/078_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -10,
+  "bias_code": 285,
+  "bias_setpoint_V": 28.5,
+  "hk_file": "备份/072/hk/ecu_1_096.hk",
+  "observe_file": "备份/072/sample/036_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -10,
+  "bias_code": 283,
+  "bias_setpoint_V": 28.3,
+  "hk_file": "备份/072/hk/ecu_1_097.hk",
+  "observe_file": "备份/072/sample/037_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -10,
+  "bias_code": 280,
+  "bias_setpoint_V": 28.0,
+  "hk_file": "备份/072/hk/ecu_1_094.hk",
+  "observe_file": "备份/072/sample/034_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -10,
+  "bias_code": 275,
+  "bias_setpoint_V": 27.5,
+  "hk_file": "备份/072/hk/ecu_1_093.hk",
+  "observe_file": "备份/072/sample/033_observe.dat",
+  "note": "33后半段"
+ },
+ {
+  "temp_setpoint_C": -10,
+  "bias_code": 270,
+  "bias_setpoint_V": 27.0,
+  "hk_file": "备份/072/hk/ecu_1_093.hk",
+  "observe_file": "备份/072/sample/033_observe.dat",
+  "note": "33前半段"
+ },
+ {
+  "temp_setpoint_C": -10,
+  "bias_code": 265,
+  "bias_setpoint_V": 26.5,
+  "hk_file": "备份/072/hk/ecu_1_092.hk",
+  "observe_file": "备份/072/sample/032_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -20,
+  "bias_code": 290,
+  "bias_setpoint_V": 29.0,
+  "hk_file": "备份/072/hk/ecu_1_068.hk",
+  "observe_file": "备份/072/sample/020_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -20,
+  "bias_code": 287,
+  "bias_setpoint_V": 28.7,
+  "hk_file": "备份/072/hk/ecu_1_069.hk",
+  "observe_file": "备份/072/sample/021_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -20,
+  "bias_code": 285,
+  "bias_setpoint_V": 28.5,
+  "hk_file": "备份/072/hk/ecu_1_057.hk",
+  "observe_file": "备份/072/sample/014_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -20,
+  "bias_code": 283,
+  "bias_setpoint_V": 28.3,
+  "hk_file": "备份/072/hk/ecu_1_058.hk",
+  "observe_file": "备份/072/sample/015_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -20,
+  "bias_code": 280,
+  "bias_setpoint_V": 28.0,
+  "hk_file": "备份/072/hk/ecu_1_059.hk",
+  "observe_file": "备份/072/sample/016_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -20,
+  "bias_code": 275,
+  "bias_setpoint_V": 27.5,
+  "hk_file": "备份/072/hk/ecu_1_060.hk",
+  "observe_file": "备份/072/sample/017_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -20,
+  "bias_code": 270,
+  "bias_setpoint_V": 27.0,
+  "hk_file": "备份/072/hk/ecu_1_066.hk",
+  "observe_file": "备份/072/sample/018_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -20,
+  "bias_code": 265,
+  "bias_setpoint_V": 26.5,
+  "hk_file": "备份/072/hk/ecu_1_067.hk",
+  "observe_file": "备份/072/sample/019_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -30,
+  "bias_code": 290,
+  "bias_setpoint_V": 29.0,
+  "hk_file": "备份/072/hk/ecu_1_088.hk",
+  "observe_file": "备份/072/sample/030_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -30,
+  "bias_code": 287,
+  "bias_setpoint_V": 28.7,
+  "hk_file": "备份/072/hk/ecu_1_086.hk",
+  "observe_file": "备份/072/sample/029_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -30,
+  "bias_code": 285,
+  "bias_setpoint_V": 28.5,
+  "hk_file": "备份/072/hk/ecu_1_085.hk",
+  "observe_file": "备份/072/sample/028_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -30,
+  "bias_code": 283,
+  "bias_setpoint_V": 28.3,
+  "hk_file": "备份/072/hk/ecu_1_083.hk",
+  "observe_file": "备份/072/sample/027_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -30,
+  "bias_code": 280,
+  "bias_setpoint_V": 28.0,
+  "hk_file": "备份/072/hk/ecu_1_082.hk",
+  "observe_file": "备份/072/sample/026_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -30,
+  "bias_code": 275,
+  "bias_setpoint_V": 27.5,
+  "hk_file": "备份/072/hk/ecu_1_081.hk",
+  "observe_file": "备份/072/sample/025_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -30,
+  "bias_code": 270,
+  "bias_setpoint_V": 27.0,
+  "hk_file": "备份/072/hk/ecu_1_077.hk",
+  "observe_file": "备份/072/sample/023_observe.dat",
+  "note": ""
+ },
+ {
+  "temp_setpoint_C": -30,
+  "bias_code": 265,
+  "bias_setpoint_V": 26.5,
+  "hk_file": "备份/072/hk/ecu_1_075.hk",
+  "observe_file": "备份/072/sample/022_observe.dat",
+  "note": ""
+ }
+]

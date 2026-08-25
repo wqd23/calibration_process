@@ -6,7 +6,7 @@ process CLI interface for each GRID payload
 
 import fire
 
-from .cmd import VersionProcessOp, VersionProcessOp10B
+from .cmd import VersionProcessOp, VersionProcessOp10B, VersionProcessOp12B
 from . import util_lib as util
 from .__init__ import CFG_PATH
 from . import operation as op
@@ -29,6 +29,8 @@ OPERATION_SPEC = {
             {"fp_method": "11"}),
     "09": (VersionProcessOp, op.TB_operation_09, op.EC_operation_09,
            {"fp_method": "09", "suffix": "txt"}),
+    "12B": (VersionProcessOp12B, op.TB_operation_12B, op.EC_operation_12B,
+            {"fp_method": "12"}),
 }
 
 

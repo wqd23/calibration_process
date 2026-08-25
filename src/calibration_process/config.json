@@ -86,5 +86,16 @@
             "x_path": "data/09/raw_data/Xray",
             "src_path": "data/09/raw_data/src"
         }
+    },
+    "12B": {
+        "tb": {
+            "path": "data/12B/raw_data",
+            "file_map": "data/12B/single_process/tb_file_map.json"
+        },
+        "ec": {
+            "tb_result_path": "data/12B/single_process/20260824134441_temp_bias_fit.json",
+            "x_path": "data/12B/raw_data/X光机/072",
+            "src_path": "data/12B/raw_data/放射源/072"
+        }
     }
 }
