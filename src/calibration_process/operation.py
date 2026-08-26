@@ -1550,6 +1550,199 @@ class EC_operation_12B(EC_operation_05B):
         return [read_config, bkg_read_config, spectrum_config, fit_config]
 
 
+class TB_operation_N1(TB_operation_05B):
+    """N1 (GRIDN1) TB data: GAGG runs (584-byte ft packets) and CLYC runs
+    (1080-byte wf packets) under {path}/GAGG and {path}/CLYC.
+
+    GAGG negative temperatures are single-bias files; all other runs (and all
+    CLYC runs) are bias-scan files split into per-bias segments by the reader
+    (seg_bias kwarg). Files with "To" (temperature transition), "CI" (current
+    scan) or "test" in the name are excluded, mirroring the dataset selection
+    of the gridN_cali L0 notebooks.
+
+    Processing names are "{ds}_{temp}_{bias}" (e.g. "GAGG_m20C_265").
+
+    Sources differ per dataset: GAGG runs used an Am241 source and cover
+    channels 1/2; CLYC runs used a Na22 source and cover all 4 channels.
+    """
+
+    # per-dataset source annotation (the two datasets use different sources)
+    source = {"GAGG": "Am241", "CLYC": "Na22"}
+
+    # CLYC scans carry extra re-measured bias segments (same per-file list as
+    # the gridN_cali read_raw_CLYC.ipynb vol_sets)
+    CLYC_EXTRA_BIAS = {
+        "m20C": (277, 279, 281),
+        "m10C": (279, 281),
+        "0C": (281,),
+        "10C": (289,),
+        "20C": (289, 291),
+        "30C": (289, 291),
+    }
+
+    def __init__(self, path, fit_range, save_path, save_fig_path, result_path) -> None:
+        import re
+
+        self.path = path
+        self.point_map = {}
+        for ds, mode in (("GAGG", "ft"), ("CLYC", "wf")):
+            d = os.path.join(path, ds)
+            for f in sorted(os.listdir(d)):
+                if not f.endswith(".event.dat") or "To" in f or "CI" in f or "test" in f:
+                    continue
+                m = re.match(r"^(m?\d+C)-(\d{3})-\d+\.event\.dat$", f)
+                if m:  # single-bias point
+                    temp, bias = m.group(1), int(m.group(2))
+                    self.point_map[f"{ds}_{temp}_{bias}"] = (os.path.join(d, f), mode, None)
+                    continue
+                m = re.match(r"^(m?\d+C)-265-290-\d+\.event\.dat$", f)
+                if m:  # bias scan: one segment per bias code
+                    temp = m.group(1)
+                    biases = [265, 270, 275, 280, 283, 285, 287, 290]
+                    if ds == "CLYC":
+                        biases += list(self.CLYC_EXTRA_BIAS.get(temp, ()))
+                    for bias in biases:
+                        self.point_map[f"{ds}_{temp}_{bias}"] = (
+                            os.path.join(d, f), mode, bias,
+                        )
+        self.files = sorted(self.point_map.keys())
+        self.adc_max = 16384.0
+
+        self.fit_range = util.json_load(fit_range)
+        self.bin_width = 4
+        self.save_path = save_path
+        self.save_fig_path = save_fig_path
+        self.result_path = result_path
+
+    def file_config(self, file):
+        sci_path, mode, seg_bias = self.point_map[file]
+        kwarg = {"mode": mode}
+        if seg_bias is not None:
+            kwarg["seg_bias"] = seg_bias
+        read_config = file_lib.Read_config(sci_path, ending="n1", kwarg=kwarg)
+        bkg_read_config = file_lib.Read_config()
+        spectrum_config = file_lib.Spectrum_config(
+            bin_width=self.bin_width, adc_max=self.adc_max
+        )
+        fit_config = file_lib.Fit_config(self.fit_range[file])
+        return [read_config, bkg_read_config, spectrum_config, fit_config]
+
+    # per-dataset, per-channel initial guesses for the 2D fit, taken from the
+    # gridN_cali L2 results (same 5-parameter model); the two datasets were
+    # taken with different sources (GAGG: Am241, CLYC: Na22) so their peak
+    # positions are on different ADC scales and are fitted separately
+    TB_FIT_P0_BY_DS = {
+        "GAGG": {
+            1: [3.296e-04, 0.0182, 23.87, 64.7, 5.197e4],
+            2: [3.775e-04, 0.0188, 23.98, 66.6, 4.476e4],
+        },
+        "CLYC": {
+            0: [7.305e-04, 0.0162, 23.60, 500.0, 3.201e4],
+            1: [1.062e-02, 0.0195, 23.81, 49.7, 1.561e4],
+            2: [1.072e-02, 0.0191, 23.97, 47.1, 1.560e4],
+            3: [7.776e-04, 0.0129, 23.57, 500.0, 3.721e4],
+        },
+    }
+
+    # which dataset each channel is fitted on (GAGG runs target ch1/2,
+    # CLYC runs cover all 4 channels)
+    CHANNEL_DS = {0: "CLYC", 1: "GAGG", 2: "GAGG", 3: "CLYC"}
+
+    def load_data(self):
+        """like the base class but grouped per dataset (GAGG/CLYC, the two DAQ
+        modes are on different ADC scales) and skipping qa_flag == 'fail'
+        single fits (redchi above fail threshold)"""
+        data_by_ds = {"GAGG": [[], [], [], []], "CLYC": [[], [], [], []]}
+        for file in self.files:
+            tb = util.pickle_load(
+                os.path.join(self.save_path, f"{os.path.splitext(file)[0]}.pickle")
+            )
+            ds = "GAGG" if "/GAGG/" in tb["file"] else "CLYC"
+            fit_4ch = tb["fit_result"]
+            tel_4ch = [
+                {k: v[i] for k, v in tb["tel"].items() if len(v) == 4} for i in range(4)
+            ]
+            for data, fit, tel in zip(data_by_ds[ds], fit_4ch, tel_4ch):
+                if fit is None or fit.get("qa_flag") == "fail":
+                    continue
+                center, center_err = fit["b"], fit["b_err"]
+                temp, temp_err = np.average(tel["tempSipm"]), np.std(tel["tempSipm"])
+                bias, bias_err = np.average(tel["bias"]), np.std(tel["bias"])
+                data.append([center, center_err, temp, temp_err, bias, bias_err])
+        return {ds: [np.array(d) for d in v] for ds, v in data_by_ds.items()}
+
+    def temp_bias_fit(self, data_by_ds):
+        """fit each dataset separately (the two sources put the peaks on
+        different ADC scales), write the two parts
+        (temp_bias_fit_am241.json = GAGG ch1/2, temp_bias_fit_na22_511.json =
+        CLYC all 4 channels; both 4-slot arrays with nulls) and the standard
+        merged temp_bias_fit.json (ch1/2 from GAGG, ch0/3 from CLYC)."""
+        part_ds = {"am241": "GAGG", "na22_511": "CLYC"}
+        part_result = {}
+        for part, ds in part_ds.items():
+            data_all = data_by_ds[ds]
+            result = [None] * 4
+            for ich, data in enumerate(data_all):
+                if ich not in self.TB_FIT_P0_BY_DS[ds] or len(data) < 6:
+                    continue
+                center, center_err, temp, bias = (
+                    data[:, 0], data[:, 1], data[:, 2], data[:, 4],
+                )
+                try:
+                    res = util.temp_bias_fit_curvefit(
+                        center, center_err, temp, bias,
+                        p0=self.TB_FIT_P0_BY_DS[ds][ich], maxfev=100000,
+                    )
+                except util.FitError as e:
+                    print(f"{ds} chan {ich} fit failed: {e.args[-1]}")
+                    continue
+                result[ich] = res
+                # canonical per-channel plots come from the merged source
+                if self.CHANNEL_DS[ich] != ds:
+                    continue
+                plot.fit_err_plot_2d(
+                    np.stack([temp, bias], axis=1),
+                    center,
+                    lambda x: util.tempbias2DFunctionInternal(x, *(list(res.values())[:5])),
+                    ("temp$^\\circ$C", "bias/V", "center"),
+                    title=f"temp bias fit: channel {ich} ({ds})",
+                    save_path=os.path.join(
+                        self.result_path, f"{util.headtime('temp_bias_fit_' + str(ich) + '.png')}"
+                    ),
+                )
+            util.json_save(
+                result,
+                os.path.join(
+                    self.result_path, f"{util.headtime(f'temp_bias_fit_{part}.json')}"
+                ),
+            )
+            part_result[part] = result
+
+        merged = [None] * 4
+        for ich, ds in self.CHANNEL_DS.items():
+            part = "am241" if ds == "GAGG" else "na22_511"
+            merged[ich] = part_result[part][ich]
+        util.json_save(
+            merged,
+            os.path.join(self.result_path, f"{util.headtime('temp_bias_fit.json')}"),
+        )
+        return merged
+
+
+class EC_operation_N1(EC_operation_05B):
+    """N1 EC: not onboarded yet (GRIDN1 EC data live in the sibling
+    experiment directories 260326/260327放射源 and 260129/260202计量院标定).
+    This stub only stores the config so that `just tb N1 ...` works; the EC
+    processing will be implemented when the EC data are organized."""
+
+    def __init__(self, **kwargs) -> None:
+        self.__dict__.update(kwargs)
+
+    def to_x_op(self):
+        return Operation([], lambda file: None, self)
+
+    def to_src_op(self):
+        return Operation([], lambda file: None, self)
 
 
 def __get_fp05B(config, nocache=False) -> file_lib.File_operation_05b:

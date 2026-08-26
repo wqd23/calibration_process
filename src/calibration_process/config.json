@@ -97,5 +97,15 @@
             "x_path": "data/12B/raw_data/X光机/072",
             "src_path": "data/12B/raw_data/放射源/072"
         }
+    },
+    "N1": {
+        "tb": {
+            "path": "data/N1/raw_data"
+        },
+        "ec": {
+            "tb_result_path": "data/N1/single_process/PLACEHOLDER_temp_bias_fit.json",
+            "x_path": "data/N1/raw_data/x_data",
+            "src_path": "data/N1/raw_data/src_data"
+        }
     }
 }

@@ -134,6 +134,10 @@ class File_operation_05b:
             data = ver.single_read12(
                 config.path, overwrite_cache=nocache, **config.kwarg
             )
+        elif config.ending == "n1":
+            data = ver.single_read_n1(
+                config.path, overwrite_cache=nocache, **config.kwarg
+            )
         elif config.ending == "09":
             data = ver.single_read09(config.path, overwrite_cache=nocache)
         else:
