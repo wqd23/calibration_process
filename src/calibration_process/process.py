@@ -31,6 +31,8 @@ OPERATION_SPEC = {
            {"fp_method": "09", "suffix": "txt"}),
     "12B": (VersionProcessOp12B, op.TB_operation_12B, op.EC_operation_12B,
             {"fp_method": "12"}),
+    "N1": (VersionProcessOp, op.TB_operation_N1, op.EC_operation_N1,
+           {"fp_method": None}),
 }
 
 
