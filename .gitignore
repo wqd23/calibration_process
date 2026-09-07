@@ -27,4 +27,8 @@ tb_logs/
 ec_logs/
 *.zip
 
+# differential regression scratch dirs
+.oracle/
+.new/
+
 .vscode

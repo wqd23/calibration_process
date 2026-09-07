@@ -2,6 +2,7 @@
 name = "calibration_process"
 version = "0.1.0"
 description = "calibration process for GRID"
+scripts = { calib = "calibration_process.cli:main" }
 authors = [
     { name = "wqd", email = "wqd.2019@tsinghua.org.cn" }
 ]
@@ -15,6 +16,8 @@ dependencies = [
     "lmfit>=1.2.2",
     "nptyping>=2.5.0",
     "dill>=0.3.7",
+    "pydantic>=2.5.0",
+    "PyYAML>=6.0",
     "fire>=0.5.0",
     "crcmod>=1.7",
     "h5py>=3.10.0",
