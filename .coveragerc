@@ -1,0 +1,32 @@
+[run]
+source = src/calibration_process
+omit =
+    src/calibration_process/__init__.py
+    src/calibration_process/operation.py
+    src/calibration_process/util_lib.py
+    src/calibration_process/file_lib.py
+    src/calibration_process/fitting.py
+    src/calibration_process/cmd.py
+    src/calibration_process/process.py
+    src/calibration_process/check.py
+    src/calibration_process/scaffold.py
+    src/calibration_process/main.py
+    src/calibration_process/ec_data_export.py
+    src/calibration_process/tb_data_export.py
+
+[report]
+omit =
+    src/calibration_process/__init__.py
+    src/calibration_process/operation.py
+    src/calibration_process/util_lib.py
+    src/calibration_process/file_lib.py
+    src/calibration_process/fitting.py
+    src/calibration_process/cmd.py
+    src/calibration_process/process.py
+    src/calibration_process/check.py
+    src/calibration_process/scaffold.py
+    src/calibration_process/main.py
+    src/calibration_process/ec_data_export.py
+    src/calibration_process/tb_data_export.py
+    lib_reader/*
+    lib_plot/*
