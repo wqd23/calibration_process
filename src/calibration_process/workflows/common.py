@@ -1,0 +1,455 @@
+# -*- coding:utf-8 -*-
+"""Reusable scientific stages shared by the explicit workflows.
+
+All of these call the protected kernel directly (file_lib, util_lib,
+lib_plot).  They never re-implement the fit / plot / serialization logic.
+"""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+from typing import List, Optional
+
+import numpy as np
+
+from .. import file_lib, util_lib as util
+from ..config_schema import ManifestEntry
+from ..products import FileRunSpec, SingleFitResult, TBPoint, ECPoint
+from ..runtime import RuntimeConfig
+
+
+# --------------------------------------------------------------------------- #
+# FileRunSpec resolution
+# --------------------------------------------------------------------------- #
+def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRunSpec:
+    """Resolve the read/bkg/spectrum/fit config for one measurement.
+
+    Mirrors the legacy ``file_config()`` tuple so the kernel sees identical
+    settings.  This is where version orchestration differences surface
+    (background rotation, 4-channel reconstruction, corr).
+    """
+    data_dir = rt.data_dir
+
+    def abspath(rel: str) -> str:
+        return str(data_dir / rel)
+
+    if branch == "tb":
+        pb = rt.payload.tb
+        read = file_lib.Read_config(abspath(m.science_files[-1]), ending=pb.reader)
+        bkg = file_lib.Read_config()
+        spec = file_lib.Spectrum_config(bin_width=pb.bin_width, adc_max=pb.adc_max)
+        fit = file_lib.Fit_config(rt.fit_range(branch, m.id), rt.bkg_form(branch, m.id))
+        return FileRunSpec(read, bkg, spec, fit)
+
+    if branch == "ec_source":
+        pb = rt.payload.ec
+        read = file_lib.Read_config(abspath(m.science_files[-1]), ending=pb.reader)
+        bkg_rel = m.aux_files[-1] if m.aux_files else ""
+        bkg = (
+            file_lib.Read_config(abspath(bkg_rel), ending=pb.reader)
+            if bkg_rel
+            else file_lib.Read_config()
+        )
+        spec = file_lib.Spectrum_config(
+            corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
+        )
+        fit = file_lib.Fit_config(rt.fit_range(branch, m.id), rt.bkg_form(branch, m.id))
+        return FileRunSpec(read, bkg, spec, fit)
+
+    if branch == "ec_xray":
+        pb = rt.payload.ec
+        reads = [
+            file_lib.Read_config(abspath(f), ending=pb.reader) for f in m.science_files
+        ]
+        n = pb.channel_count
+        rotation = pb.xray_bkg_rotation
+        bkg_reads = _rotate_bkg(reads, rotation, n)
+        spec = file_lib.Spectrum_config(
+            corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
+        )
+        fit = file_lib.Fit_config(rt.fit_range(branch, m.id), rt.bkg_form(branch, m.id))
+        return FileRunSpec(reads, bkg_reads, spec, fit)
+
+    raise ValueError(f"unknown branch {branch!r}")
+
+
+def channel_use(m, ch: int) -> bool:
+    """measurement-level then channel-level exclusion (plan section 25)."""
+    if not m.use:
+        return False
+    if m.channels and str(ch) in m.channels:
+        return bool(m.channels[str(ch)].get("use", True))
+    return True
+
+
+def _rotate_bkg(reads: List, rotation: str, n: int) -> List:
+    if rotation == "circle":
+        # ch i background uses channel (i+1) % n  (legacy 03B/07/04/09)
+        return [reads[(i + 1) % n] for i in range(n)]
+    if rotation == "fixed":
+        # legacy 10B/11B/12B: [ch1, ch2, ch0, ch0]
+        return [reads[1], reads[2], reads[0], reads[0]]
+    raise ValueError(f"unknown xray_bkg_rotation {rotation!r}")
+
+
+# --------------------------------------------------------------------------- #
+# Single-fit stage
+# --------------------------------------------------------------------------- #
+def build_fit_operation(rt, branch, fc: FileRunSpec, nocache=False) -> object:
+    """Construct a File_operation_05b from a resolved spec (protected kernel)."""
+    from ..operation import __get_fp03B, __get_fp05B
+
+    if branch == "ec_xray":
+        fp = __get_fp03B(
+            [fc.read_config, fc.bkg_read_config, fc.spectrum_config, fc.fit_config],
+            nocache=nocache,
+        )
+    else:
+        fp = __get_fp05B(
+            [fc.read_config, fc.bkg_read_config, fc.spectrum_config, fc.fit_config],
+            nocache=nocache,
+        )
+    return fp
+
+
+def qa_category(output_dir: str, branch: str) -> str:
+    return "tb" if branch == "tb" else "ec"
+
+
+def run_single_fit(
+    rt: RuntimeConfig,
+    branch: str,
+    m: ManifestEntry,
+    output_root: Optional[Path] = None,
+    nocache: bool = False,
+):
+    """Run the single-fit stage and save pickle + single-fit figure.
+
+    Mirrors legacy ``process()`` exactly, but file/config selection comes from
+    the manifest instead of a directory scan.
+    """
+    output_root = output_root or rt.data_dir
+    category = qa_category(str(output_root), branch)
+    fc = single_run_spec(rt, branch, m)
+    fp = build_fit_operation(rt, branch, fc, nocache=nocache)
+    fp.qa_thresholds = util.load_qa_thresholds(rt.version, category)
+    fp.get_spectrum()
+    fp.peak_fit()
+
+    from lib_plot import plot
+
+    # the persisted/figure name is the measurement id with its extension
+    # stripped: TB/EC-src ids are "<stem>.txt", EC-xray ids are "<energy>"
+    stem = os.path.splitext(m.id)[0]
+    title = (
+        f"{stem}: {np.mean(fp.tel['bias'][0]):.2f}V, "
+        f"{np.mean(fp.tel['tempSipm'][0]):.2f}C"
+    )
+    sub = "TB_fit_result" if branch == "tb" else "EC_fit_result"
+    fig_dir = output_root / "single_process" / "single_fit_fig"
+    save_dir = output_root / "single_process" / sub
+    fig_dir.mkdir(parents=True, exist_ok=True)
+    save_dir.mkdir(parents=True, exist_ok=True)
+    plot.fit_plot(
+        fp.spectrum,
+        fp.x,
+        fp.fit_result,
+        title=title,
+        bkgForm=fc.fit_config.bkg_form,
+        fit_range=fc.fit_config.fit_range,
+        save_path=str(fig_dir / f"{stem}.png"),
+    )
+    fp.save(str(save_dir / f"{stem}.pickle"))
+    return fp
+
+
+class _LoadedFit:
+    """Minimal accessor over a persisted single-fit pickle."""
+
+    def __init__(self, pickle_dict):
+        self.fit_result = pickle_dict["fit_result"]
+        self.tel = pickle_dict["tel"]
+
+
+def load_single_fp_from_store(rt, branch, m, output_root) -> _LoadedFit:
+    """Load a single-fit pickle produced by the single-fit stage."""
+    stem = os.path.splitext(m.id)[0]
+    sub = "TB_fit_result" if branch == "tb" else "EC_fit_result"
+    path = output_root / "single_process" / sub / f"{stem}.pickle"
+    return _LoadedFit(util.pickle_load(str(path)))
+
+
+# --------------------------------------------------------------------------- #
+# Typed intermediate conversion
+# --------------------------------------------------------------------------- #
+def to_single_fit_result(m: ManifestEntry, fp) -> List[Optional[SingleFitResult]]:
+    """Wrap the kernel's per-channel fit_result into typed SingleFitResult."""
+    out: List[Optional[SingleFitResult]] = []
+    fit_result = getattr(fp, "fit_result", None) or []
+    for ch, fr in enumerate(fit_result):
+        if fr is None:
+            out.append(None)
+            continue
+        out.append(
+            SingleFitResult(
+                measurement_id=m.id,
+                channel=ch,
+                peak_amplitude=fr["a"],
+                peak_amplitude_err=fr["a_err"],
+                peak_center=fr["b"],
+                peak_center_err=fr["b_err"],
+                peak_sigma=fr["c"],
+                peak_sigma_err=fr["c_err"],
+                resolution=fr["resolution"],
+                resolution_err=fr["resolution_err"],
+                rate=fr["rate"],
+                rate_err=fr["rate_err"],
+                redchi=fr["redchi"],
+                ndf=fr["ndf"],
+                success=fr["success"],
+                qa_flag=fr["qa_flag"],
+                boundary_hit=list(fr.get("boundary_hit", [])),
+            )
+        )
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# TB points
+# --------------------------------------------------------------------------- #
+def build_tb_points(rt: RuntimeConfig, items: List) -> List[List[TBPoint]]:
+    """Build per-channel TBPoint lists from (measurement, fp) pairs.
+
+    Mirrors legacy ``load_data``: temperature/bias are the mean/std of the
+    telemetry arrays for that channel; the center is the fitted peak center.
+    """
+    per_channel: List[List[TBPoint]] = [[] for _ in range(4)]
+    for m, fp in items:
+        tel_4ch = [
+            {k: v[i] for k, v in fp.tel.items() if len(v) == 4} for i in range(4)
+        ]
+        for ch, fit in enumerate(fp.fit_result):
+            if fit is None:
+                continue
+            tel = tel_4ch[ch]
+            temp = float(np.average(tel["tempSipm"]))
+            temp_err = float(np.std(tel["tempSipm"]))
+            bias = float(np.average(tel["bias"]))
+            bias_err = float(np.std(tel["bias"]))
+            per_channel[ch].append(
+                TBPoint(
+                    measurement_id=m.id,
+                    channel=ch,
+                    temperature=temp,
+                    temperature_err=temp_err,
+                    bias=bias,
+                    bias_err=bias_err,
+                    peak_center=fit["b"],
+                    peak_center_err=fit["b_err"],
+                    enabled=channel_use(m, ch),
+                )
+            )
+    return per_channel
+
+
+def global_tb(rt: RuntimeConfig, per_channel: List[List[TBPoint]],
+              result_path: Path) -> List[dict]:
+    """Temperature-bias 2D global fit (protected kernel)."""
+    from lib_plot import plot
+
+    result_path.mkdir(parents=True, exist_ok=True)
+    result = []
+    for ch, points in enumerate(per_channel):
+        pts = [p for p in points if p.enabled]
+        data_all = np.array(
+            [[p.peak_center, p.peak_center_err, p.temperature, p.temperature_err,
+              p.bias, p.bias_err] for p in pts]
+        )
+        if data_all.size == 0:
+            raise util.FitError(f"channel {ch}: no enabled TB points")
+        pb = rt.payload.tb
+        data_all = _apply_bias_filter(data_all, pb.bias_min_filter)
+        center, center_err, temp, bias = (
+            data_all[:, 0], data_all[:, 1], data_all[:, 2], data_all[:, 4],
+        )
+        try:
+            res = util.temp_bias_fit_curvefit(
+                center, center_err, temp, bias,
+                p0=pb.tb_fit_p0, maxfev=pb.tb_fit_maxfev,
+            )
+        except util.FitError as e:
+            raise util.FitError(f"failed to do temp bias fit: {e.args[-1]}")
+        result.append(res)
+        xy = np.stack([temp, bias], axis=1)
+        name = f"temp_bias_fit_{ch}.png"
+        plot.fit_err_plot_2d(
+            xy,
+            center,
+            lambda x: util.tempbias2DFunctionInternal(x, *(list(res.values())[:5])),
+            ("temp$^\\circ$C", "bias/V", "center"),
+            title=f"temp bias fit: channel {ch}",
+            save_path=str(result_path / util.headtime(name)),
+        )
+    util.json_save(
+        result,
+        str(result_path / util.headtime("temp_bias_fit.json")),
+    )
+    return result
+
+
+def _apply_bias_filter(data_all, bias_min: Optional[float]):
+    if bias_min is None:
+        return data_all
+    return data_all[data_all[:, 4] >= bias_min]
+
+
+# --------------------------------------------------------------------------- #
+# EC points + global fit
+# --------------------------------------------------------------------------- #
+def build_ec_points(rt: RuntimeConfig, items: List, source_kind: str) -> List[List[ECPoint]]:
+    """Build per-channel ECPoint lists from (measurement, fp) pairs.
+
+    Only channels < channel_count are kept (10B/11B legacy 3-channel behavior
+    is handled by channel_count).  Energy comes from the runtime energy map.
+    """
+    n = rt.payload.ec.channel_count
+    per_channel: List[List[ECPoint]] = [[] for _ in range(n)]
+    for m, fp in items:
+        energy = rt.energies[m.id]
+        for ch, fit in enumerate(fp.fit_result):
+            if ch >= n:
+                continue
+            if fit is None:
+                continue
+            per_channel[ch].append(
+                ECPoint(
+                    measurement_id=m.id,
+                    channel=ch,
+                    source_kind=source_kind,
+                    energy=energy,
+                    peak_center=fit["b"],
+                    peak_center_err=fit["b_err"],
+                    resolution=fit["resolution"],
+                    resolution_err=fit["resolution_err"],
+                    enabled=channel_use(m, ch),
+                )
+            )
+    return per_channel
+
+
+def global_ec(rt: RuntimeConfig, src_pts: List[List[ECPoint]], x_pts: List[List[ECPoint]],
+              result_path: Path) -> List[dict]:
+    """EC energy/resolution global fit (protected kernel).
+
+    Mirrors the legacy ``ec_fit``: points are split at the K-edge, each half
+    gets an independent quadratic center fit and a resolution fit, and the
+    results are written to ``ec_logs/``.  ``plot.ec_plot`` is called directly
+    with the same argument shape it expects.
+    """
+    from lib_plot import plot
+
+    result_path.mkdir(parents=True, exist_ok=True)
+    pb = rt.payload.ec
+    n = pb.channel_count
+    src = [p for ch in src_pts for p in ch if p.enabled]
+    xr = [p for ch in x_pts for p in ch if p.enabled]
+    all_pts = src + xr
+    all_pts.sort(key=lambda p: p.energy)
+
+    # per-channel arrays aligned to energy (every point on 09 EC has all 4 ch)
+    center, center_err, resolution, resolution_err = [], [], [], []
+    energies_all = None
+    for ch in range(n):
+        pts = [p for p in all_pts if p.channel == ch]
+        en = np.array([p.energy for p in pts])
+        center.append(np.array([p.peak_center for p in pts]))
+        center_err.append(np.array([p.peak_center_err for p in pts]))
+        resolution.append(np.array([p.resolution for p in pts]))
+        resolution_err.append(np.array([p.resolution_err for p in pts]))
+        if energies_all is None:
+            energies_all = en
+
+    result = [{} for _ in range(n)]
+    for ch in range(n):
+        en, c, ce, r, re = energies_all, center[ch], center_err[ch], resolution[ch], resolution_err[ch]
+        q_low = en < pb.energy_split_low
+        q_high = en >= pb.energy_split_high
+        ec_low, ec_low_err = _center_fit(en[q_low], c[q_low], ce[q_low])
+        ec_high, ec_high_err = _center_fit(en[q_high], c[q_high], ce[q_high])
+        res_low, res_low_err = _resolution_fit(pb.resolution_method, en[q_low], r[q_low], re[q_low])
+        res_high, res_high_err = _resolution_fit(pb.resolution_method, en[q_high], r[q_high], re[q_high])
+        result[ch] = {
+            "channel": ch,
+            "EC_low": ec_low,
+            "EC_low_err": ec_low_err,
+            "EC_high": ec_high,
+            "EC_high_err": ec_high_err,
+            "resolution_low": res_low,
+            "resolution_low_err": res_low_err,
+            "resolution_high": res_high,
+            "resolution_high_err": res_high_err,
+        }
+        util.json_save(result[ch], str(result_path / util.headtime(f"ec_coef_sci_ch{ch}.json")))
+        save_data = np.array([en, c], dtype=np.float64)
+        np.save(str(result_path / util.headtime(f"ec_data_ch{ch}.npy")), arr=save_data)
+
+    src_energy = np.sort(np.array(sorted({p.energy for p in src})))
+    x_energy = np.sort(np.array(sorted({p.energy for p in xr})))
+    src_result = _group_4ch(src)
+    x_result = _group_4ch(xr)
+    plot.ec_plot(
+        energies_all, center[:4] if n == 4 else [center[0], center[1], center[2], center[0]],
+        result[:4] if n == 4 else [result[0], result[1], result[2], result[0]],
+        src_energy, x_energy, src_result, x_result,
+        str(result_path), pb.energy_split_low, pb.energy_split_high,
+    )
+    return result
+
+
+def _group_4ch(points: List[ECPoint]) -> List[list]:
+    """Rebuild per-measurement list-of-4-channel fit dicts for ec_plot.
+
+    Each element is a list of 4 dicts ``[{b, b_err, resolution,
+    resolution_err}, ...]``, exactly the shape legacy ``ec_fit`` passes to
+    ``plot.ec_plot``.  Ordered by energy to make the scatter arrays internally
+    consistent.
+    """
+    by_id = {}
+    for p in points:
+        by_id.setdefault(p.measurement_id, {})[p.channel] = p
+    items = sorted(by_id.items(), key=lambda kv: min(q.energy for q in kv[1].values()))
+    out = []
+    for _mid, chmap in items:
+        fit = []
+        for ch in sorted(chmap):
+            p = chmap[ch]
+            fit.append({
+                "b": p.peak_center,
+                "b_err": p.peak_center_err,
+                "resolution": p.resolution,
+                "resolution_err": p.resolution_err,
+            })
+        out.append(fit)
+    return out
+
+
+def _center_fit(energy, center, center_err):
+    popt, pcov = np.polyfit(center, energy, deg=2, full=False, cov=True, w=1.0 / center_err)
+    perr = np.sqrt(np.diag(pcov))
+    return list(popt), list(perr)
+
+
+def _resolution_fit(method, energy, resolution, resolution_err):
+    if method == "polyfit":
+        p0, pcov = util.resolution_polyfit(energy, resolution, resolution_err)
+        perr = np.sqrt(np.diag(pcov))
+        return list(p0), list(perr)
+    if method == "exprfit":
+        return util.resolution_ExprFit(energy, resolution, resolution_err)
+    if method == "lmfit":
+        return util.resolution_lmfit(energy, resolution, resolution_err)
+    raise ValueError(f"unknown resolution method {method!r}")
+
+
+
