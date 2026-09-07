@@ -1,0 +1,36 @@
+version: 09
+branch: ec_source
+measurements:
+- id: 0826_10C_285_Na22_20m_0x00CF.txt
+  branch: ec_source
+  science_files:
+  - raw_data/src/0826_10C_285_Na22_20m_0x00CF.txt
+  hk_files: []
+  aux_files:
+  - raw_data/src/0826_10C_285_Na22_bkg_20m.txt
+  metadata:
+    energy: 511.0
+  use: true
+  channels: null
+- id: 0827_10C_285_Co60_20m_0x010F.txt
+  branch: ec_source
+  science_files:
+  - raw_data/src/0827_10C_285_Co60_20m_0x010F.txt
+  hk_files: []
+  aux_files:
+  - raw_data/src/0827_10C_285_bkg_20m_0x00CF.txt
+  metadata:
+    energy: 1332.0
+  use: true
+  channels: null
+- id: 0827_10C_285_Cs137_20m_0x010F.txt
+  branch: ec_source
+  science_files:
+  - raw_data/src/0827_10C_285_Cs137_20m_0x010F.txt
+  hk_files: []
+  aux_files:
+  - raw_data/src/0827_10C_285_bkg_20m_0x00CF.txt
+  metadata:
+    energy: 662.0
+  use: true
+  channels: null

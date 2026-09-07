@@ -1,0 +1,435 @@
+version: 09
+branch: tb
+measurements:
+- id: 0825_0C_265_4m_0x00C5.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_0C_265_4m_0x00C5.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_0C_270_4m_0x00C5.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_0C_270_4m_0x00C5.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_0C_275_4m_0x00C5.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_0C_275_4m_0x00C5.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_0C_280_4m_0x00C5.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_0C_280_4m_0x00C5.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_0C_283_4m_0x00C5.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_0C_283_4m_0x00C5.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_0C_285_4m_0x00C5.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_0C_285_4m_0x00C5.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_0C_287_4m_0x00C5.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_0C_287_4m_0x00C5.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_0C_290_4m_0x0105.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_0C_290_4m_0x0105.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_10C_265_7m_0x00CF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_10C_265_7m_0x00CF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_10C_270_5m_0x00CF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_10C_270_5m_0x00CF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_10C_275_5m_0x00CF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_10C_275_5m_0x00CF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_10C_280_5m_0x00CF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_10C_280_5m_0x00CF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_10C_283_10m_0x00CF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_10C_283_10m_0x00CF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_10C_285_6m_0x00CF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_10C_285_6m_0x00CF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_10C_287_6m_0x00CF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_10C_287_6m_0x00CF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_10C_290_5m_0x00CF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_10C_290_5m_0x00CF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m10C_265_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m10C_265_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m10C_270_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m10C_270_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m10C_275_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m10C_275_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m10C_280_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m10C_280_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m10C_283_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m10C_283_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m10C_285_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m10C_285_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m10C_287_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m10C_287_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m10C_290_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m10C_290_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m20C_265_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m20C_265_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m20C_270_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m20C_270_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m20C_275_5m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m20C_275_5m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m20C_280_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m20C_280_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m20C_283_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m20C_283_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m20C_285_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m20C_285_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m20C_287_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m20C_287_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0825_m20C_290_4m_0x00DF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0825_m20C_290_4m_0x00DF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_20C_265_5m_0x0090.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_20C_265_5m_0x0090.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_20C_270_5m_0x0090.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_20C_270_5m_0x0090.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_20C_275_5m_0x0099.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_20C_275_5m_0x0099.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_20C_280_5m_0x00A9.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_20C_280_5m_0x00A9.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_20C_283_5m_0x00C9.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_20C_283_5m_0x00C9.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_20C_285_5m_0x00E9.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_20C_285_5m_0x00E9.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_20C_287_5m_0x00F9.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_20C_287_5m_0x00F9.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_20C_290_5m_0x01F0.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_20C_290_5m_0x01F0.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_30C_265_30m_0x00B0.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_30C_265_30m_0x00B0.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_30C_270_5m_0x00D8.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_30C_270_5m_0x00D8.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_30C_275_5m_0x00EF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_30C_275_5m_0x00EF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_30C_280_5m_0x00FF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_30C_280_5m_0x00FF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_30C_283_5m_0x00FF.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_30C_283_5m_0x00FF.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_30C_285_5m_0x00E9.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_30C_285_5m_0x00E9.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_30C_287_5m_0x0190.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_30C_287_5m_0x0190.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0826_30C_290_5m_0x01F0.txt
+  branch: tb
+  science_files:
+  - raw_data/temp_bias/0826_30C_290_5m_0x01F0.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null

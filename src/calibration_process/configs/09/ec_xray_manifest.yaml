@@ -1,0 +1,172 @@
+version: 09
+branch: ec_xray
+measurements:
+- id: 15keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/15keV_ch0_0x00EF_2m.txt
+  - raw_data/Xray/15keV_ch1_0x00EF_2m.txt
+  - raw_data/Xray/15keV_ch2_0x00BF_2m.txt
+  - raw_data/Xray/15keV_ch3_0x00BF_2m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 15.0
+  use: true
+  channels: null
+- id: 20keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/20keV_ch0_0x00EF_2m.txt
+  - raw_data/Xray/20keV_ch1_0x00EF_2m.txt
+  - raw_data/Xray/20keV_ch2_0x00EF_2m.txt
+  - raw_data/Xray/20keV_ch3_0x00EF_2m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 20.0
+  use: true
+  channels: null
+- id: 25keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/25keV_ch0_0x00EF_2m.txt
+  - raw_data/Xray/25keV_ch1_0x00EF_2m.txt
+  - raw_data/Xray/25keV_ch2_0x00EF_2m.txt
+  - raw_data/Xray/25keV_ch3_0x00EF_2m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 25.0
+  use: true
+  channels: null
+- id: 30keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/30keV_ch0_0x00EF_2m.txt
+  - raw_data/Xray/30keV_ch1_0x00EF_2m.txt
+  - raw_data/Xray/30keV_ch2_0x00EF_2m.txt
+  - raw_data/Xray/30keV_ch3_0x00EF_2m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 30.0
+  use: true
+  channels: null
+- id: 35keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/35keV_ch0_0x00EF_2m.txt
+  - raw_data/Xray/35keV_ch1_0x00EF_2m.txt
+  - raw_data/Xray/35keV_ch2_0x00EF_2m.txt
+  - raw_data/Xray/35keV_ch3_0x00EF_2m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 35.0
+  use: true
+  channels: null
+- id: 40keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/40keV_ch0_0x00EF_2m.txt
+  - raw_data/Xray/40keV_ch1_0x00EF_2m.txt
+  - raw_data/Xray/40keV_ch2_0x00EF_2m.txt
+  - raw_data/Xray/40keV_ch3_0x00EF_2m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 40.0
+  use: true
+  channels: null
+- id: 45keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/45keV_ch0_0x00DF_2m.txt
+  - raw_data/Xray/45keV_ch1_0x00DF_5m.txt
+  - raw_data/Xray/45keV_ch2_0x00DF_2m.txt
+  - raw_data/Xray/45keV_ch3_0x00DF_2m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 45.0
+  use: true
+  channels: null
+- id: 47keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/47keV_ch0_0x011F_5m.txt
+  - raw_data/Xray/47keV_ch1_0x011F_5m.txt
+  - raw_data/Xray/47keV_ch2_0x012F_5m.txt
+  - raw_data/Xray/47keV_ch3_0x011F_5m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 47.0
+  use: true
+  channels: null
+- id: 49keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/49keV_ch0_0x011F_5m.txt
+  - raw_data/Xray/49keV_ch1_0x011F_5m.txt
+  - raw_data/Xray/49keV_ch2_0x011F_5m.txt
+  - raw_data/Xray/49keV_ch3_0x011F_5m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 49.0
+  use: true
+  channels: null
+- id: 51keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/51keV_ch0_0x011F_5m.txt
+  - raw_data/Xray/51keV_ch1_0x011F_5m.txt
+  - raw_data/Xray/51keV_ch2_0x011F_5m.txt
+  - raw_data/Xray/51keV_ch3_0x011F_5m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 51.0
+  use: true
+  channels: null
+- id: 53keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/53keV_ch0_0x011F_5m.txt
+  - raw_data/Xray/53keV_ch1_0x011F_5m.txt
+  - raw_data/Xray/53keV_ch2_0x011F_5m.txt
+  - raw_data/Xray/53keV_ch3_0x011F_5m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 53.0
+  use: true
+  channels: null
+- id: 55keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/55keV_ch0_0x011F_5m.txt
+  - raw_data/Xray/55keV_ch1_0x011F_5m.txt
+  - raw_data/Xray/55keV_ch2_0x011F_5m.txt
+  - raw_data/Xray/55keV_ch3_0x011F_5m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 55.0
+  use: true
+  channels: null
+- id: 60keV
+  branch: ec_xray
+  science_files:
+  - raw_data/Xray/60keV_ch0_0x011F_5m.txt
+  - raw_data/Xray/60keV_ch1_0x011F_5m.txt
+  - raw_data/Xray/60keV_ch2_0x011F_5m.txt
+  - raw_data/Xray/60keV_ch3_0x011F_5m.txt
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 60.0
+  use: true
+  channels: null
