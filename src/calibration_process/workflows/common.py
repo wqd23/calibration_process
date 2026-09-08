@@ -405,6 +405,18 @@ def global_tb(rt: RuntimeConfig, per_channel: List[List[TBPoint]],
         result,
         str(result_path / util.headtime("temp_bias_fit.json")),
     )
+    # Option A: publish the temp-bias reference that EC corr reads, so the new
+    # workflow is self-contained on a fresh machine.  Only write it when the
+    # path is absent: the historical reference (for the migrated versions) is
+    # kept untouched because the frozen-oracle EC was produced against it and it
+    # is the source of strict identity.  A truly fresh run (no historical file)
+    # gets this produced copy.
+    ref = rt.payload.ec.tb_ref_path
+    if ref:
+        ref_path = rt.data_dir / ref
+        if not ref_path.exists():
+            ref_path.parent.mkdir(parents=True, exist_ok=True)
+            util.json_save(result, str(ref_path))
     return result
 
 
