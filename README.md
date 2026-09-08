@@ -93,6 +93,7 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 | [docs/results.md](docs/results.md) | 结果产物与 QA 指标说明 |
 | [docs/12B_13B/data.md](docs/12B_13B/data.md) | 12B/13B 类载荷的数据说明（点位对照表、各文件的特殊情况） |
 | [docs/payloads_data.md](docs/payloads_data.md) | 其它 7 个载荷的数据说明（简化版：通用结构 + 各版本选点/排除） |
+| [docs/intermediate_data.md](docs/intermediate_data.md) | 中间数据格式与读取、跨项目分析、定制 pipeline、pickle 环境依赖 |
 
 每类载荷的数据说明单独放一个目录（如 `docs/12B_13B/`），新增载荷时仿照添加。
 
@@ -126,6 +127,7 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 │   ├── data.md                     # 数据准备与目录约定、接入方法论
 │   ├── results.md                  # 结果产物与 QA 指标
 │   ├── payloads_data.md            # 其它 7 个载荷的数据说明（简化版）
+│   ├── intermediate_data.md        # 中间数据格式 / 跨项目 / 定制 pipeline / pickle 依赖
 │   └── 12B_13B/                    # 12B/13B 类载荷的数据说明（详细版）
 │       └── data.md                 # 点位对照表、各数据文件的特殊情况
 ├── data/{ver}/                     # 各版本数据目录

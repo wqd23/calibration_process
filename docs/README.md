@@ -17,6 +17,7 @@
 | D5 | [workflow_matrix.md](workflow_matrix.md) | 历史 workflow 完整审计矩阵（重构前每个版本实际做了什么，逐版本表格） |
 | D6 | [12B_13B/data.md](12B_13B/data.md) | 12B/13B 类载荷的数据说明：温度偏压点位与文件对照表、X 光机/放射源各数据文件的状态与特殊情况 |
 | D7 | [payloads_data.md](payloads_data.md) | 其它 7 个载荷的数据说明（简化版）：通用结构 + 每个版本的目录/reader/命名/选择与排除/已知坑 |
+| D8 | [intermediate_data.md](intermediate_data.md) | 中间数据格式（pickle/json/npy/cache）、怎么读、能否跨项目分析、如何定制 pipeline、pickle 对环境的依赖 |
 
 **数据说明的约定**：数据特殊的载荷（如 12B/13B）单独放一个子目录详述
 （数据从哪来、每个文件对应什么条件、哪些文件有坑：截断/复制/补测等）。
