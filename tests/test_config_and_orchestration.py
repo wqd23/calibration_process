@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+sys.path.insert(0, str(Path(__file__).parent))
 SRC = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(SRC / "calibration_process"))
 from calibration_process import migration, pipeline  # noqa: E402
@@ -79,56 +80,30 @@ def test_manifest_discover_and_load():
         assert len(filtered_measurements(m)) == len(m.measurements)
 
 
-def test_versions_v09_enumerate_matches_legacy():
-    from calibration_process import operation as op
-    rt = pipeline.load_rt(VER)
-    data_dir = Path("data") / VER
-    wf = get_workflow(VER)
-    tb_ids = [r["id"] for r in wf.enumerate_measurements(VER, "tb", rt, data_dir)]
-    leg_tb = op.TB_operation_09(
-        path="data/09/raw_data/temp_bias", fit_range="data/09/single_process/fit_range.json",
-        save_path="x", save_fig_path="x", result_path="x")
-    assert set(tb_ids) == set(leg_tb.files)
-    ec_op = op.EC_operation_09(
-        tb_result_path="data/09/single_process/20260301164328_temp_bias_fit.json",
-        fit_range="data/09/single_process/fit_range.json",
-        energy="data/09/single_process/ec_energy.json",
-        bkg_form="data/09/single_process/bkg_form.json",
-        x_path="data/09/raw_data/Xray", src_path="data/09/raw_data/src",
-        save_path="x", save_fig_path="x", result_path="x")
-    src_ids = [r["id"] for r in wf.enumerate_measurements(VER, "ec_source", rt, data_dir)]
-    assert set(src_ids) == set(ec_op.src_list)
-    x_ids = [r["id"] for r in wf.enumerate_measurements(VER, "ec_xray", rt, data_dir)]
-    assert set(x_ids) == set(ec_op.x_list)
-
-
 def test_registry_unknown_version_raises():
     with pytest.raises(KeyError):
         get_workflow("99X")
 
 
-def test_versions_v12b_enumerate_matches_legacy():
-    from calibration_process import operation as op
-    rt = pipeline.load_rt("12B")
-    data_dir = Path("data") / "12B"
-    wf = get_workflow("12B")
-    tb_ids = [r["id"] for r in wf.enumerate_measurements("12B", "tb", rt, data_dir)]
-    leg_tb = op.TB_operation_12B(
-        path="data/12B/raw_data", fit_range="data/12B/single_process/fit_range.json",
-        save_path="x", save_fig_path="x", result_path="x",
-        file_map="data/12B/single_process/tb_file_map.json")
-    assert set(tb_ids) == set(leg_tb.files)
-    ec_op = op.EC_operation_12B(
-        tb_result_path="data/12B/single_process/20260824134441_temp_bias_fit.json",
-        fit_range="data/12B/single_process/fit_range.json",
-        energy="data/12B/single_process/ec_energy.json",
-        bkg_form="data/12B/single_process/bkg_form.json",
-        x_path="data/12B/raw_data/X光机/072", src_path="data/12B/raw_data/放射源/072",
-        save_path="x", save_fig_path="x", result_path="x")
-    src_ids = [r["id"] for r in wf.enumerate_measurements("12B", "ec_source", rt, data_dir)]
-    assert set(src_ids) == set(ec_op.src_list)
-    x_ids = [r["id"] for r in wf.enumerate_measurements("12B", "ec_xray", rt, data_dir)]
-    assert set(x_ids) == set(ec_op.x_list)
+@pytest.mark.parametrize("ver", ["09", "04", "07", "12B"])
+@pytest.mark.parametrize("branch", ["tb", "ec_source", "ec_xray"])
+def test_versions_enumerate_matches_legacy(ver, branch):
+    from legacy_ops import legacy_tb, legacy_ec
+    rt = pipeline.load_rt(ver)
+    data_dir = Path("data") / ver
+    wf = get_workflow(ver)
+    got = [r["id"] for r in wf.enumerate_measurements(ver, branch, rt, data_dir)]
+    if branch == "tb":
+        expected = legacy_tb(ver).files
+    elif branch == "ec_source":
+        expected = legacy_ec(ver).src_list
+    else:
+        expected = list(legacy_ec(ver).x_list)
+    got_sorted = sorted(got)
+    # enumerate order may differ from legacy's os.listdir order; compare as sets
+    # and also keep the same measurement count
+    assert set(got) == set(expected), f"{ver}/{branch}: {sorted(set(got) ^ set(expected))}"
+    assert len(got) == len(expected), f"{ver}/{branch}: {len(got)} != {len(expected)}"
 
 
 def test_migration_writes_valid_yaml_12b(tmp_path):
