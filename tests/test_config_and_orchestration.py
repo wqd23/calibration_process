@@ -118,3 +118,30 @@ def test_channel_use_semantics():
     ch_disabled = ManifestEntry(id="y", branch="tb", channels={"2": {"use": False}})
     assert channel_use(ch_disabled, 2) is False
     assert channel_use(ch_disabled, 0) is True
+
+
+def test_check_version_ready():
+    from calibration_process import deploy
+    assert deploy.check_version("09") is True
+
+
+def test_check_version_missing_manifest(tmp_path):
+    from calibration_process import deploy
+    cfg = tmp_path / "cfg" / "09"
+    cfg.mkdir(parents=True)
+    import shutil
+    shutil.copy("src/calibration_process/configs/09/payload.yaml", cfg / "payload.yaml")
+    shutil.copy("src/calibration_process/configs/09/analysis.yaml", cfg / "analysis.yaml")
+    assert deploy.check_version("09", config_root=tmp_path / "cfg", data_root=tmp_path / "d") is False
+
+
+def test_scaffold_then_check(tmp_path):
+    from calibration_process import deploy
+    root = tmp_path / "cfg"
+    data = tmp_path / "d"
+    deploy.scaffold_version("ZK", data_dir=str(tmp_path / "raw"), config_root=root, data_root=data)
+    assert (root / "ZK/payload.yaml").exists()
+    assert (root / "ZK/tb_manifest.yaml").exists()
+    assert (data / "ZK/tb_logs").is_dir()
+    # a freshly scaffolded skeleton has empty manifests -> check reports NOT READY
+    assert deploy.check_version("ZK", config_root=root, data_root=data) is False

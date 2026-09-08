@@ -27,15 +27,16 @@ _OUTPUT_SUBDIRS = (
 )
 
 
-def _cfg_root(ver: str) -> Path:
-    return CONFIG_ROOT / ver
+def _cfg_root(ver: str, config_root: Path = None) -> Path:
+    return (config_root or CONFIG_ROOT) / ver
 
 
-def _data_dir(ver: str) -> Path:
-    return DATA / ver
+def _data_dir(ver: str, data_root: Path = None) -> Path:
+    return (data_root or DATA) / ver
 
 
-def check_version(ver: str, fix: bool = False) -> bool:
+def check_version(ver: str, fix: bool = False,
+                  config_root: Path = None, data_root: Path = None) -> bool:
     """Validate a version's new config/manifest layer and data links.
 
     - ``payload.yaml`` / ``analysis.yaml`` must be strict-valid.
@@ -44,7 +45,7 @@ def check_version(ver: str, fix: bool = False) -> bool:
     - output dirs are reported (created with ``--fix``).
     - returns True when everything is ready.
     """
-    root = _cfg_root(ver)
+    root = _cfg_root(ver, config_root)
     ok = True
 
     print(f"[{ver}] deployment check")
@@ -66,7 +67,7 @@ def check_version(ver: str, fix: bool = False) -> bool:
             print(f"  INVALID  configs/{ver}/{fname}: {e}")
             ok = False
 
-    data_dir = _data_dir(ver)
+    data_dir = _data_dir(ver, data_root)
     raw = data_dir / "raw_data"
     if raw.is_symlink():
         state = "valid" if raw.exists() else "BROKEN"
@@ -150,9 +151,11 @@ def _template_payload(ver: str, import_from: str = "") -> dict:
     }
 
 
-def scaffold_version(ver: str, data_dir: str = None) -> None:
+def scaffold_version(ver: str, data_dir: str = None,
+                     config_root: Path = None, data_root: Path = None) -> None:
     """Create a new payload's config skeleton, data dirs and raw_data link."""
-    root = _cfg_root(ver)
+    root = _cfg_root(ver, config_root)
+    data_dir_path = _data_dir(ver, data_root)
     root.mkdir(parents=True, exist_ok=True)
 
     if not (root / "payload.yaml").exists():
@@ -174,10 +177,10 @@ def scaffold_version(ver: str, data_dir: str = None) -> None:
             print(f"  created configs/{ver}/{fname}")
 
     for sub in _OUTPUT_SUBDIRS:
-        (_data_dir(ver) / sub).mkdir(parents=True, exist_ok=True)
+        (data_dir_path / sub).mkdir(parents=True, exist_ok=True)
         print(f"  created data/{ver}/{sub}")
 
-    link = _data_dir(ver) / "raw_data"
+    link = data_dir_path / "raw_data"
     if data_dir and not os.path.exists(link):
         os.symlink(data_dir, link)
         print(f"  symlinked data/{ver}/raw_data -> {data_dir}")
