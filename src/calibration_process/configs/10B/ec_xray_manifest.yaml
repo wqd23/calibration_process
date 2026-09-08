@@ -272,5 +272,7 @@ measurements:
   aux_files: []
   metadata:
     energy: 90.0
-  use: true
+    note: legacy 90keV ch3 gaus fit fails -> plot KeyError; excluded to reproduce
+      legacy unprocessable point
+  use: false
   channels: null
