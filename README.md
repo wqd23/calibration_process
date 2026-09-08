@@ -29,14 +29,67 @@ just discover {ver} {branch}         # 扫描目录 -> manifest 草稿
 
 新版本由**显式 workflow** 驱动：配置在 `src/calibration_process/configs/{ver}/`（YAML + strict schema），每一步都调用同一个未改动的科学内核，因此结果与历史实现一致。
 
+## 标定的基础流程
+
+GRID 载荷标定分成 **TB**（温度-偏压）与 **EC**（能量-道址）两条线，处理链路都是：
+
+```text
+[Raw Measurement Bundle]        # 一个 measurement = science + hk + aux + metadata（manifest 记录）
+        │  discover → 人工确认 manifest
+        ▼
+[单文件处理]  read → TV/temp-bias 校正 → 能谱 → 峰拟合   # file_lib / util_lib（科学内核）
+        ▼
+[SingleFitResult]  peak / center / sigma / resolution / errors
+        ▼
+[TBPoint / ECPoint]  build_tb_points / build_ec_points（含 channel 过滤、能量映射）
+        ▼
+[版本特有 correction（若有）]   例如 12B 的 bias≥27.5V、11B 的 lmfit
+        ▼
+[全局拟合]  TB：峰位~（温度,偏压）二维面；EC：按 K 边拆两段二次拟合 + 分辨率拟合
+        ▼
+[最终产物]  JSON / NumPy / 图   # 与历史格式兼容
+```
+
+- **TB** 单谱峰拟合**不做**校正（corr = 1），温压依赖交给二维面建模。
+- **EC** 单谱在生成阶段做**TV 校正**：以 TB 二维面为参考（默认 25°C/28.5V），
+  把每个 EC 文件修正到该参考点（`get_spectrum` 里对 amp 乘因子）。
+- EC 再分成**放射源**与**X 光机**两条分支（背景/选点不同，见 [workflows.md](docs/workflows.md)）。
+- 每个版本的实际选择规则与特殊处理见 [docs/workflows.md](docs/workflows.md)。
+
+## 增加一个新载荷
+
+最小流程（新配置 + 新数据，**无需改科学内核**）：
+
+```bash
+calib scaffold {ver} --data-dir /path/to/data   # 生成 configs/{ver}/*.yaml + 目录 + 软链 raw_data
+# 1) 编辑 configs/{ver}/payload.yaml：reader / bin_width / adc_max / 分支路径 / channel_count
+# 2) 新增 reader（若包格式不同）：lib_reader/src/lib_reader/reader{ver}/，在 lib_reader/__init__.py 注册
+calib discover {ver} tb                        # 扫描 -> manifest 草稿（tb / ec_source / ec_xray 各一次）
+# 3) 人工确认 manifest（去重、剔除坏点、设 use / channels.use）
+# 4) 填 configs/{ver}/fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml
+calib check {ver}                               # 校验配置/manifest 层与数据链接
+calib all {ver}                                 # 全流程：单拟合 + TB/EC 全局拟合
+```
+
+- 若该版本的流程与已有版本**完全相同**，在 `workflows/versions/` 里复用对应文件的
+  `enumerate_measurements`，并去 `workflows/registry.py` 注册即可（版本选择只发生一次）。
+- 若流程**真的不同**（不同的选点/背景/分辨率/模型），在 `workflows/versions/v{ver}.py`
+  里显式写出差异，并把差异点写进 [docs/workflows.md](docs/workflows.md)。
+- 配置都是 **strict schema**：未知字段/非法枚举/重复 id/指向缺失文件 都会在
+  `calib check` 或 workflow 开始前失败，报错会带上 version/branch/measurement/字段。
+- 参考：不同读者 / 包格式判定、HK 截取、找峰、Co60 双高斯等工程细节见
+  [docs/data.md](docs/data.md)；每个载荷现有 workflow 见 [docs/workflows.md](docs/workflows.md)。
+
 ## 文档
 
 详细文档在 [docs/](docs/) 目录（清单与写作约定见 [docs/README.md](docs/README.md)）：
 
 | 文档 | 内容 |
 |------|------|
-| [docs/deploy.md](docs/deploy.md) | 部署指南：新机器上装环境、挂数据、验证部署 |
-| [docs/data.md](docs/data.md) | 数据准备与目录约定：配置文件格式、新版本载荷接入流程与方法论 |
+| [docs/workflows.md](docs/workflows.md) | 每个载荷各自的显式 workflow（选点、reader、背景轮转、分辨率、特殊处理） |
+| [docs/workflow_matrix.md](docs/workflow_matrix.md) | 历史 workflow 完整审计矩阵（每个版本实际做了什么） |
+| [docs/deploy.md](docs/deploy.md) | 部署指南：新机器上装环境、挂数据、`calib check` 验证 |
+| [docs/data.md](docs/data.md) | 数据准备与目录约定：新配置/manifest 格式、新载荷接入流程与方法论 |
 | [docs/results.md](docs/results.md) | 结果产物与 QA 指标说明 |
 | [docs/12B_13B/data.md](docs/12B_13B/data.md) | 12B/13B 类载荷的数据说明（点位对照表、各文件的特殊情况） |
 
@@ -66,6 +119,8 @@ just discover {ver} {branch}         # 扫描目录 -> manifest 草稿
 ├── README.md
 ├── docs/                           # 详细文档（清单见 docs/README.md）
 │   ├── README.md                   # 文档目录说明与清单
+│   ├── workflows.md                # 每个载荷各自的显式 workflow
+│   ├── workflow_matrix.md          # 历史 workflow 审计矩阵
 │   ├── deploy.md                   # 部署指南
 │   ├── data.md                     # 数据准备与目录约定、接入方法论
 │   ├── results.md                  # 结果产物与 QA 指标
@@ -73,7 +128,7 @@ just discover {ver} {branch}         # 扫描目录 -> manifest 草稿
 │       └── data.md                 # 点位对照表、各数据文件的特殊情况
 ├── data/{ver}/                     # 各版本数据目录
 │   ├── raw_data -> /path/to/data   # 原始数据软链
-│   ├── single_process/             # 配置文件和拟合产物
+│   ├── single_process/             # 拟合产物（+ 历史 JSON oracle）
 │   ├── tb_logs/                    # TB 面拟合产物
 │   └── ec_logs/                    # E-C 拟合产物
 ├── lib_reader/                     # 各版本数据读取库（workspace 子包）

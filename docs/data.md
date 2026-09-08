@@ -9,69 +9,109 @@
 
 ## 目录结构
 
+配置已迁移为 **YAML + manifest**（在 `src/calibration_process/configs/{ver}/`），
+新流程只读这些 YAML；`data/{ver}/single_process/` 下仍保留历史 JSON：
+`fit_range.json` / `bkg_form.json` / `ec_energy.json` / `time_cut.json` /
+`tb_file_map.json` / `{ts}_temp_bias_fit.json` 作为**迁移前的 oracle / 审计**（不再被新流程读，
+但 `qa_thresholds.json` **仍是 QA 阈值的来源**，新流程 `common.py` 通过
+`util.load_qa_thresholds` 读取）。
+
 ```
-data/{ver}/
-├── raw_data -> /path/to/actual/data       # 软链，指向原始标定数据
-├── single_process/
-│   ├── fit_range.json                      # 每通道拟合区间配置
-│   ├── bkg_form.json                       # 每通道本底模型配置
-│   ├── ec_energy.json                      # 文件名 → 能量映射
-│   ├── qa_thresholds.json                  # QA 阈值配置
-│   ├── TB_fit_result/                      # TB 单谱拟合产物（pickle）
-│   ├── EC_fit_result/                      # EC 单谱拟合产物（pickle）
-│   └── single_fit_fig/                     # 拟合图（png）
-├── tb_logs/                                # TB 二维面拟合产物
-└── ec_logs/                                # E-C 关系拟合产物
+data/{ver}/                       # 数据目录（数据 + 产物）
+├── raw_data -> /path/to/data     # 软链，指向原始标定数据
+├── single_process/               # 单谱拟合产物 + 历史 JSON（oracle）
+│   ├── fit_range.json ...        # （历史 oracle，新流程不再读）
+│   ├── TB_fit_result/            # TB 单谱拟合产物（pickle）
+│   ├── EC_fit_result/            # EC 单谱拟合产物（pickle）
+│   └── single_fit_fig/           # 拟合图（png）
+├── tb_logs/                      # TB 二维面拟合产物
+└── ec_logs/                      # E-C 关系拟合产物
+
+src/calibration_process/configs/{ver}/   # 新配置（唯一事实来源）
+├── payload.yaml                 # 版本级科学/reader 参数
+├── analysis.yaml                # 人类可编辑：背景/峰型默认与逐点 override
+├── fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml
+├── tb_manifest.yaml / ec_source_manifest.yaml / ec_xray_manifest.yaml
 ```
 
-`just init {ver} {path}` 会自动创建目录结构并软链 `raw_data`。`just check {ver}` 会验证所有路径是否就绪。
+`just init {ver} {path}` 负责**软链 raw_data + 创建输出目录**；`just check {ver}`
+（`calib check`）校验新配置/manifest 层与数据链接。
 
 ## 配置文件
 
-### fit_range.json
+### payload.yaml
 
-每通道的拟合区间。格式为 4 元素数组（对应 ch0–ch3），每个元素是 `[low, high]`（ADC 道址范围），`null` 表示跳过该通道。
+版本级参数：`reader`、`bin_width`、`adc_max`、`channel_count`（10B/11B 为 3）、
+TB 的二维面初值/过滤（`tb_fit_p0`/`tb_fit_maxfev`/`bias_min_filter`/`tb_file_map`）、
+EC 的各分支路径（`x_path`/`src_path`）、能量分界（`energy_split_low/high`）、
+温度参考（`ref_temp`/`ref_bias`）、EC 的温度偏压参考（`tb_ref_path`）、
+能量映射（`energy_map`）、X 光机的过滤/背景轮转（`xray_drop_*`、`xray_bkg_rotation`、
+`xray_name_index`）、以及 05B 的单文件 X 光机标志（`xray_single_file` + `time_cut`）。
 
-参考：`data/03B/single_process/fit_range.json`
-
-### bkg_form.json
-
-每通道的本底模型。可选值：`"lin"`（线性）、`"quad"`（二次）、`"exp"`（指数）、`"gaus"`（高斯）、`null`（无本底）。
-
-参考：`data/03B/single_process/bkg_form.json`
-
-### ec_energy.json
-
-文件名到光子能量（keV）的映射。键为 pickle 文件名（不含扩展名），值为能量值（标量或每通道数组）。
-
-参考：`data/07/single_process/ec_energy.json`
-
-### qa_thresholds.json
-
-拟合质量阈值。格式：
-```json
-{
-  "tb": {"redchi_warn": 2.0, "redchi_fail": 5.0},
-  "ec": {"redchi_warn": 5.0, "redchi_fail": 50.0}
-}
+示例（09）：
+```yaml
+tb: {reader: "09", bin_width: 6, adc_max: 65535.0, science_dir: raw_data/temp_bias}
+ec:
+  reader: "09"
+  energy_split_low: 49.0
+  energy_split_high: 55.0
+  xray_bkg_rotation: circle
+  energy_map: {"15keV": 15.0, "0827_10C_285_Co60_20m_0x010F.txt": 1332.0}
 ```
 
-文件不存在时使用默认值。新版本接入后建议先跑一遍数据再根据实际分布调整阈值。
+### analysis.yaml
+
+每个分支一份 `default_bkg`（默认背景）与 `background_overrides`（逐 measurement 的
+背景/峰型覆盖）。可选值：`"lin"`/`"quad"`/`"exp"`/`"gaus"`/`null`。
+
+### fit_range_*.yaml
+
+逐 measurement 的每通道拟合区间。每个 measurement 是 4 元素列表（ch0–ch3），
+每元素是 `[low, high]`（ADC 道址范围），`null` 表示该通道不拟合（12B 用到）。
+
+```yaml
+measurements:
+  "0825_0C_265_4m_0x00C5.txt":
+    - [235.2, 775.2]     # ch0
+    - [235.2, 775.2]     # ch1
+    - [235.2, 775.2]     # ch2
+    - [235.2, 775.2]     # ch3
+```
+
+### *_manifest.yaml
+
+**人工确认**的 measurement 列表。每个条目至少含 `id`、`branch`、`science_files`、
+可选 `hk_files`/`aux_files`/`metadata`，以及 `use`（整条是否启用）和
+`channels: {chN: {use: false}}`（单通道剔除）。
+
+```yaml
+measurements:
+  - id: 0825_0C_265_4m_0x00C5.txt
+    branch: tb
+    science_files: [raw_data/temp_bias/0825_0C_265_4m_0x00C5.txt]
+    use: true
+```
+
+> 这些 YAML 都是 **strict schema**：未知字段、非法枚举、重复 id、指向缺失文件
+> 都会在 workflow 开始前报错（报错带 version/branch/measurement/字段）。
 
 ## 新版本接入流程
 
 ```bash
-just new-payload {ver}          # 生成 config 条目 + 目录 + reader 骨架
-just init {ver} {data-path}     # 软链数据
-# 编辑 data/{ver}/single_process/ 下的 fit_range / bkg_form / ec_energy
-# 实现 lib_reader/src/lib_reader/reader{ver}/
-just check {ver}                # 验证配置
-just all {ver}                  # 跑数据
-just tbfit {ver}                # TB 二维面拟合
-just ecfit {ver}                # E-C 关系拟合
+calib scaffold {ver} --data-dir /path/to/data   # 生成 configs/{ver}/*.yaml + 目录 + 软链 raw_data
+# 1) 编辑 configs/{ver}/payload.yaml：reader / bin_width / adc_max / 分支路径 / channel_count
+# 2) 若包格式不同，新增 reader：lib_reader/src/lib_reader/reader{ver}/，并在 lib_reader/__init__.py 注册
+calib discover {ver} tb                        # 扫描 -> manifest 草稿（tb / ec_source / ec_xray 各一次）
+# 3) 人工确认 manifest（去重、剔除坏点、设 use / channels.use）
+# 4) 填 configs/{ver}/fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml
+calib check {ver}                               # 校验
+calib all {ver}                                 # 全流程：单拟合 + TB/EC 全局拟合
 ```
 
-配置文件的具体格式可参考已有版本（如 `data/03B/` 或 `data/07/`）。
+> 若该版本流程与已有版本完全相同，可复用对应 `workflows/versions/v{ver}.py` 的
+> `enumerate_measurements`，并在 `workflows/registry.py` 注册；若流程不同，在
+> `workflows/versions/v{ver}.py` 显式写出差异（并更新 docs/workflows.md）。
+> 每个载荷各自的 workflow 见 [workflows.md](workflows.md)。
 
 ### 接入细节与经验（以 12B 为例）
 
@@ -119,7 +159,7 @@ just ecfit {ver}                # E-C 关系拟合
   谷值之上，把阈值沿排除在窗口外；窗口太宽会把右侧连续谱的下降尾巴
   包进来，线性本底拟合会把峰位拉偏
 - X 光机数据增益低，光子信号埋在噪声包附近，要用同 kV 点其他通道的文件
-  互扣本底（`xray_config` 里的 bkg 轮转 `[1,2,0,0]` 就是干这个的）才能
+  互扣本底（`payload.ec.xray_bkg_rotation` = `fixed [1,2,0,0]` / `circle` 就是干这个的）才能
   露出峰；注意扣除残余会在峰低能侧产生假的负凹陷，拟合窗口下沿要避开
 - 低 kV 点（12B 的 ≤65 kV）的峰包不是干净的全能峰：管压越低，连续谱
   端点离阈值越近，谱形被阈值截断，且端点以上有堆积尾巴（12B 的 40 kV
@@ -151,9 +191,8 @@ just ecfit {ver}                # E-C 关系拟合
   ~0.9°C）
 
 二维面拟合不收敛时先检查初值：共享的 `temp_bias_fit_curvefit` 默认初值
-是为其他版本调的，12B 用自己的初值（`TB_operation_12B` 的类属性
-`TB_FIT_P0`/`TB_FIT_MAXFEV`，基类 `temp_bias_fit` 会把它们传给
-`temp_bias_fit_curvefit` 的 `p0`/`maxfev` 参数）。
+是为其他版本调的，12B 用自己的初值（`payload.yaml` 的 `tb.tb_fit_p0` /
+`tb.tb_fit_maxfev`，`global_tb` 传给 `temp_bias_fit_curvefit` 的 `p0`/`maxfev`）。
 验收标准：相对残差 max < 5%。
 
 **3c. 低增益点位的峰不要轻易放弃：用模型反推重试。**
@@ -162,20 +201,22 @@ just ecfit {ver}                # E-C 关系拟合
 肉眼可见、且物理上必然存在。流程：先用高置信度点位拟合出二维响应，再对每个
 缺测通道用模型在实测 (T, B) 下反推预期峰位，开窗口 [谷值, 预期+2.5σ] 做
 高斯+线性拟合，验收条件：拟合中心与预期偏差 ≤12%、redchi<5、
-center_err<5%。重试成功的点写回 fit_range 后重跑 tbfit，迭代到没有新增
+center_err<5%。重试成功的点写回 fit_range 后重跑 `calib global {ver} tb`，迭代到没有新增
 为止（12B 由此多救回 60 个通道，含全部 27.0V 行）。
 
 注意 12B 的 27.0V 行拟合中心对窗口不敏感（窗口扫描中心变化 <1 ADC），
 但对二维面有 +3~+6% 的系统偏高——实测增益随过偏压的变化比模型的
 Vov² 形式平缓，是模型形式本身的偏差，不是拟合错误。因此二维拟合限定
-在偏压 ≥27.5V 范围（`TB_operation_12B.load_data` 过滤），27.0V 行的单谱
+在偏压 ≥27.5V 范围（`payload.yaml` 的 `bias_min_filter`，`global_tb` 在点过滤时使用），27.0V 行的单谱
 拟合结果仍保留在 pickle 中可参考。EC 运行偏压 28.5V，在适用范围内。
 
 **4. EC 的两个易踩的坑。**
 
-- `ec_energy.json` 的键命名影响 `cmd.py` 里 ecfit 对 X 光机/放射源条目的
-  区分：10B/11B 用文件名里是否含 `observe` 区分，12B 的放射源文件名不含
-  observe，改用"键是否纯数字（kV 值）"区分（`VersionProcessOp12B`）
+- 能量映射（`payload.ec.energy_map`，原 `ec_energy.json`）的键命名影响 EC 全局
+  对 X 光机/放射源条目的区分：10B/11B 用文件名里是否含 `observe`，12B 的放射源
+  文件名不含 observe，改用"键是否纯数字（kV 值）"区分。新架构里这个"哪个文件是
+  source/xray"由 manifest 的 `branch` 决定（`ec_source` vs `ec_xray`），不再依赖
+  文件名启发式。
 - EC 拟合按 Gd K 吸收边（50.2 keV）拆成低/高两段二次拟合，拆分阈值
   （`energy_split_low`/`energy_split_high`）要按实际点位设置：12B 用
   49/55 keV，落在死区里的点（如 51/53 kV）不参与拟合。若某载荷所有点

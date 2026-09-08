@@ -1,6 +1,10 @@
 # 结果产物与 QA 指标
 
-修订日期：2026-08-25
+修订日期：2026-09-08
+
+> 下文所有产物由 `calib all {ver}`（或 `calib fit`/`calib global`）产生，
+> 路径与历史实现保持一致。处理流程见 [README 标定基础流程](../README.md) 与
+> [workflows.md](workflows.md)。
 
 ## 产物清单
 

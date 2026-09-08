@@ -28,22 +28,36 @@ cargo install just
 git clone <repo-url>
 cd calibration_process
 uv sync                          # 安装依赖到 .venv
-just init {ver} {data-path}      # 软链数据 + 创建输出目录
-just check {ver}                 # 验证部署是否完整
+just init {ver} {data-path}      # 软链 data/{ver}/raw_data + 创建输出目录
+just check {ver}                 # 验证新配置/manifest 层与数据链接
 ```
 
 其中 `{ver}` 为载荷版本号（如 `03B`），`{data-path}` 为该版本原始标定数据的绝对路径。
 
-`just`（无参数）可查看所有可用命令和版本列表。
+`just`（无参数）可查看所有可用命令。
+
+> 说明：新架构的配置（`src/calibration_process/configs/{ver}/*.yaml`）与
+> manifest 已经随仓库提交；`just init` 只负责**软链原始数据 + 建输出目录**，
+> 不再生成配置。配置/manifest 的校验由 `calib check`（`deploy.py`）完成。
 
 ## 验证部署
 
-`just check {ver}` 会逐项检查：
-- **raw_data 软链**：是否存在、目标是否可达
-- **输入路径**：数据目录、fit_range / bkg_form / ec_energy 配置文件是否存在
-- **输出目录**：TB_fit_result / EC_fit_result / single_fit_fig / tb_logs / ec_logs 是否存在（缺失时加 `--fix` 自动创建）
+`just check {ver}`（即 `calib check {ver}`）会逐项检查：
+- **raw_data 软链**：是否存在、目标是否可达（真实目录也算可接受）
+- **配置层**：`configs/{ver}/payload.yaml` / `analysis.yaml` 是否 strict-valid
+- **manifest 层**：`configs/{ver}/{tb,ec_source,ec_xray}_manifest.yaml` 是否
+  strict-valid、id 是否唯一、引用的 science/hk/aux 文件在 `data/{ver}/` 下是否存在
+- **输出目录**：`single_process/{TB,EC}_fit_result`、`single_fit_fig`、`tb_logs`、
+  `ec_logs` 是否存在（缺失时加 `--fix` 自动创建）
 
-全部 OK 时输出 `[ver] READY`，exit code 0。有缺失时输出 `[ver] NOT READY`，exit code 1。
+全部 OK 时输出 `[ver] READY`，exit code 0；有缺失/非法时输出 `[ver] NOT READY`，
+exit code 1。
+
+## 新载荷
+
+用 `calib scaffold {ver} --data-dir <path>` 生成一个新载荷的
+`configs/{ver}/*.yaml` 骨架、输出目录，并可选软链 `raw_data`。详见
+[data.md](data.md) 的"新版本接入流程"。
 
 ## 已知问题
 

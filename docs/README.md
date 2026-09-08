@@ -10,9 +10,12 @@
 
 | 编号 | 文档 | 内容 |
 |------|------|------|
-| D1 | [deploy.md](deploy.md) | 部署指南：新机器上从 GitHub 拉取后如何装环境、挂数据、验证部署 |
-| D2 | [data.md](data.md) | 数据准备与目录约定：配置文件的格式、新版本载荷的接入流程与方法论经验（找峰、HK 截取、质量筛查、拟合技巧） |
+| D1 | [deploy.md](deploy.md) | 部署指南：新机器上从 GitHub 拉取后如何装环境、挂数据、`calib check` 验证 |
+| D2 | [data.md](data.md) | 数据准备与目录约定：新配置（`configs/{ver}/*.yaml` + manifest）的格式、新载荷接入流程、以及方法论经验（找峰、HK 截取、质量筛查、拟合技巧） |
 | D3 | [results.md](results.md) | 结果产物清单与质量判定指标（pickle 字段、redchi、qa_flag）的含义 |
-| D4 | [12B_13B/data.md](12B_13B/data.md) | 12B/13B 类载荷的数据说明：温度偏压点位与文件对照表、X 光机/放射源各数据文件的状态与特殊情况 |
+| D4 | [workflows.md](workflows.md) | 每个载荷各自的显式 workflow：文件选择、reader、背景轮转、分辨率方法、特殊处理，一步可从 `v{ver}.py` 读出 |
+| D5 | [workflow_matrix.md](workflow_matrix.md) | 历史 workflow 完整审计矩阵（重构前每个版本实际做了什么，逐版本表格） |
+| D6 | [12B_13B/data.md](12B_13B/data.md) | 12B/13B 类载荷的数据说明：温度偏压点位与文件对照表、X 光机/放射源各数据文件的状态与特殊情况 |
 
 每类载荷一个子目录（如 `12B_13B/`），里面放该类载荷的数据说明：数据从哪来、每个文件对应什么实验条件、哪些文件有特殊情况（截断、复制、补测等）。新增载荷时仿照建目录。
+
