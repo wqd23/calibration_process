@@ -71,13 +71,14 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
             # 05B style: one 4-channel file, background = the same file with a
             # rotated (cyclically shifted per channel) time cut
             basename = os.path.basename(m.science_files[-1])
+            reader = pb.xray_reader or pb.reader
             read = file_lib.Read_config(
-                abspath(m.science_files[-1]), ending=pb.reader,
+                abspath(m.science_files[-1]), ending=reader,
                 config_file=pb.xray_config_file or "",
                 time_cut=_time_cut(pb, basename),
             )
             bkg = file_lib.Read_config(
-                abspath(m.science_files[-1]), ending=pb.reader,
+                abspath(m.science_files[-1]), ending=reader,
                 config_file=pb.xray_config_file or "",
                 time_cut=_bkg_time_cut(pb, basename),
             )

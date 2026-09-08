@@ -94,11 +94,12 @@ def _build_payload(ver, cfg, params, energy) -> dict:
         "energy_map": dict(energy),
         "resolution_method": ec["resolution_method"],
         "channel_count": ec["channel_count"],
-        "xray_bkg_rotation": ec["xray_bkg_rotation"],
+        "xray_bkg_rotation": ec.get("xray_bkg_rotation", "circle"),
     }
     for k in ("xray_drop_energies", "xray_drop_old", "xray_require_hk",
               "xray_require_fit_range", "src_bkg_map", "xray_drop_substrs",
-              "xray_name_index", "xray_config_file", "time_cut", "xray_single_file"):
+              "xray_name_index", "xray_config_file", "time_cut",
+              "xray_single_file", "xray_reader"):
         if ec.get(k) is not None:
             ec_out[k] = ec[k]
     return {"version": ver, "tb": tb_out, "ec": ec_out}
@@ -131,6 +132,8 @@ def _scan_tb_ids(ver, cfg) -> list:
             for p in tm if (p["temp_setpoint_C"], p["bias_code"]) not in EXCLUDE
         )
     full = Path(cfg["tb"]["path"])
+    if ver == "05B":
+        return [f for f in os.listdir(full) if "rundata" in f and "50C" not in f]
     files = [f for f in os.listdir(full) if os.path.splitext(f)[1] == ".txt"]
     if ver == "09":
         for excl in v09.TB_EXCLUDE:
@@ -149,10 +152,16 @@ def _scan_ec_source_ids(ver, cfg) -> list:
         full = Path(cfg["ec"]["src_path"])
         return [f for f in os.listdir(full)
                 if "src" in f and "_bk_" not in f and "bkg" not in f]
+    if ver == "05B":
+        full = Path(cfg["ec"]["src_path"])
+        return [f for f in os.listdir(full) if "rundata" in f and "bkg" not in f]
     return list(v09.SRC_LIST)
 
 
 def _scan_ec_xray_ids(ver, cfg, fit_range) -> list:
+    if ver == "05B":
+        full = Path(cfg["ec"]["x_path"])
+        return [f for f in os.listdir(full) if "_observe.dat" in f and "XM_22" not in f]
     if ver == "12B":
         full = Path(cfg["ec"]["x_path"])
         x_ch = [f for f in os.listdir(full) if f.endswith(".dat") and "_ch" in f and "old" not in f]
@@ -263,6 +272,34 @@ def _p04(ver, cfg, tb, ec):
     return p
 
 
+def _p05B(ver, cfg, tb, ec):
+    import json as _j
+    tc = _j.load(open(_load(ver, "time_cut.json")))
+    p = {
+        "tb": {"reader": "normal", "bin_width": 6, "adc_max": 16384.0,
+               "science_dir": _rel(tb["path"])},
+        "ec": {
+            "reader": "normal", "xray_reader": "xray", "bin_width": 10,
+            "adc_max": 16384.0,
+            "x_path": _rel(ec["x_path"]), "src_path": _rel(ec["src_path"]),
+            "energy_split_low": 49.0, "energy_split_high": 52.0,
+            "ref_temp": 25.0, "ref_bias": 28.5,
+            "tb_ref_path": _rel(ec["tb_result_path"]),
+            "resolution_method": "polyfit", "channel_count": 4,
+            "xray_single_file": True,
+            # keep the full path so it matches the legacy config_file string
+            "xray_config_file": ec["x_config"],
+            "time_cut": tc,
+        },
+        "analysis": {"tb": {"default_bkg": "lin"}, "ec_source": {"default_bkg": "lin"},
+                     "ec_xray": {"default_bkg": "lin"}},
+    }
+    p["selected_ids"] = {"tb": _scan_tb_ids(ver, cfg),
+                         "ec_source": _scan_ec_source_ids(ver, cfg),
+                         "ec_xray": _scan_ec_xray_ids(ver, cfg, _j.load(open(_load(ver, "fit_range.json"))))}
+    return p
+
+
 def _p07(ver, cfg, tb, ec):
     p = {
         "tb": {"reader": "07", "bin_width": 6, "adc_max": 65535.0,
@@ -286,11 +323,11 @@ def _p07(ver, cfg, tb, ec):
     return p
 
 
-_PARAMS = {"09": _p09, "12B": _p12b, "04": _p04, "07": _p07}
+_PARAMS = {"09": _p09, "12B": _p12b, "04": _p04, "07": _p07, "05B": _p05B}
 
 
 def main():
-    for ver in ["09", "04", "07", "12B"]:
+    for ver in ["09", "04", "05B", "07", "12B"]:
         migrate_version(ver)
 
 

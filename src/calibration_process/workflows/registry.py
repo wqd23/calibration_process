@@ -14,6 +14,7 @@ _MODULE = {
     "12B": "calibration_process.workflows.versions.v12B",
     "04": "calibration_process.workflows.versions.v04",
     "07": "calibration_process.workflows.versions.v07",
+    "05B": "calibration_process.workflows.versions.v05B",
 }
 
 

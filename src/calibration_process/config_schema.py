@@ -109,6 +109,9 @@ class ECParams(_StrictBase):
     xray_config_file: Optional[str] = None
     # 05B-style per-file time cut (dict of basename -> [[lo,hi]*4])
     time_cut: Optional[Dict[str, Any]] = None
+    # reader used by the ec_xray branch (05B uses "xray" while ec_source uses
+    # "normal"); defaults to the shared ec.reader
+    xray_reader: Optional[str] = None
 
 
 class PayloadSchema(_StrictBase):

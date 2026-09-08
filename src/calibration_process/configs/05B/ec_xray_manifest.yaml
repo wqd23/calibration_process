@@ -1,0 +1,163 @@
+version: 05B
+branch: ec_xray
+measurements:
+- id: XM_65_015_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_65_015_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 65.0
+  use: true
+  channels: null
+- id: XM_40_005_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_40_005_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 40.0
+  use: true
+  channels: null
+- id: XM_47_020_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_47_020_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 47.1
+  use: true
+  channels: null
+- id: XM_80_012_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_80_012_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 80.0
+  use: true
+  channels: null
+- id: XM_75_013_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_75_013_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 75.0
+  use: true
+  channels: null
+- id: XM_53_017_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_53_017_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 53.2
+  use: true
+  channels: null
+- id: XM_49_019_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_49_019_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 49.1
+  use: true
+  channels: null
+- id: XM_55_016_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_55_016_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 55.0
+  use: true
+  channels: null
+- id: XM_45_021_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_45_021_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 45.1
+  use: true
+  channels: null
+- id: XM_29_009_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_29_009_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 29.0
+  use: true
+  channels: null
+- id: XM_35_006_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_35_006_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 35.0
+  use: true
+  channels: null
+- id: XM_51_018_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_51_018_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 51.1
+  use: true
+  channels: null
+- id: XM_100_026_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_100_026_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 100.0
+  use: true
+  channels: null
+- id: XM_120_028_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_120_028_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 119.9
+  use: true
+  channels: null
+- id: XM_110_027_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_110_027_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 110.1
+  use: true
+  channels: null
+- id: XM_90_025_observe.dat
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u5B9E\u9A8C-\u5929\u683C_reset/XM_90_025_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 90.0
+  use: true
+  channels: null
