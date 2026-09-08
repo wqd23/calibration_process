@@ -2,7 +2,6 @@ import lib_reader as ver
 from . import util_lib as util
 from lib_reader.reader05.my_type import *
 from dataclasses import dataclass, field
-from .fitting import peak_fit
 import numpy as np
 
 
@@ -313,83 +312,3 @@ class File_operation_05b:
             },
         }
         util.pickle_save(data, path)
-
-
-@dataclass
-class Fit_cfg4ch:
-    """settings for 4 channel fit"""
-
-    fit_range: List[List[float]] = field(default_factory=lambda: [[None, None]] * 4)
-    bkg_form: List[str] = field(default_factory=lambda: ["lin"] * 4)
-    peak_form: List[str] = field(default_factory=lambda: ["gaus"] * 4)
-
-
-class File_operation_10b(File_operation_05b):
-    """settings and functions for transfer 4 channel data file into data point with error, with compton fitting ability"""
-
-    def __init__(
-        self,
-        read_config: Union[Read_config, Dict[str, Any]] = {},
-        bkg_read_config: Union[Read_config, Dict[str, Any]] = {},
-        spectrum_config: Union[Spectrum_config, Dict[str, Any]] = {},
-        fit_config: Union[Fit_cfg4ch, Dict[str, Any]] = {},
-    ):
-        path = (
-            read_config.path
-            if isinstance(read_config, Read_config)
-            else read_config["path"]
-        )
-        super().__init__(path, read_config, bkg_read_config, spectrum_config)
-        self.fit_config = config_import(Fit_cfg4ch, fit_config)
-        # read_config use a mutable {} as default value, read_config should never be changed
-        del read_config, bkg_read_config, spectrum_config, fit_config
-        self.sci, self.tel = self.read_out()
-
-    def peak_fit(self, **kwargs):
-        fit_result = []
-        for ich, (x, spectrum, spectrum_err, x_range, time, bkg, peak) in enumerate(
-            zip(
-                self.x,
-                self.spectrum,
-                self.spectrum_err,
-                self.fit_config.fit_range,
-                self.time,
-                self.fit_config.bkg_form,
-                self.fit_config.peak_form,
-            )
-        ):
-            if x_range == None:
-                fit_result.append(None)
-                continue
-            q = (x >= x_range[0]) * (x <= x_range[1])
-
-            try:
-                result = peak_fit(
-                    x[q],
-                    spectrum[q],
-                    spectrum_err[q],
-                    peak_form=peak,
-                    bkg_form=bkg,
-                    **kwargs,
-                )
-            except Exception as e:
-                print(e)
-                raise util.FitError(f"failed to fit {self.path} channel {ich}")
-            rate = result["peak_amplitude"]
-            rate_err = np.sqrt(rate / time)
-            fit_result.append(
-                {
-                    "a": result["peak_amplitude"],
-                    "b": result["peak_center"],
-                    "c": result["peak_sigma"],
-                    "a_err": result["peak_amplitude_err"],
-                    "b_err": result["peak_center_err"],
-                    "c_err": result["peak_sigma_err"],
-                    "rate": rate,
-                    "rate_err": rate_err,
-                    "resolution": result["peak_resolution"],
-                    "resolution_err": result["peak_resolution_err"],
-                    "bkg": result["bkg"],
-                }
-            )
-        self.fit_result = fit_result
