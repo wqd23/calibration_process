@@ -36,6 +36,8 @@ def test_payload_analysis_schemas_load():
 
 def test_fit_range_schema_strict():
     FitRangeSet.model_validate({"measurements": {"x": [[0, 1]] * 4}})
+    # a per-channel None range is allowed (12B uses un-fitted channels)
+    FitRangeSet.model_validate({"measurements": {"x": [[0, 1], None, [0, 1], None]}})
     with pytest.raises(Exception):
         FitRangeSet.model_validate({"measurements": {"x": [[0, 1], [0, 1]]}})
     with pytest.raises(Exception):
@@ -103,6 +105,44 @@ def test_versions_v09_enumerate_matches_legacy():
 def test_registry_unknown_version_raises():
     with pytest.raises(KeyError):
         get_workflow("99X")
+
+
+def test_versions_v12b_enumerate_matches_legacy():
+    from calibration_process import operation as op
+    rt = pipeline.load_rt("12B")
+    data_dir = Path("data") / "12B"
+    wf = get_workflow("12B")
+    tb_ids = [r["id"] for r in wf.enumerate_measurements("12B", "tb", rt, data_dir)]
+    leg_tb = op.TB_operation_12B(
+        path="data/12B/raw_data", fit_range="data/12B/single_process/fit_range.json",
+        save_path="x", save_fig_path="x", result_path="x",
+        file_map="data/12B/single_process/tb_file_map.json")
+    assert set(tb_ids) == set(leg_tb.files)
+    ec_op = op.EC_operation_12B(
+        tb_result_path="data/12B/single_process/20260824134441_temp_bias_fit.json",
+        fit_range="data/12B/single_process/fit_range.json",
+        energy="data/12B/single_process/ec_energy.json",
+        bkg_form="data/12B/single_process/bkg_form.json",
+        x_path="data/12B/raw_data/X光机/072", src_path="data/12B/raw_data/放射源/072",
+        save_path="x", save_fig_path="x", result_path="x")
+    src_ids = [r["id"] for r in wf.enumerate_measurements("12B", "ec_source", rt, data_dir)]
+    assert set(src_ids) == set(ec_op.src_list)
+    x_ids = [r["id"] for r in wf.enumerate_measurements("12B", "ec_xray", rt, data_dir)]
+    assert set(x_ids) == set(ec_op.x_list)
+
+
+def test_migration_writes_valid_yaml_12b(tmp_path):
+    root = tmp_path / "configs" / "12B"
+    migration.migrate_version("12B", config_root=root)
+    p = PayloadSchema.model_validate(yaml.safe_load(open(root / "payload.yaml")))
+    assert p.tb.bias_min_filter == 27.25
+    assert p.tb.tb_file_map == "single_process/tb_file_map.json"
+    assert p.ec.xray_bkg_rotation == "fixed"
+    assert p.ec.energy_map["0611_Co60_25min_240f0032.dat"] == 1332.492
+    tb_fr = FitRangeSet.model_validate(yaml.safe_load(open(root / "fit_range_tb.yaml")))
+    assert len(tb_fr.measurements) == 54
+    x_fr = FitRangeSet.model_validate(yaml.safe_load(open(root / "fit_range_ec_xray.yaml")))
+    assert len(x_fr.measurements) == 14
 
 
 def test_migration_writes_valid_yaml(tmp_path):

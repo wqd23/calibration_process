@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
-"""End-to-end run of the explicit new workflow for version 09.
+"""End-to-end run of the explicit new workflow (09, 12B).
 
 Runs the full formal workflow (single fit + global fit for TB and EC) into a
 temporary output root, then compares every output to the frozen legacy oracle
-(``.oracle/09``).  This exercises the pipeline, the shared stages and the
+(``.oracle/<ver>``).  This exercises the pipeline, the shared stages and the
 version workflow, and provides the Level 1/2/3 regression evidence.
 
 Skipped when the raw data or the frozen oracle are absent.
@@ -26,43 +26,37 @@ SRC = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(SRC / "calibration_process"))
 from calibration_process.cli import main as cli_main  # noqa: E402
 
-VER = "09"
-ORACLE = Path(".oracle") / VER
-pytestmark = pytest.mark.skipif(
-    not (ORACLE / "TB_fit_result").exists(),
-    reason=".oracle/09 not present (run the legacy pipeline first)",
-)
+VERSIONS = ["09", "12B"]
+# expected single-fit pickle counts per version
+COUNTS = {"09": (48, 16), "12B": (54, 18)}
 
 
-def test_full_pipeline_matches_oracle(tmp_path):
-    out = tmp_path / "out"
-    assert cli_main(["all", VER, "-o", str(out)]) == 0
+def test_all_versions_match_oracle(tmp_path):
+    for VER in VERSIONS:
+        oracle = Path(".oracle") / VER
+        if not (oracle / "TB_fit_result").exists():
+            pytest.skip(f".oracle/{VER} not present")
+        out = tmp_path / VER
+        assert cli_main(["all", VER, "-o", str(out)]) == 0
 
-    # file set / counts
-    tb_pickles = out / "single_process/TB_fit_result"
-    ec_pickles = out / "single_process/EC_fit_result"
-    assert len(list(tb_pickles.glob("*.pickle"))) == 48
-    assert len(list(ec_pickles.glob("*.pickle"))) == 16
+        tb_n, ec_n = COUNTS[VER]
+        assert len(list((out / "single_process/TB_fit_result").glob("*.pickle"))) == tb_n
+        assert len(list((out / "single_process/EC_fit_result").glob("*.pickle"))) == ec_n
 
-    # Level 1: pickles
-    import pickle
-    for sub in ("TB_fit_result", "EC_fit_result"):
-        leg = ORACLE / sub
-        new = out / "single_process" / sub
-        for f in sorted(os_listdir(leg)):
-            assert_pickle_equivalent(
-                pickle.load(open(new / f, "rb")), pickle.load(open(leg / f, "rb")),
-                f"pickle.{sub}.{f}",
-            )
-
-    # Level 3: global outputs
-    _compare_global(out / "tb_logs", ORACLE / "tb_logs")
-    _compare_global(out / "ec_logs", ORACLE / "ec_logs")
-
-    # figure sets + dimensions
-    _compare_figs(out / "single_process/single_fit_fig", ORACLE / "single_fit_fig")
-    _compare_figs(out / "tb_logs", ORACLE / "tb_logs")
-    _compare_figs(out / "ec_logs", ORACLE / "ec_logs")
+        import pickle
+        for sub in ("TB_fit_result", "EC_fit_result"):
+            leg = oracle / sub
+            new = out / "single_process" / sub
+            for f in sorted(os_listdir(leg)):
+                assert_pickle_equivalent(
+                    pickle.load(open(new / f, "rb")), pickle.load(open(leg / f, "rb")),
+                    f"pickle.{sub}.{f}",
+                )
+        _compare_global(out / "tb_logs", oracle / "tb_logs")
+        _compare_global(out / "ec_logs", oracle / "ec_logs")
+        _compare_figs(out / "single_process/single_fit_fig", oracle / "single_fit_fig")
+        _compare_figs(out / "tb_logs", oracle / "tb_logs")
+        _compare_figs(out / "ec_logs", oracle / "ec_logs")
 
 
 def os_listdir(p):
