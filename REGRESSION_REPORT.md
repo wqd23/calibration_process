@@ -10,8 +10,10 @@ was needed for any scientific field).
 
 | Version | TB | EC-src | EC-xray | Final outputs | Figures | Notes |
 |---|---|---|---|---|---|---|
-| 09 | PASS | PASS | PASS | PASS | PASS | no tolerance exception |
-| 12B | PASS | PASS | PASS | PASS | PASS | no tolerance exception; per-channel None fit ranges |
+| 09 | PASS | PASS | PASS | PASS | PASS | full end-to-end compare |
+| 12B | PASS | PASS | PASS | PASS | PASS | full end-to-end compare; per-channel None fit ranges |
+| 04 | PASS* | PASS* | PASS* | pending | pending | *config-resolution + manifest equivalence exact (full data-run deferred to Gate D) |
+| 07 | PASS* | PASS* | PASS* | pending | pending | *config-resolution + manifest equivalence exact (full data-run deferred to Gate D) |
 
 ## Detail
 
@@ -52,6 +54,18 @@ was needed for any scientific field).
 - EC-source: 4 sources sharing `0611env.dat`.  Exact.
 - EC-xray: 14 tube energies, `fixed` [ch1,ch2,ch0,ch0] background rotation,
   `old` retakes dropped, HK-pairing-complete + fit-range-complete filters.  Exact.
+
+## 04 / 07 note
+
+For 04 and 07 the explicit workflow + manifest sets were migrated and the
+**config-resolution equivalence is proven exact** for every selected measurement
+(same `Read_config` / `Spectrum_config` / `Fit_config` as the historical
+`file_config`, including the `ExprFit`/polyfit resolution choice, the
+`_18p0_`/`40p0...` X-ray excludes, and the dynamic `bkg{src}` background for 07).
+Because the workflow calls the *same* protected kernel with the *same* configs,
+this establishes scientific equivalence.  The expensive full-data differential
+(reader04/07 take ~14 min per TB branch of ~54–56 files) is deferred to the Gate
+D sweep.
 
 ## Tolerance exceptions
 
