@@ -19,7 +19,7 @@ from calibration_process.pipeline import load_rt, _manifest_path  # noqa: E402
 from calibration_process.workflows import common as stages  # noqa: E402
 from legacy_ops import legacy_tb, legacy_ec, legacy_file_config  # noqa: E402
 
-VERSIONS = ["09", "04", "05B", "07", "12B"]
+VERSIONS = ["03B", "04", "05B", "07", "10B", "11B", "09", "12B"]
 BRANCHES = ["tb", "ec_source", "ec_xray"]
 
 

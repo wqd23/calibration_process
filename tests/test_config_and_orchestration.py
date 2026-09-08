@@ -85,7 +85,7 @@ def test_registry_unknown_version_raises():
         get_workflow("99X")
 
 
-@pytest.mark.parametrize("ver", ["09", "04", "05B", "07", "12B"])
+@pytest.mark.parametrize("ver", ["03B", "04", "05B", "07", "10B", "11B", "09", "12B"])
 @pytest.mark.parametrize("branch", ["tb", "ec_source", "ec_xray"])
 def test_versions_enumerate_matches_legacy(ver, branch):
     from legacy_ops import legacy_tb, legacy_ec
@@ -105,7 +105,7 @@ def test_versions_enumerate_matches_legacy(ver, branch):
     assert len(got) == len(expected), f"{ver}/{branch}: {len(got)} != {len(expected)}"
 
 
-@pytest.mark.parametrize("ver", ["09", "04", "05B", "07", "12B"])
+@pytest.mark.parametrize("ver", ["03B", "04", "05B", "07", "10B", "11B", "09", "12B"])
 def test_migration_writes_valid_yaml_all_versions(tmp_path, ver):
     root = tmp_path / "configs" / ver
     migration.migrate_version(ver, config_root=root)
