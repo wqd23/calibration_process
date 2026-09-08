@@ -111,7 +111,8 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 > 若该版本流程与已有版本完全相同，可复用对应 `workflows/versions/v{ver}.py` 的
 > `enumerate_measurements`，并在 `workflows/registry.py` 注册；若流程不同，在
 > `workflows/versions/v{ver}.py` 显式写出差异（并更新 docs/workflows.md）。
-> 每个载荷各自的 workflow 见 [workflows.md](workflows.md)。
+> 每个载荷各自的 workflow 见 [workflows.md](workflows.md)；各载荷的**数据/选点**说明见
+> [payloads_data.md](payloads_data.md)（除 12B/13B，见 [12B_13B/data.md](12B_13B/data.md)）。
 
 ### 接入细节与经验（以 12B 为例）
 

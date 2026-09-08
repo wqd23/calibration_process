@@ -92,6 +92,7 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 | [docs/data.md](docs/data.md) | 数据准备与目录约定：新配置/manifest 格式、新载荷接入流程与方法论 |
 | [docs/results.md](docs/results.md) | 结果产物与 QA 指标说明 |
 | [docs/12B_13B/data.md](docs/12B_13B/data.md) | 12B/13B 类载荷的数据说明（点位对照表、各文件的特殊情况） |
+| [docs/payloads_data.md](docs/payloads_data.md) | 其它 7 个载荷的数据说明（简化版：通用结构 + 各版本选点/排除） |
 
 每类载荷的数据说明单独放一个目录（如 `docs/12B_13B/`），新增载荷时仿照添加。
 
@@ -124,7 +125,8 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 │   ├── deploy.md                   # 部署指南
 │   ├── data.md                     # 数据准备与目录约定、接入方法论
 │   ├── results.md                  # 结果产物与 QA 指标
-│   └── 12B_13B/                    # 12B/13B 类载荷的数据说明（每类载荷一个目录）
+│   ├── payloads_data.md            # 其它 7 个载荷的数据说明（简化版）
+│   └── 12B_13B/                    # 12B/13B 类载荷的数据说明（详细版）
 │       └── data.md                 # 点位对照表、各数据文件的特殊情况
 ├── data/{ver}/                     # 各版本数据目录
 │   ├── raw_data -> /path/to/data   # 原始数据软链
