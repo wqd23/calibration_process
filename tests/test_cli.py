@@ -44,3 +44,20 @@ def test_all_version_nocache_output_root(tmp_path):
     from calibration_process import pipeline
     o = pipeline.output_root(VER, str(tmp_path / "x"))
     assert o == tmp_path / "x"
+
+
+def test_check_cli(capsys):
+    assert main(["check", "09"]) == 0
+    assert "READY" in capsys.readouterr().out
+
+
+def test_config_not_found_raises():
+    import pytest as pt
+    with pt.raises(SystemExit):
+        main(["config", "09", "tb", "zzz_not_here"])
+
+
+def test_global_unknown_branch_raises():
+    import pytest as pt
+    with pt.raises(SystemExit):
+        main(["global", "09", "nope"])

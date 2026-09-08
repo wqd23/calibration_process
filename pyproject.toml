@@ -56,8 +56,7 @@ members = ["lib_plot", "lib_reader"]
 
 
 [tool.pytest.ini_options]
-# run coverage whenever pytest is invoked (VS Code Test Explorer picks this up)
-addopts = "--cov=src/calibration_process --cov-config=.coveragerc --cov-report=term"
+testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/calibration_process"]

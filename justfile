@@ -60,4 +60,4 @@ init ver path:
   mkdir -p ./data/{{ver}}/ec_logs
 
 cover:
-  {{py}} -m coverage run --source src/ -m pytest tests/ && {{py}} -m coverage report -m
+  {{py}} -m coverage run --source=src/calibration_process -m pytest tests/ && {{py}} -m coverage report -m

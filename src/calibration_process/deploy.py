@@ -171,7 +171,21 @@ def scaffold_version(ver: str, data_dir: str = None,
                   "ec_xray_manifest.yaml"):
         p = root / fname
         if not p.exists():
-            data = {"default_bkg": "lin", "background_overrides": {}, "peak_overrides": {}, "qa": {}} if fname == "analysis.yaml" else {"measurements": {}}
+            if fname == "analysis.yaml":
+                data = {"tb": {"default_bkg": "lin", "background_overrides": {},
+                               "peak_overrides": {}, "qa": {}},
+                        "ec_source": {"default_bkg": "lin", "background_overrides": {},
+                                      "peak_overrides": {}, "qa": {}},
+                        "ec_xray": {"default_bkg": "lin", "background_overrides": {},
+                                    "peak_overrides": {}, "qa": {}}}
+            elif fname == "fit_range_tb.yaml":
+                data = {"measurements": {}}
+            elif fname in ("fit_range_ec_source.yaml", "fit_range_ec_xray.yaml"):
+                data = {"measurements": {}}
+            else:  # *_manifest.yaml
+                data = {"version": ver,
+                        "branch": fname.replace("_manifest.yaml", ""),
+                        "measurements": []}
             with open(p, "w") as f:
                 yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)
             print(f"  created configs/{ver}/{fname}")

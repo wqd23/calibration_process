@@ -96,13 +96,6 @@ class MeasurementBundle:
     use: bool = True
     channels: dict = None  # channel -> {"use": bool}
 
-    def channel_use(self, channel: int) -> bool:
-        if not self.use:
-            return False
-        if self.channels and str(channel) in self.channels:
-            return bool(self.channels[str(channel)].get("use", True))
-        return True
-
 
 OptionalFit = Union[SingleFitResult, None]
 FitResultList = List[OptionalFit]

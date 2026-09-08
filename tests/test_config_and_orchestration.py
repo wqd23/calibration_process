@@ -145,3 +145,64 @@ def test_scaffold_then_check(tmp_path):
     assert (data / "ZK/tb_logs").is_dir()
     # a freshly scaffolded skeleton has empty manifests -> check reports NOT READY
     assert deploy.check_version("ZK", config_root=root, data_root=data) is False
+
+
+def test_pipeline_single_fit_unknown_id_raises():
+    with pytest.raises(KeyError):
+        pipeline.single_fit("09", "tb", "no_such_measurement")
+
+
+@pytest.mark.parametrize("ver", ["03B", "04", "05B", "07", "10B", "11B", "09", "12B"])
+def test_versions_unknown_branch_raises(ver):
+    rt = pipeline.load_rt(ver)
+    with pytest.raises(ValueError):
+        get_workflow(ver).enumerate_measurements(ver, "nope", rt, Path("data") / ver)
+
+
+def test_check_config_root_missing(tmp_path):
+    from calibration_process import deploy
+    assert deploy.check_version("NOPE", config_root=tmp_path / "cfg", data_root=tmp_path / "d") is False
+
+
+def test_check_payload_missing(tmp_path):
+    from calibration_process import deploy
+    root = tmp_path / "cfg" / "09"
+    root.mkdir(parents=True)
+    assert deploy.check_version("09", config_root=tmp_path / "cfg", data_root=tmp_path / "d") is False
+
+
+def test_check_raw_is_real_dir_and_fix(tmp_path):
+    from calibration_process import deploy
+    import shutil
+    root = tmp_path / "cfg"
+    data = tmp_path / "d"
+    deploy.scaffold_version("ZK", config_root=root, data_root=data)
+    # raw_data is a real directory (not a symlink) -- acceptable
+    raw = data / "ZK" / "raw_data"
+    raw.mkdir(parents=True, exist_ok=True)
+    # freshly scaffolded skeleton is READY
+    assert deploy.check_version("ZK", config_root=root, data_root=data) is True
+    # drop an output dir -> NOT READY without fix, READY with --fix
+    shutil.rmtree(data / "ZK" / "tb_logs")
+    assert deploy.check_version("ZK", config_root=root, data_root=data) is False
+    assert deploy.check_version("ZK", fix=True, config_root=root, data_root=data) is True
+
+
+def test_check_duplicate_ids_and_missing_file(tmp_path):
+    from calibration_process import deploy
+    import shutil
+    root = tmp_path / "cfg" / "ZK"
+    data = tmp_path / "d" / "ZK"
+    shutil.copytree("data/09", data.parent, dirs_exist_ok=True)
+    deploy.scaffold_version("ZK", config_root=tmp_path / "cfg", data_root=tmp_path / "d")
+    # duplicate id
+    import yaml as yl
+    mp = root / "tb_manifest.yaml"
+    m = yl.safe_load(open(mp))
+    m["measurements"] = [{"id": "a", "branch": "tb"}, {"id": "a", "branch": "tb"}]
+    yl.safe_dump(m, open(mp, "w"))
+    assert deploy.check_version("ZK", config_root=tmp_path / "cfg", data_root=tmp_path / "d") is False
+    # missing referenced file
+    m["measurements"] = [{"id": "a", "branch": "tb", "science_files": ["nope.dat"]}]
+    yl.safe_dump(m, open(mp, "w"))
+    assert deploy.check_version("ZK", config_root=tmp_path / "cfg", data_root=tmp_path / "d") is False
