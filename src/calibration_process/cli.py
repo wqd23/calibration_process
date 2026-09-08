@@ -8,6 +8,8 @@
 ``calib global   VERSION BRANCH``  -> global fit (tb / ec)
 ``calib all      VERSION``         -> full formal workflow
 ``calib config   VERSION BRANCH ID``-> show resolved config for one measurement
+``calib check    VERSION [--fix]`` -> deployment/validity check
+``calib scaffold VERSION [--data-dir PATH]`` -> create a new payload skeleton
 """
 
 from __future__ import annotations
@@ -16,6 +18,16 @@ import argparse
 import sys
 
 from . import pipeline
+from . import deploy
+
+
+def cmd_check(args) -> int:
+    return 0 if deploy.check_version(args.version, fix=args.fix) else 1
+
+
+def cmd_scaffold(args) -> int:
+    deploy.scaffold_version(args.version, args.data_dir)
+    return 0
 
 
 def cmd_discover(args) -> int:
@@ -120,6 +132,14 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("branch")
     sp.add_argument("id")
     sp.set_defaults(func=cmd_config)
+    sp = sub.add_parser("check", help="deployment/validity check")
+    sp.add_argument("version")
+    sp.add_argument("--fix", action="store_true", help="create missing output dirs")
+    sp.set_defaults(func=cmd_check)
+    sp = sub.add_parser("scaffold", help="create a new payload skeleton")
+    sp.add_argument("version")
+    sp.add_argument("--data-dir")
+    sp.set_defaults(func=cmd_scaffold)
     return p
 
 
