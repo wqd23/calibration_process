@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-"""Unit coverage for the new config / migration / orchestration layer."""
+"""Unit coverage for the new config / manifest / orchestration layer."""
 
 import sys
 from pathlib import Path
@@ -10,7 +10,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).parent))
 SRC = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(SRC / "calibration_process"))
-from calibration_process import migration, pipeline  # noqa: E402
+from calibration_process import pipeline  # noqa: E402
 from calibration_process import manifest as man  # noqa: E402
 from calibration_process.manifest import discover, load_manifest, filtered_measurements  # noqa: E402
 from calibration_process.workflows.registry import get_workflow  # noqa: E402
@@ -87,57 +87,16 @@ def test_registry_unknown_version_raises():
 
 @pytest.mark.parametrize("ver", ["03B", "04", "05B", "07", "10B", "11B", "09", "12B"])
 @pytest.mark.parametrize("branch", ["tb", "ec_source", "ec_xray"])
-def test_versions_enumerate_matches_legacy(ver, branch):
-    from legacy_ops import legacy_tb, legacy_ec
+def test_versions_enumerate_matches_manifest(ver, branch):
+    # the committed manifest is the frozen, legacy-validated measurement set;
+    # discover->enumerate must reproduce it exactly
     rt = pipeline.load_rt(ver)
     data_dir = Path("data") / ver
     wf = get_workflow(ver)
-    got = [r["id"] for r in wf.enumerate_measurements(ver, branch, rt, data_dir)]
-    if branch == "tb":
-        expected = legacy_tb(ver).files
-    elif branch == "ec_source":
-        expected = legacy_ec(ver).src_list
-    else:
-        expected = list(legacy_ec(ver).x_list)
-    # enumerate order may differ from legacy's os.listdir order; compare as sets
-    # and also keep the same measurement count
-    assert set(got) == set(expected), f"{ver}/{branch}: {sorted(set(got) ^ set(expected))}"
-    assert len(got) == len(expected), f"{ver}/{branch}: {len(got)} != {len(expected)}"
-
-
-@pytest.mark.parametrize("ver", ["03B", "04", "05B", "07", "10B", "11B", "09", "12B"])
-def test_migration_writes_valid_yaml_all_versions(tmp_path, ver):
-    root = tmp_path / "configs" / ver
-    migration.migrate_version(ver, config_root=root)
-    PayloadSchema.model_validate(yaml.safe_load(open(root / "payload.yaml")))
-    AnalysisSchema.model_validate(yaml.safe_load(open(root / "analysis.yaml")))
-    for fname in ("fit_range_tb.yaml", "fit_range_ec_source.yaml", "fit_range_ec_xray.yaml"):
-        FitRangeSet.model_validate(yaml.safe_load(open(root / fname)))
-
-
-def test_migration_writes_valid_yaml_12b(tmp_path):
-    root = tmp_path / "configs" / "12B"
-    migration.migrate_version("12B", config_root=root)
-    p = PayloadSchema.model_validate(yaml.safe_load(open(root / "payload.yaml")))
-    assert p.tb.bias_min_filter == 27.25
-    assert p.tb.tb_file_map == "single_process/tb_file_map.json"
-    assert p.ec.xray_bkg_rotation == "fixed"
-    assert p.ec.energy_map["0611_Co60_25min_240f0032.dat"] == 1332.492
-    tb_fr = FitRangeSet.model_validate(yaml.safe_load(open(root / "fit_range_tb.yaml")))
-    assert len(tb_fr.measurements) == 54
-    x_fr = FitRangeSet.model_validate(yaml.safe_load(open(root / "fit_range_ec_xray.yaml")))
-    assert len(x_fr.measurements) == 14
-
-
-def test_migration_writes_valid_yaml(tmp_path):
-    root = tmp_path / "configs" / VER
-    migration.migrate_version(VER, config_root=root)
-    p = PayloadSchema.model_validate(yaml.safe_load(open(root / "payload.yaml")))
-    assert p.ec.energy_map["0827_10C_285_Co60_20m_0x010F.txt"] == 1332.0
-    assert len(FitRangeSet.model_validate(
-        yaml.safe_load(open(root / "fit_range_tb.yaml"))).measurements) == 48
-    assert len(FitRangeSet.model_validate(
-        yaml.safe_load(open(root / "fit_range_ec_xray.yaml"))).measurements) == 13
+    got = {r["id"] for r in wf.enumerate_measurements(ver, branch, rt, data_dir)}
+    expected = {m.id for m in load_manifest(
+        Path("src/calibration_process/configs") / ver / f"{branch}_manifest.yaml").measurements}
+    assert got == expected, f"{ver}/{branch}: {sorted(got ^ expected)}"
 
 
 def test_runtime_corr_from_tb_ref():
