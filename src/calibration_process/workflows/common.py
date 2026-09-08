@@ -459,21 +459,33 @@ def global_ec(rt: RuntimeConfig, src_pts: List[List[ECPoint]], x_pts: List[List[
 
     src_energy = np.sort(np.array(sorted({p.energy for p in src})))
     x_energy = np.sort(np.array(sorted({p.energy for p in xr})))
-    src_result = _group_4ch(src)
-    x_result = _group_4ch(xr)
+    # plot.ec_plot always expects 4 channels; 10B/11B are physically 3 channels
+    # and legacy pads channel 3 as a copy of channel 0 (see migration note B8)
+    center4 = _pad_to4(center)
+    result4 = _pad_to4(result)
+    src_result = _pad_group_4ch(_group_4ch(src))
+    x_result = _pad_group_4ch(_group_4ch(xr))
     plot.ec_plot(
-        energies_all, center[:4] if n == 4 else [center[0], center[1], center[2], center[0]],
-        result[:4] if n == 4 else [result[0], result[1], result[2], result[0]],
+        energies_all, center4, result4,
         src_energy, x_energy, src_result, x_result,
         str(result_path), pb.energy_split_low, pb.energy_split_high,
     )
     return result
 
 
+def _pad_to4(seq):
+    if len(seq) >= 4:
+        return seq[:4]
+    out = list(seq)
+    while len(out) < 4:
+        out.append(out[0])
+    return out
+
+
 def _group_4ch(points: List[ECPoint]) -> List[list]:
     """Rebuild per-measurement list-of-4-channel fit dicts for ec_plot.
 
-    Each element is a list of 4 dicts ``[{b, b_err, resolution,
+    Each element is a list of dicts ``[{b, b_err, resolution,
     resolution_err}, ...]``, exactly the shape legacy ``ec_fit`` passes to
     ``plot.ec_plot``.  Ordered by energy to make the scatter arrays internally
     consistent.
@@ -494,6 +506,20 @@ def _group_4ch(points: List[ECPoint]) -> List[list]:
                 "resolution_err": p.resolution_err,
             })
         out.append(fit)
+    return out
+
+
+def _pad_group_4ch(groups: List[list]) -> List[list]:
+    """Pad each per-measurement fit list to 4 channels (ch3 = ch0 copy)."""
+    out = []
+    for g in groups:
+        if len(g) >= 4:
+            out.append(g[:4])
+        else:
+            padded = list(g)
+            while len(padded) < 4:
+                padded.append(padded[0])
+            out.append(padded)
     return out
 
 

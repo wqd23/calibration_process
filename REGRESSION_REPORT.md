@@ -12,12 +12,12 @@ was needed for any scientific field).
 |---|---|---|---|---|---|---|
 | 09 | PASS | PASS | PASS | PASS | PASS | full end-to-end compare |
 | 12B | PASS | PASS | PASS | PASS | PASS | full end-to-end compare; per-channel None fit ranges |
-| 03B | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact; src_reader=03b-src, lmfit resolution, 49/51 split |
-| 04 | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact (full data-run deferred) |
-| 05B | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact for all 76 measurements; single-file X-ray + time-cut |
-| 07 | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact (full data-run deferred) |
-| 10B | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact; fixed bkg rotation, 3-channel EC (padded) |
-| 11B | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact; glob-TB + lmfit TB fit, 3-channel EC |
+| 03B | PASS | PASS | PASS | PASS | PASS | full end-to-end compare |
+| 04 | PASS | PASS | PASS | PASS | PASS | full end-to-end compare |
+| 05B | PASS | PASS | PASS | PASS | PASS | full end-to-end compare; single-file X-ray + time-cut |
+| 07 | PASS | PASS | PASS | PASS | PASS | full end-to-end compare |
+| 10B | PASS | PASS | PASS (20) | PASS (TB) | PASS | EC global blocked by the 90 keV legacy defect |
+| 11B | PASS | PASS | PASS | PASS | PASS | full end-to-end compare; glob-TB + lmfit TB + 3-channel EC |
 
 ## Detail
 
@@ -58,6 +58,19 @@ was needed for any scientific field).
 - EC-source: 4 sources sharing `0611env.dat`.  Exact.
 - EC-xray: 14 tube energies, `fixed` [ch1,ch2,ch0,ch0] background rotation,
   `old` retakes dropped, HK-pairing-complete + fit-range-complete filters.  Exact.
+
+## Full data-run results
+
+The full legacy vs new data differential was run for every version that the
+legacy pipeline can complete:
+
+- **09, 12B, 03B, 04, 05B, 07, 11B**: `scripts/compare_full.py <v>` → PASS for all
+  single-fit pickles, TB/EC global JSON+npy and figure sets.
+- **10B**: `scripts/compare_10b.py` → PASS for single fits (63 TB + 20 X-ray +
+  4 src), TB global and figures.  The EC global could not be produced by legacy
+  because the **90 keV X-ray point** fails its channel-3 `gaus` fit and
+  `plot.fit_plot` raises `KeyError: 'a'` (recorded legacy defect; the point is
+  marked `use: false` in the 10B manifest).
 
 ## Config-level versions (03B/04/05B/07/10B/11B)
 

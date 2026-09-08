@@ -90,6 +90,13 @@
 - **现象**：10B/11B 的 EC X 光机单文件拟合仍为 4 通道（每通道一个文件，fp03B 重建），但全局 EC 拟合只使用 ch0/1/2（`channel_count=3`），随后把 ch3 补成 ch0 供 `plot.ec_plot` 使用（见 B8）。
 - **保留原因**：新架构 `enumerate` 恒定收集 4 个通道文件（结构常量），`build_ec_points`/`global_ec` 用 `channel_count=3` 取前 3 通道并在绘制层补齐。
 
+## B16. 10B 的 90 keV X 光机点不可处理（legacy defect）
+
+- **现象**：10B 的 90 keV 能量点（`037_observe_90_ch0.dat` 等）其 ch3 通道用 `gaus` 背景拟合失败，`util.peak_fit` 抛出 `FitError`；`File_operation_05b.peak_fit` 把它记录为 `{"success": False, ...}`（无 `a` 键），随后 `plot.fit_plot` 索引 `fit_result["a"]` 抛 `KeyError: 'a'`，导致该文件的单拟合与后续 `ec_fit`（读 `90.pickle`）都失败。
+- **影响**：legacy 无法对 90 keV 点产生任何输出；`just all 10B` 也因此无法完整跑完（`ec x run all` 在 90 处崩溃、`ecfit` 读不到 `90.pickle`）。
+- **保留/复现**：新架构会渲染出与 legacy 相同的失败（同一 kernel + 同一 plot）。为完成 Gate D，10B 的 manifest 将 `"90"` 标记 `use: false` 并在 metadata 记录原因；`scripts/compare_10b.py` 对可产生的 20 个 X 光机点 + 4 源 + TB 全局做等价对比。
+- **记录，不修**：修复需改 `plot.fit_plot` 对失败入口的处理，属于超出纯架构迁移范围，且会改变 legacy 可视输出。
+
 ## B11. 12B TB 的定制拟合参数与 bias 过滤
 
 - **现象**：`TB_operation_12B` 覆盖 `TB_FIT_P0=[-0.02,0.07,24.4,-35.0,-1000.0]`、`TB_FIT_MAXFEV=100000`，且 `load_data` 把参与 2D 拟合的点限制在 `bias>=27.25 V`。文档注释说明这是为了适配 12B 增益响应。

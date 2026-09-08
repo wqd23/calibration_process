@@ -20,8 +20,8 @@
 | EC figures visually checked | ✅ | `~0.03%` scatter-point-only diff |
 | representative version full-run passes | ✅ | `test_all_versions_match_oracle` (09 + 12B) |
 | all historical versions config-level pass | ✅ | `test_config_resolution_matches_legacy` all 8 versions |
-| all historical versions full-run pass | ⬜ | 03B/04/05B/07/10B/11B data-run pending (Gate D) |
-| legacy retired | ⬜ | beyond Gate D |
+| all historical versions full-run pass | ✅ (except 10B EC) | 09/12B/03B/04/05B/07/11B PASS; 10B single+TB-global PASS, EC global blocked by 90 keV legacy defect |
+| legacy retired | ⬜ | beyond Gate D (needs consumer confirmation) |
 
 ---
 
