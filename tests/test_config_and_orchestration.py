@@ -106,7 +106,7 @@ def test_versions_enumerate_matches_legacy(ver, branch):
 
 
 @pytest.mark.parametrize("ver", ["09", "04", "05B", "07", "12B"])
-def test_migration_writes_valid_yaml(tmp_path, ver):
+def test_migration_writes_valid_yaml_all_versions(tmp_path, ver):
     root = tmp_path / "configs" / ver
     migration.migrate_version(ver, config_root=root)
     PayloadSchema.model_validate(yaml.safe_load(open(root / "payload.yaml")))
