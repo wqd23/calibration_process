@@ -108,8 +108,10 @@ data/{ver}/raw_data/
 - X光机：`{序号}_observe_{能量}_ch{通道}.dat`，同目录 `{序号}_hk_...`/ivscan；
   `_ch` 且不含 `hk`；能量名取第 3 段（`split("_")[2]`）；**fixed** 背景轮转
   `[ch1,ch2,ch0,ch0]`；resolution polyfit；拆分 49/55 keV。21 个点。
-  **单一 90 keV 点被标记 `use:false`**（ch3 的 `gaus` 背景拟合失败 → 旧绘图
-  抛 `KeyError`，历史不可处理，见 MIGRATION_NOTES）。
+  **单一 90 keV 点被标记 `use:false`**：该点 ch3 的 `gaus` 背景拟合失败，旧版
+  绘图对失败结果取 `["a"]` 抛 `KeyError`，因此**旧版本就处理不了这个点**。新
+  版本沿用同一个科学内核与绘图，行为一致，仍无法产生该点；作为"历史不可处理点"
+  显式排除（`use:false`），不做额外处理。
 - 放射源：4 个硬编码源（Cs137/Na22/Am241/Co60）+ 硬编码本底；目录含
   `{序号}_observe_CI_off/on.dat`、`ivscan` 等未用文件。
 - **EC 物理 3 通道**（`channel_count=3`）：单拟合仍读 4 通道（fp03B 重建），
