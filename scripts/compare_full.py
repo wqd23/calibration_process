@@ -122,7 +122,7 @@ def main():
         for p in problems:
             print("  -", p)
         return 1
-    print("PASS: all 09 legacy vs new outputs equivalent")
+    print(f"PASS: all {VER} legacy vs new outputs equivalent")
     return 0
 
 

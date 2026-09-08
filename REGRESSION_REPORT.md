@@ -1,16 +1,17 @@
-# Regression Report — legacy vs new (version 09)
+# Regression Report — legacy vs new (09, 12B)
 
 修订日期：2026-09-08
 
-Comparison mode: `legacy` (frozen `.oracle/09`) vs `new` (`.new/09`, produced by the
-explicit workflow). All numeric comparisons are **exact** (no tolerance was
-needed for any scientific field).
+Comparison mode: `legacy` (frozen `.oracle/<ver>`) vs `new` (`.new/<ver>`, produced
+by the explicit workflow). All numeric comparisons are **exact** (no tolerance
+was needed for any scientific field).
 
 ## Matrix
 
 | Version | TB | EC-src | EC-xray | Final outputs | Figures | Notes |
 |---|---|---|---|---|---|---|
 | 09 | PASS | PASS | PASS | PASS | PASS | no tolerance exception |
+| 12B | PASS | PASS | PASS | PASS | PASS | no tolerance exception; per-channel None fit ranges |
 
 ## Detail
 
@@ -42,6 +43,16 @@ needed for any scientific field).
   only; fit curves identical. Accepted under the plan's "PNG need not be
   byte-identical; visually equivalent" rule.
 
+## 12B specifics verified
+
+- TB: 54 points from `tb_file_map.json` (2 excluded), custom `p0`/`maxfev`,
+  global fit restricted to bias >= 27.25 V, two points split by `sci_half` +
+  `hk_bias`.  Per-channel `None` fit ranges are preserved (those channels are
+  not fitted).  All exact.
+- EC-source: 4 sources sharing `0611env.dat`.  Exact.
+- EC-xray: 14 tube energies, `fixed` [ch1,ch2,ch0,ch0] background rotation,
+  `old` retakes dropped, HK-pairing-complete + fit-range-complete filters.  Exact.
+
 ## Tolerance exceptions
 
 None. No scientific field required a tolerance; every float/np comparison was
@@ -56,6 +67,6 @@ See `MIGRATION_NOTES.md` (B1–B8). All preserved by the new workflow.
 ```bash
 # needs the full raw data + a frozen legacy oracle
 uv sync
-pytest tests/ -q                # 32 tests (incl. full pipeline run)
-coverage report                # new-code coverage 94%
+pytest tests/ -q                # 36 tests (incl. full pipeline runs for 09 + 12B)
+coverage report                # new-code coverage 95%
 ```

@@ -55,3 +55,21 @@
 - **现象**：`EC_operation_10B/11B.ec_fit` 用 `CHN_NUM=3`，随后 `center=[c0,c1,c2,c0]`、`result=[r0,r1,r2,r0]`、`src_result/x_result` 同样把 ch3 补成 ch0。
 - **影响**：下游 `plot.ec_plot` 需要 4 通道，但 ch3 实际上是 ch0 的拷贝。物理意图 `UNKNOWN`。
 - **保留原因**：这是历史行为。新架构通过 `payload.ec.channel_count` + `global_ec` 的补齐逻辑保留（09 为 4 通道，不使用补齐）。
+
+## B9. 12B 的逐通道 `None` fit range
+
+- **现象**：12B 的 `fit_range.json` 中，某些 measurement 的某些通道 range 为 `None`（该通道不参与拟合）。`File_operation_05b.peak_fit` 对 `None` 通道产出 `fit_result=None`，下游 `load_data` / `ec_fit` 跳过。
+- **影响**：这些通道在 TB/EC 中不产生点；点构建时被跳过。
+- **保留原因**：这是历史行为。新 `FitRangeSet` 允许逐通道 `null`，`build_tb_points` / `build_ec_points` 跳过 `None` 拟合。
+
+## B10. 12B EC-Xray 完整性过滤（HK 配对 + fit range 完整）
+
+- **现象**：12B `EC_operation_12B` 对 xray 能量做两级过滤：(a) `__x_hk_complete`（4 通道文件都能配对到 HK，否则丢弃整点）；(b) `all(r is not None for r in fit_range[e])`（4 通道 fit range 完整才保留）。
+- **影响**：能量点要么 4 通道齐全、要么整点丢弃；缺失的通道不会被半途使用。
+- **保留原因**：新 `v12B.py` 以 `xray_require_hk` / `xray_require_fit_range` 复现。
+
+## B11. 12B TB 的定制拟合参数与 bias 过滤
+
+- **现象**：`TB_operation_12B` 覆盖 `TB_FIT_P0=[-0.02,0.07,24.4,-35.0,-1000.0]`、`TB_FIT_MAXFEV=100000`，且 `load_data` 把参与 2D 拟合的点限制在 `bias>=27.25 V`。文档注释说明这是为了适配 12B 增益响应。
+- **影响**：这是科学方法参数，不是 bug；对 12B 是刻意的 version override。
+- **保留原因**：新 `payload.yaml` 的 `tb.tb_fit_p0 / tb_fit_maxfev / bias_min_filter` 原样携带，`global_tb` 读取它们。

@@ -10,16 +10,16 @@
 | old config migration verified | ✅ | `migration.py` + `test_migration_writes_valid_yaml` |
 | manifest generated and verified | ✅ | `configs/09/*_manifest.yaml` (TB 48 / src 3 / xray 13) |
 | preview works without fit range | ⬜ | preview stage intentionally not built in this phase (see note) |
-| single fit regression passes | ✅ | `test_regression_09.py` + pipeline run (Level 1) |
-| TB points regression passes | ✅ | `test_tb_points_match_legacy_load_data` (Level 2) |
-| EC points regression passes | ✅ | `test_ec_global_outputs_match_legacy` (Level 2/3) |
-| final TB output passes | ✅ | tb_logs JSON exact match |
-| final EC output passes | ✅ | ec_logs JSON + npy exact match |
+| single fit regression passes | ✅ | `test_regression.py` + pipeline run (Level 1), 09 + 12B |
+| TB points regression passes | ✅ | pipeline run Level 2/3, 09 + 12B |
+| EC points regression passes | ✅ | pipeline run Level 2/3, 09 + 12B |
+| final TB output passes | ✅ | tb_logs JSON exact match (09 + 12B) |
+| final EC output passes | ✅ | ec_logs JSON + npy exact match (09 + 12B) |
 | single-fit figures checked | ✅ | pixel-identical |
 | TB figures visually checked | ✅ | pixel-identical |
 | EC figures visually checked | ✅ | `~0.03%` scatter-point-only diff |
-| representative version full-run passes | ✅ | `test_full_pipeline_matches_oracle` |
-| all historical versions full-run pass | ⬜ | beyond Gate B (requires migrating other versions) |
+| representative version full-run passes | ✅ | `test_all_versions_match_oracle` (09 + 12B) |
+| all historical versions full-run pass | ⬜ | 03B/04/05B/07/10B/11B not yet migrated |
 | legacy retired | ⬜ | beyond Gate D |
 
 ---
