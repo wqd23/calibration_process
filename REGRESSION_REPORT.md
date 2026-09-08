@@ -12,9 +12,12 @@ was needed for any scientific field).
 |---|---|---|---|---|---|---|
 | 09 | PASS | PASS | PASS | PASS | PASS | full end-to-end compare |
 | 12B | PASS | PASS | PASS | PASS | PASS | full end-to-end compare; per-channel None fit ranges |
-| 04 | PASS* | PASS* | PASS* | pending | pending | *config-resolution + manifest equivalence exact (full data-run deferred) |
-| 05B | PASS* | PASS* | PASS* | pending | pending | *config-resolution equivalence exact for all 76 measurements; single-file X-ray + time-cut path |
-| 07 | PASS* | PASS* | PASS* | pending | pending | *config-resolution + manifest equivalence exact (full data-run deferred) |
+| 03B | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact; src_reader=03b-src, lmfit resolution, 49/51 split |
+| 04 | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact (full data-run deferred) |
+| 05B | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact for all 76 measurements; single-file X-ray + time-cut |
+| 07 | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact (full data-run deferred) |
+| 10B | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact; fixed bkg rotation, 3-channel EC (padded) |
+| 11B | PASS* | PASS* | PASS* | pending | pending | *config-resolution exact; glob-TB + lmfit TB fit, 3-channel EC |
 
 ## Detail
 
@@ -56,17 +59,27 @@ was needed for any scientific field).
 - EC-xray: 14 tube energies, `fixed` [ch1,ch2,ch0,ch0] background rotation,
   `old` retakes dropped, HK-pairing-complete + fit-range-complete filters.  Exact.
 
-## 04 / 07 note
+## Config-level versions (03B/04/05B/07/10B/11B)
 
-For 04 and 07 the explicit workflow + manifest sets were migrated and the
+For these the explicit workflow + manifest sets were migrated and the
 **config-resolution equivalence is proven exact** for every selected measurement
 (same `Read_config` / `Spectrum_config` / `Fit_config` as the historical
-`file_config`, including the `ExprFit`/polyfit resolution choice, the
-`_18p0_`/`40p0...` X-ray excludes, and the dynamic `bkg{src}` background for 07).
+`file_config`): the version-specific readers (`03b-src`, `xray`), the
+`ExprFit`/`lmfit`/polyfit resolution choices, the hardcoded/dynamic source
+selections and backgrounds, the `_18p0_`/`40p0...`/`CI`/XM_22/`20` X-ray
+excludes, the `time_cut` single-file path, the `fixed` vs `circle` background
+rotation, the 11B glob-TB selection, and the 3-channel EC convention.
 Because the workflow calls the *same* protected kernel with the *same* configs,
 this establishes scientific equivalence.  The expensive full-data differential
-(reader04/07 take ~14 min per TB branch of ~54–56 files) is deferred to the Gate
-D sweep.
+(reader03B/04/07 are binary/hex and take ~14 min per TB branch) is deferred to
+the Gate D sweep, where the end-to-end compare already demonstrated for 09/12B
+will be run for every remaining version.
+
+## 09 / 12B end-to-end
+
+- 09: full legacy vs new output compare (48 TB + 16 EC pickles, TB/EC JSON+npy
+  exact, figures pixel-identical).
+- 12B: full compare (54 TB + 18 EC pickles, per-channel None ranges preserved).
 
 ## Tolerance exceptions
 

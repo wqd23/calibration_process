@@ -19,6 +19,7 @@
 | TB figures visually checked | ✅ | pixel-identical |
 | EC figures visually checked | ✅ | `~0.03%` scatter-point-only diff |
 | representative version full-run passes | ✅ | `test_all_versions_match_oracle` (09 + 12B) |
+| all historical versions config-level pass | ✅ | `test_config_resolution_matches_legacy` all 8 versions |
 | all historical versions full-run pass | ⬜ | 03B/04/05B/07/10B/11B data-run pending (Gate D) |
 | legacy retired | ⬜ | beyond Gate D |
 

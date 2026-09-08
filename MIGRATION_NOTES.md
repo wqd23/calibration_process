@@ -75,6 +75,21 @@
 - **保留原因**：新 `v05B.py` 以 `xray_single_file` + `time_cut` + `xray_config_file` 复现；`common.single_run_spec` 对 `xray_single_file` 走单文件 fp05B 路径。
 - **备注**：`xray_config_file` 保留 config.json 的**完整** `data/<ver>/...` 字符串（而非 manifest 相对路径），以与 legacy 的 `config_file` 字段逐字符一致。
 
+## B13. 03B 的源 reader 与 X 光机排除
+
+- **现象**：03B 的 EC 源用 `03b-src` reader（`src_read03b`，featureMode=False），而 TB 与 X 光机用 `03b` reader。X 光机文件用 `jly_*_ch{n}_*` 命名，能量 token 为 split("_")[1]；CI 实验点被排除。
+- **保留原因**：新 `v03B.py` 用 `src_reader="03b-src"` + `xray_drop_substrs=["CI"]` 复现；`common.single_run_spec` 的 `src_reader` 分支读取它。
+
+## B14. 11B 的 id 与 fit_range 键不一致
+
+- **现象**：11B 的 TB `fit_range.json` 按**文件 stem** 键控（无扩展名），而 `just list` / `self.files` 显示**带扩展名**的 basename。二者不一致。
+- **保留原因**：新 workflow 以 manifest `id`=basename（与 `just list` 一致），并在 metadata 记录 `fit_key`=stem；`single_run_spec` 用 `fit_key` 查 fit_range/bkg_form。这是 11B 特有的历史约定。
+
+## B15. 10B/11B 的 4 通道单拟合与 3 通道全局
+
+- **现象**：10B/11B 的 EC X 光机单文件拟合仍为 4 通道（每通道一个文件，fp03B 重建），但全局 EC 拟合只使用 ch0/1/2（`channel_count=3`），随后把 ch3 补成 ch0 供 `plot.ec_plot` 使用（见 B8）。
+- **保留原因**：新架构 `enumerate` 恒定收集 4 个通道文件（结构常量），`build_ec_points`/`global_ec` 用 `channel_count=3` 取前 3 通道并在绘制层补齐。
+
 ## B11. 12B TB 的定制拟合参数与 bias 过滤
 
 - **现象**：`TB_operation_12B` 覆盖 `TB_FIT_P0=[-0.02,0.07,24.4,-35.0,-1000.0]`、`TB_FIT_MAXFEV=100000`，且 `load_data` 把参与 2D 拟合的点限制在 `bias>=27.25 V`。文档注释说明这是为了适配 12B 增益响应。
