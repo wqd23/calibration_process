@@ -12,8 +12,9 @@ was needed for any scientific field).
 |---|---|---|---|---|---|---|
 | 09 | PASS | PASS | PASS | PASS | PASS | full end-to-end compare |
 | 12B | PASS | PASS | PASS | PASS | PASS | full end-to-end compare; per-channel None fit ranges |
-| 04 | PASS* | PASS* | PASS* | pending | pending | *config-resolution + manifest equivalence exact (full data-run deferred to Gate D) |
-| 07 | PASS* | PASS* | PASS* | pending | pending | *config-resolution + manifest equivalence exact (full data-run deferred to Gate D) |
+| 04 | PASS* | PASS* | PASS* | pending | pending | *config-resolution + manifest equivalence exact (full data-run deferred) |
+| 05B | PASS* | PASS* | PASS* | pending | pending | *config-resolution equivalence exact for all 76 measurements; single-file X-ray + time-cut path |
+| 07 | PASS* | PASS* | PASS* | pending | pending | *config-resolution + manifest equivalence exact (full data-run deferred) |
 
 ## Detail
 
