@@ -1,0 +1,633 @@
+version: 10B
+branch: tb
+measurements:
+- id: 094_observe_50C_290.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/094_observe_50C_290.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 101_observe_50C_285.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/101_observe_50C_285.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 102_observe_50C_287.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/102_observe_50C_287.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 103_observe_50C_283.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/103_observe_50C_283.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 104_observe_50C_280.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/104_observe_50C_280.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 105_observe_50C_275.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/105_observe_50C_275.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 106_observe_50C_270.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/106_observe_50C_270.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 113_observe_40C_290.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/113_observe_40C_290.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 114_observe_40C_287.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/114_observe_40C_287.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 115_observe_40C_285.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/115_observe_40C_285.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 116_observe_40C_283.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/116_observe_40C_283.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 117_observe_40C_280.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/117_observe_40C_280.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 118_observe_40C_275.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/118_observe_40C_275.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 119_observe_40C_270.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/119_observe_40C_270.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 120_observe_40C_265.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/120_observe_40C_265.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 125_observe_30C_290.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/125_observe_30C_290.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 126_observe_30C_285.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/126_observe_30C_285.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 127_observe_30C_287.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/127_observe_30C_287.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 128_observe_30C_283.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/128_observe_30C_283.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 129_observe_30C_280.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/129_observe_30C_280.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 130_observe_30C_275.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/130_observe_30C_275.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 131_observe_30C_270.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/131_observe_30C_270.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 132_observe_30C_265.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/132_observe_30C_265.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 136_observe_20C_290.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/136_observe_20C_290.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 137_observe_20C_287.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/137_observe_20C_287.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 138_observe_20C_285.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/138_observe_20C_285.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 139_observe_20C_283.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/139_observe_20C_283.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 140_observe_20C_280.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/140_observe_20C_280.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 141_observe_20C_275.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/141_observe_20C_275.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 142_observe_20C_270.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/142_observe_20C_270.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 143_observe_20C_265.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/143_observe_20C_265.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 147_observe_10C_290.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/147_observe_10C_290.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 148_observe_10C_287.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/148_observe_10C_287.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 149_observe_10C_285.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/149_observe_10C_285.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 150_observe_10C_283.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/150_observe_10C_283.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 151_observe_10C_280.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/151_observe_10C_280.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 152_observe_10C_275.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/152_observe_10C_275.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 153_observe_10C_270.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/153_observe_10C_270.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 154_observe_10C_265.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/154_observe_10C_265.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 155_observe_0C_290.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/155_observe_0C_290.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 156_observe_0C_287.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/156_observe_0C_287.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 157_observe_0C_285.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/157_observe_0C_285.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 158_observe_0C_283.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/158_observe_0C_283.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 160_observe_0C_280.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/160_observe_0C_280.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 161_observe_0C_275.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/161_observe_0C_275.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 162_observe_0C_270.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/162_observe_0C_270.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 163_observe_0C_265.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/163_observe_0C_265.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 169_observe_-10C_290.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/169_observe_-10C_290.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 170_observe_-10C_287.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/170_observe_-10C_287.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 171_observe_-10C_285.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/171_observe_-10C_285.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 172_observe_-10C_283.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/172_observe_-10C_283.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 173_observe_-10C_280.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/173_observe_-10C_280.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 175_observe_-10C_275.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/175_observe_-10C_275.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 176_observe_-10C_270.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/176_observe_-10C_270.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 177_observe_-10C_265.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/177_observe_-10C_265.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 181_observe_-20C_290.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/181_observe_-20C_290.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 182_observe_-20C_287.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/182_observe_-20C_287.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 183_observe_-20C_285.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/183_observe_-20C_285.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 184_observe_-20C_283.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/184_observe_-20C_283.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 185_observe_-20C_280.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/185_observe_-20C_280.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 187_observe_-20C_275.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/187_observe_-20C_275.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 188_observe_-20C_270.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/188_observe_-20C_270.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 189_observe_-20C_265.dat
+  branch: tb
+  science_files:
+  - raw_data/tb_data/189_observe_-20C_265.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null

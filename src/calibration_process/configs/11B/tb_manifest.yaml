@@ -1,0 +1,548 @@
+version: 11B
+branch: tb
+measurements:
+- id: 222_Cs_-20_26.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/222_Cs_-20_26.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 222_Cs_-20_26.5_observe
+  use: true
+  channels: null
+- id: 223_Cs_-20_27_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/223_Cs_-20_27_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 223_Cs_-20_27_observe
+  use: true
+  channels: null
+- id: 224_Cs_-20_27.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/224_Cs_-20_27.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 224_Cs_-20_27.5_observe
+  use: true
+  channels: null
+- id: 225_Cs_-20_28_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/225_Cs_-20_28_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 225_Cs_-20_28_observe
+  use: true
+  channels: null
+- id: 226_Cs_-20_28.3_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/226_Cs_-20_28.3_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 226_Cs_-20_28.3_observe
+  use: true
+  channels: null
+- id: 227_Cs_-20_28.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/227_Cs_-20_28.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 227_Cs_-20_28.5_observe
+  use: true
+  channels: null
+- id: 228_Cs_-20_28.7_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/228_Cs_-20_28.7_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 228_Cs_-20_28.7_observe
+  use: true
+  channels: null
+- id: 229_Cs_-20_29_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/229_Cs_-20_29_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 229_Cs_-20_29_observe
+  use: true
+  channels: null
+- id: 234_Cs_-10_27_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/234_Cs_-10_27_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 234_Cs_-10_27_observe
+  use: true
+  channels: null
+- id: 235_Cs_-10_27.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/235_Cs_-10_27.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 235_Cs_-10_27.5_observe
+  use: true
+  channels: null
+- id: 236_Cs_-10_28_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/236_Cs_-10_28_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 236_Cs_-10_28_observe
+  use: true
+  channels: null
+- id: 237_Cs_-10_28.3_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/237_Cs_-10_28.3_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 237_Cs_-10_28.3_observe
+  use: true
+  channels: null
+- id: 238_Cs_-10_28.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/238_Cs_-10_28.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 238_Cs_-10_28.5_observe
+  use: true
+  channels: null
+- id: 239_Cs_-10_28.7_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/239_Cs_-10_28.7_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 239_Cs_-10_28.7_observe
+  use: true
+  channels: null
+- id: 240_Cs_-10_29_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6-\u504F\u538B\u5B9E\u9A8C-20~-10\u2103/240_Cs_-10_29_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 240_Cs_-10_29_observe
+  use: true
+  channels: null
+- id: 006_10_Cs137_26.5_2_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/006_10_Cs137_26.5_2_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 006_10_Cs137_26.5_2_observe
+  use: true
+  channels: null
+- id: 007_10_Cs137_27_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/007_10_Cs137_27_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 007_10_Cs137_27_observe
+  use: true
+  channels: null
+- id: 008_10_Cs137_27.5_observe .dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/008_10_Cs137_27.5_observe\
+    \ .dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: '008_10_Cs137_27.5_observe '
+  use: true
+  channels: null
+- id: 009_10_Cs137_28_observe .dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/009_10_Cs137_28_observe\
+    \ .dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: '009_10_Cs137_28_observe '
+  use: true
+  channels: null
+- id: 010_10_Cs137_28.3_observe .dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/010_10_Cs137_28.3_observe\
+    \ .dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: '010_10_Cs137_28.3_observe '
+  use: true
+  channels: null
+- id: 011_10_Cs137_28.5_observe .dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/011_10_Cs137_28.5_observe\
+    \ .dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: '011_10_Cs137_28.5_observe '
+  use: true
+  channels: null
+- id: 012_10_Cs137_28.7_observe .dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/012_10_Cs137_28.7_observe\
+    \ .dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: '012_10_Cs137_28.7_observe '
+  use: true
+  channels: null
+- id: 245_0_Cs137_26.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/245_0_Cs137_26.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 245_0_Cs137_26.5_observe
+  use: true
+  channels: null
+- id: 246_0_Cs137_27_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/246_0_Cs137_27_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 246_0_Cs137_27_observe
+  use: true
+  channels: null
+- id: 248_0_Cs137_27.5_observe_2.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/248_0_Cs137_27.5_observe_2.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 248_0_Cs137_27.5_observe_2
+  use: true
+  channels: null
+- id: 249_0_Cs137_28_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/249_0_Cs137_28_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 249_0_Cs137_28_observe
+  use: true
+  channels: null
+- id: 250_0_Cs137_28.3_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/250_0_Cs137_28.3_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 250_0_Cs137_28.3_observe
+  use: true
+  channels: null
+- id: 251_0_Cs137_28.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/251_0_Cs137_28.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 251_0_Cs137_28.5_observe
+  use: true
+  channels: null
+- id: 252_0_Cs137_28.7_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/252_0_Cs137_28.7_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 252_0_Cs137_28.7_observe
+  use: true
+  channels: null
+- id: 253_0_Cs137_29_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B0\uFF5E10\u6444\u6C0F\u5EA6/253_0_Cs137_29_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 253_0_Cs137_29_observe
+  use: true
+  channels: null
+- id: 017_Cs_20_26.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/017_Cs_20_26.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 017_Cs_20_26.5_observe
+  use: true
+  channels: null
+- id: 018_Cs_20_27_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/018_Cs_20_27_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 018_Cs_20_27_observe
+  use: true
+  channels: null
+- id: 019_Cs_20_27.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/019_Cs_20_27.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 019_Cs_20_27.5_observe
+  use: true
+  channels: null
+- id: 020_Cs_20_28_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/020_Cs_20_28_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 020_Cs_20_28_observe
+  use: true
+  channels: null
+- id: 021_Cs_20_28.3_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/021_Cs_20_28.3_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 021_Cs_20_28.3_observe
+  use: true
+  channels: null
+- id: 022_Cs_20_28.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/022_Cs_20_28.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 022_Cs_20_28.5_observe
+  use: true
+  channels: null
+- id: 023_Cs_20_28.7_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/023_Cs_20_28.7_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 023_Cs_20_28.7_observe
+  use: true
+  channels: null
+- id: 024_Cs_20_29_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/024_Cs_20_29_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 024_Cs_20_29_observe
+  use: true
+  channels: null
+- id: 028_Cs_30_26.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/028_Cs_30_26.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 028_Cs_30_26.5_observe
+  use: true
+  channels: null
+- id: 029_Cs_30_27_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/029_Cs_30_27_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 029_Cs_30_27_observe
+  use: true
+  channels: null
+- id: 030_Cs_30_27.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/030_Cs_30_27.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 030_Cs_30_27.5_observe
+  use: true
+  channels: null
+- id: 031_Cs_30_28_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/031_Cs_30_28_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 031_Cs_30_28_observe
+  use: true
+  channels: null
+- id: 032_Cs_30_28.3_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/032_Cs_30_28.3_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 032_Cs_30_28.3_observe
+  use: true
+  channels: null
+- id: 033_Cs_30_28.5_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/033_Cs_30_28.5_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 033_Cs_30_28.5_observe
+  use: true
+  channels: null
+- id: 034_Cs_30_28.7_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/034_Cs_30_28.7_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 034_Cs_30_28.7_observe
+  use: true
+  channels: null
+- id: 035_Cs_30_29_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B20\uFF5E30\u6444\u6C0F\u5EA6/035_Cs_30_29_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 035_Cs_30_29_observe
+  use: true
+  channels: null
+- id: 40_40_26.5_Cs_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B40\uFF5E50\u6444\u6C0F\u5EA6/40_40_26.5_Cs_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 40_40_26.5_Cs_observe
+  use: true
+  channels: null
+- id: 41_40_27_Cs_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B40\uFF5E50\u6444\u6C0F\u5EA6/41_40_27_Cs_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 41_40_27_Cs_observe
+  use: true
+  channels: null
+- id: 42_40_27.5_Cs_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B40\uFF5E50\u6444\u6C0F\u5EA6/42_40_27.5_Cs_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 42_40_27.5_Cs_observe
+  use: true
+  channels: null
+- id: 43_40_28_Cs_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B40\uFF5E50\u6444\u6C0F\u5EA6/43_40_28_Cs_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 43_40_28_Cs_observe
+  use: true
+  channels: null
+- id: 44_40_28.3_Cs_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B40\uFF5E50\u6444\u6C0F\u5EA6/44_40_28.3_Cs_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 44_40_28.3_Cs_observe
+  use: true
+  channels: null
+- id: 45_40_28.5_Cs_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B40\uFF5E50\u6444\u6C0F\u5EA6/45_40_28.5_Cs_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 45_40_28.5_Cs_observe
+  use: true
+  channels: null
+- id: 46_40_28.7_Cs_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B40\uFF5E50\u6444\u6C0F\u5EA6/46_40_28.7_Cs_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 46_40_28.7_Cs_observe
+  use: true
+  channels: null
+- id: 47_40_29_Cs_observe.dat
+  branch: tb
+  science_files:
+  - "raw_data/tempbias/\u6E29\u5EA6\u504F\u538B40\uFF5E50\u6444\u6C0F\u5EA6/47_40_29_Cs_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    fit_key: 47_40_29_Cs_observe
+  use: true
+  channels: null

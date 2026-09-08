@@ -47,22 +47,23 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
                                     kwarg=kwarg)
         bkg = file_lib.Read_config()
         spec = file_lib.Spectrum_config(bin_width=pb.bin_width, adc_max=pb.adc_max)
-        fit = file_lib.Fit_config(rt.fit_range(branch, m.id), rt.bkg_form(branch, m.id))
+        fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
         return FileRunSpec(read, bkg, spec, fit)
 
     if branch == "ec_source":
         pb = rt.payload.ec
-        read = file_lib.Read_config(abspath(m.science_files[-1]), ending=pb.reader)
+        src_reader = pb.src_reader or pb.reader
+        read = file_lib.Read_config(abspath(m.science_files[-1]), ending=src_reader)
         bkg_rel = m.aux_files[-1] if m.aux_files else ""
         bkg = (
-            file_lib.Read_config(abspath(bkg_rel), ending=pb.reader)
+            file_lib.Read_config(abspath(bkg_rel), ending=src_reader)
             if bkg_rel
-            else file_lib.Read_config()
+            else file_lib.Read_config("", ending=src_reader)
         )
         spec = file_lib.Spectrum_config(
             corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
         )
-        fit = file_lib.Fit_config(rt.fit_range(branch, m.id), rt.bkg_form(branch, m.id))
+        fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
         return FileRunSpec(read, bkg, spec, fit)
 
     if branch == "ec_xray":
@@ -85,7 +86,7 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
             spec = file_lib.Spectrum_config(
                 corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
             )
-            fit = file_lib.Fit_config(rt.fit_range(branch, m.id), rt.bkg_form(branch, m.id))
+            fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
             return FileRunSpec(read, bkg, spec, fit)
 
         reads = [
@@ -99,7 +100,7 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
         spec = file_lib.Spectrum_config(
             corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
         )
-        fit = file_lib.Fit_config(rt.fit_range(branch, m.id), rt.bkg_form(branch, m.id))
+        fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
         return FileRunSpec(reads, bkg_reads, spec, fit)
 
     raise ValueError(f"unknown branch {branch!r}")
@@ -117,6 +118,17 @@ def _bkg_time_cut(pb, basename: str):
         return None
     # legacy bkg_time_cut rotation: [v[1], v[2], v[3], v[0]]
     return [v[1], v[2], v[3], v[0]]
+
+
+def _fit_key(m) -> str:
+    """Return the fit_range/bkg_form lookup key for a measurement.
+
+    Most versions key fit ranges by the measurement id itself; 11B keys its TB
+    fit ranges by the file stem (so ``just list`` shows the basename but the
+    range is looked up by stem).  A version workflow may record ``fit_key`` in
+    the measurement metadata.
+    """
+    return m.metadata.get("fit_key", m.id) if m.metadata else m.id
 
 
 def channel_use(m, ch: int) -> bool:
@@ -315,14 +327,20 @@ def global_tb(rt: RuntimeConfig, per_channel: List[List[TBPoint]],
             raise util.FitError(f"channel {ch}: no enabled TB points")
         pb = rt.payload.tb
         data_all = _apply_bias_filter(data_all, pb.bias_min_filter)
-        center, center_err, temp, bias = (
-            data_all[:, 0], data_all[:, 1], data_all[:, 2], data_all[:, 4],
+        center, center_err, temp, temp_err, bias, bias_err = (
+            data_all[:, 0], data_all[:, 1], data_all[:, 2],
+            data_all[:, 3], data_all[:, 4], data_all[:, 5],
         )
         try:
-            res = util.temp_bias_fit_curvefit(
-                center, center_err, temp, bias,
-                p0=pb.tb_fit_p0, maxfev=pb.tb_fit_maxfev,
-            )
+            if pb.tb_fit_method == "lmfit":
+                res = util.temp_bias_lmfit(
+                    center, center_err, temp, temp_err, bias, bias_err
+                )
+            else:
+                res = util.temp_bias_fit_curvefit(
+                    center, center_err, temp, bias,
+                    p0=pb.tb_fit_p0, maxfev=pb.tb_fit_maxfev,
+                )
         except util.FitError as e:
             raise util.FitError(f"failed to do temp bias fit: {e.args[-1]}")
         result.append(res)

@@ -10,11 +10,14 @@ from __future__ import annotations
 import importlib
 
 _MODULE = {
+    "03B": "calibration_process.workflows.versions.v03B",
+    "04": "calibration_process.workflows.versions.v04",
+    "05B": "calibration_process.workflows.versions.v05B",
+    "07": "calibration_process.workflows.versions.v07",
+    "10B": "calibration_process.workflows.versions.v10B",
+    "11B": "calibration_process.workflows.versions.v11B",
     "09": "calibration_process.workflows.versions.v09",
     "12B": "calibration_process.workflows.versions.v12B",
-    "04": "calibration_process.workflows.versions.v04",
-    "07": "calibration_process.workflows.versions.v07",
-    "05B": "calibration_process.workflows.versions.v05B",
 }
 
 

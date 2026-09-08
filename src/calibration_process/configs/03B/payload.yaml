@@ -1,0 +1,38 @@
+version: 03B
+tb:
+  reader: 03b
+  bin_width: 6
+  adc_max: 16384.0
+  science_dir: raw_data/20210501_tempbias_03B
+  fit_range_file: fit_range_tb.yaml
+ec:
+  reader: 03b
+  bin_width: 10
+  adc_max: 16384.0
+  x_path: raw_data/20210429_Xray_03B
+  src_path: raw_data/20210504_source_03B
+  energy_split_low: 49.0
+  energy_split_high: 51.0
+  ref_temp: 25.0
+  ref_bias: 28.5
+  tb_ref_path: single_process/20230903214108_temp_bias_fit.json
+  fit_range_file: fit_range_ec_xray.yaml
+  energy_map:
+    77p0: 77.0
+    64p7: 64.7
+    31p2: 31.2
+    50p3: 50.3
+    45p9: 45.9
+    24p2: 24.2
+    38p2: 38.2
+    18p0: 18.0
+    src_Na22_20m_10cm_rundata2021-05-05-15-29-56.dat: 511.0
+    src_Am241_5m_10cm_rundata2021-05-05-15-15-48.dat: 59.5
+    src_Cs137_12m_10cm_rundata2021-05-05-12-12-27.dat: 661.7
+  resolution_method: lmfit
+  channel_count: 4
+  xray_bkg_rotation: circle
+  xray_drop_substrs:
+  - CI
+  xray_name_index: 1
+  src_reader: 03b-src

@@ -75,6 +75,8 @@ class TBParams(_StrictBase):
     bias_min_filter: Optional[float] = None
     # explicit file_map (12B-style) instead of a directory scan, manifest-relative
     tb_file_map: Optional[str] = None
+    # 11B uses the lmfit temp-bias fit (which needs temp/bias errors); 11B stores "lmfit"
+    tb_fit_method: str = "curvefit"
 
 
 class ECParams(_StrictBase):
@@ -112,6 +114,9 @@ class ECParams(_StrictBase):
     # reader used by the ec_xray branch (05B uses "xray" while ec_source uses
     # "normal"); defaults to the shared ec.reader
     xray_reader: Optional[str] = None
+    # reader used by the ec_source branch (03B uses "03b-src" while others share
+    # the ec.reader)
+    src_reader: Optional[str] = None
 
 
 class PayloadSchema(_StrictBase):

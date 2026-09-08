@@ -1,0 +1,47 @@
+version: 10B
+branch: ec_source
+measurements:
+- id: 073_observe_Cs137.dat
+  branch: ec_source
+  science_files:
+  - raw_data/src_data/073_observe_Cs137.dat
+  hk_files: []
+  aux_files:
+  - raw_data/src_data/075_observe_Cs137_bkg.dat
+  metadata:
+    energy: 661.657
+  use: true
+  channels: null
+- id: 085_observe_Na22.dat
+  branch: ec_source
+  science_files:
+  - raw_data/src_data/085_observe_Na22.dat
+  hk_files: []
+  aux_files:
+  - raw_data/src_data/086_observe_Na22_bkg.dat
+  metadata:
+    energy: 511.004
+  use: true
+  channels: null
+- id: 089_observe_Am241.dat
+  branch: ec_source
+  science_files:
+  - raw_data/src_data/089_observe_Am241.dat
+  hk_files: []
+  aux_files:
+  - raw_data/src_data/090_observe_Am241_bkg.dat
+  metadata:
+    energy: 59.5409
+  use: true
+  channels: null
+- id: 077_observe_Co60.dat
+  branch: ec_source
+  science_files:
+  - raw_data/src_data/077_observe_Co60.dat
+  hk_files: []
+  aux_files:
+  - raw_data/src_data/078_observe_Co60_bkg.dat
+  metadata:
+    energy: 1332.492
+  use: true
+  channels: null

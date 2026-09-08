@@ -1,0 +1,276 @@
+version: 11B
+branch: ec_xray
+measurements:
+- id: '100'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/008_observe_100_ch0.dat
+  - raw_data/GRID-11B_x_data/011_observe_100_ch1.dat
+  - raw_data/GRID-11B_x_data/009_observe_100_ch2.dat
+  - raw_data/GRID-11B_x_data/010_observe_100_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 100.0
+  use: true
+  channels: null
+- id: '110'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/012_observe_110_ch0.dat
+  - raw_data/GRID-11B_x_data/015_observe_110_ch1.dat
+  - raw_data/GRID-11B_x_data/013_observe_110_ch2.dat
+  - raw_data/GRID-11B_x_data/014_observe_110_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 110.0
+  use: true
+  channels: null
+- id: '120'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/016_observe_120_ch0.dat
+  - raw_data/GRID-11B_x_data/019_observe_120_ch1.dat
+  - raw_data/GRID-11B_x_data/017_observe_120_ch2.dat
+  - raw_data/GRID-11B_x_data/018_observe_120_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 120.0
+  use: true
+  channels: null
+- id: '15'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/028_observe_15_ch0.dat
+  - raw_data/GRID-11B_x_data/031_observe_15_ch1.dat
+  - raw_data/GRID-11B_x_data/029_observe_15_ch2.dat
+  - raw_data/GRID-11B_x_data/030_observe_15_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 15.0
+  use: true
+  channels: null
+- id: '25'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/036_observe_25_ch0.dat
+  - raw_data/GRID-11B_x_data/039_observe_25_ch1.dat
+  - raw_data/GRID-11B_x_data/037_observe_25_ch2.dat
+  - raw_data/GRID-11B_x_data/038_observe_25_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 25.0
+  use: true
+  channels: null
+- id: '30'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/040_observe_30_ch0.dat
+  - raw_data/GRID-11B_x_data/043_observe_30_ch1.dat
+  - raw_data/GRID-11B_x_data/041_observe_30_ch2.dat
+  - raw_data/GRID-11B_x_data/042_observe_30_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 30.0
+  use: true
+  channels: null
+- id: '35'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/044_observe_35_ch0.dat
+  - raw_data/GRID-11B_x_data/047_observe_35_ch1.dat
+  - raw_data/GRID-11B_x_data/045_observe_35_ch2.dat
+  - raw_data/GRID-11B_x_data/046_observe_35_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 35.0
+  use: true
+  channels: null
+- id: '40'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/048_observe_40_ch0.dat
+  - raw_data/GRID-11B_x_data/051_observe_40_ch1.dat
+  - raw_data/GRID-11B_x_data/049_observe_40_ch2.dat
+  - raw_data/GRID-11B_x_data/050_observe_40_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 40.0
+  use: true
+  channels: null
+- id: '45'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/057_observe_45_ch0.dat
+  - raw_data/GRID-11B_x_data/054_observe_45_ch1.dat
+  - raw_data/GRID-11B_x_data/056_observe_45_ch2.dat
+  - raw_data/GRID-11B_x_data/055_observe_45_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 45.0
+  use: true
+  channels: null
+- id: '47'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/061_observe_47_ch0.dat
+  - raw_data/GRID-11B_x_data/058_observe_47_ch1.dat
+  - raw_data/GRID-11B_x_data/060_observe_47_ch2.dat
+  - raw_data/GRID-11B_x_data/059_observe_47_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 47.0
+  use: true
+  channels: null
+- id: '49'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/065_observe_49_ch0.dat
+  - raw_data/GRID-11B_x_data/062_observe_49_ch1.dat
+  - raw_data/GRID-11B_x_data/064_observe_49_ch2.dat
+  - raw_data/GRID-11B_x_data/063_observe_49_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 49.0
+  use: true
+  channels: null
+- id: '50'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/069_observe_50_ch0.dat
+  - raw_data/GRID-11B_x_data/066_observe_50_ch1.dat
+  - raw_data/GRID-11B_x_data/068_observe_50_ch2.dat
+  - raw_data/GRID-11B_x_data/067_observe_50_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 50.0
+  use: true
+  channels: null
+- id: '51'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/073_observe_51_ch0.dat
+  - raw_data/GRID-11B_x_data/070_observe_51_ch1.dat
+  - raw_data/GRID-11B_x_data/072_observe_51_ch2.dat
+  - raw_data/GRID-11B_x_data/071_observe_51_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 51.0
+  use: true
+  channels: null
+- id: '53'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/077_observe_53_ch0.dat
+  - raw_data/GRID-11B_x_data/074_observe_53_ch1.dat
+  - raw_data/GRID-11B_x_data/076_observe_53_ch2.dat
+  - raw_data/GRID-11B_x_data/075_observe_53_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 53.0
+  use: true
+  channels: null
+- id: '55'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/081_observe_55_ch0.dat
+  - raw_data/GRID-11B_x_data/078_observe_55_ch1.dat
+  - raw_data/GRID-11B_x_data/080_observe_55_ch2.dat
+  - raw_data/GRID-11B_x_data/079_observe_55_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 55.0
+  use: true
+  channels: null
+- id: '60'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/085_observe_60_ch0.dat
+  - raw_data/GRID-11B_x_data/082_observe_60_ch1.dat
+  - raw_data/GRID-11B_x_data/084_observe_60_ch2.dat
+  - raw_data/GRID-11B_x_data/083_observe_60_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 60.0
+  use: true
+  channels: null
+- id: '65'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/089_observe_65_ch0.dat
+  - raw_data/GRID-11B_x_data/086_observe_65_ch1.dat
+  - raw_data/GRID-11B_x_data/088_observe_65_ch2.dat
+  - raw_data/GRID-11B_x_data/087_observe_65_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 65.0
+  use: true
+  channels: null
+- id: '70'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/093_observe_70_ch0.dat
+  - raw_data/GRID-11B_x_data/090_observe_70_ch1.dat
+  - raw_data/GRID-11B_x_data/092_observe_70_ch2.dat
+  - raw_data/GRID-11B_x_data/091_observe_70_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 70.0
+  use: true
+  channels: null
+- id: '75'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/097_observe_75_ch0.dat
+  - raw_data/GRID-11B_x_data/094_observe_75_ch1.dat
+  - raw_data/GRID-11B_x_data/096_observe_75_ch2.dat
+  - raw_data/GRID-11B_x_data/095_observe_75_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 75.0
+  use: true
+  channels: null
+- id: '80'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/101_observe_80_ch0.dat
+  - raw_data/GRID-11B_x_data/098_observe_80_ch1.dat
+  - raw_data/GRID-11B_x_data/100_observe_80_ch2.dat
+  - raw_data/GRID-11B_x_data/099_observe_80_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 80.0
+  use: true
+  channels: null
+- id: '90'
+  branch: ec_xray
+  science_files:
+  - raw_data/GRID-11B_x_data/003_observe_90_ch0.dat
+  - raw_data/GRID-11B_x_data/007_observe_90_ch1.dat
+  - raw_data/GRID-11B_x_data/005_observe_90_ch2.dat
+  - raw_data/GRID-11B_x_data/006_observe_90_ch3.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 90.0
+  use: true
+  channels: null

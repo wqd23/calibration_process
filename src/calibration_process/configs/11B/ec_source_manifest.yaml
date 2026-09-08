@@ -1,0 +1,53 @@
+version: 11B
+branch: ec_source
+measurements:
+- id: 182_Ba133_20min_observe.dat
+  branch: ec_source
+  science_files:
+  - "raw_data/src/\u80FD\u91CF\u9053\u5740\u5B9E\u9A8C\u2014\u20141.15/\u6570\u636E\
+    //182_Ba133_20min_observe.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 356.0
+  use: true
+  channels: null
+- id: 187_Cs137_ch012_3min_observe.dat
+  branch: ec_source
+  science_files:
+  - "raw_data/src/\u80FD\u91CF\u9053\u5740\u5B9E\u9A8C\u2014\u20141.15/\u6570\u636E\
+    //187_Cs137_ch012_3min_observe.dat"
+  hk_files: []
+  aux_files:
+  - "raw_data/src/\u80FD\u91CF\u9053\u5740\u5B9E\u9A8C\u2014\u20141.15/\u6570\u636E\
+    //188_Cs137_ch3_15min_observe.dat"
+  metadata:
+    energy: 662.0
+  use: true
+  channels: null
+- id: 189_Eu152_2min_observe.dat
+  branch: ec_source
+  science_files:
+  - "raw_data/src/\u80FD\u91CF\u9053\u5740\u5B9E\u9A8C\u2014\u20141.15/\u6570\u636E\
+    //189_Eu152_2min_observe.dat"
+  hk_files: []
+  aux_files:
+  - "raw_data/src/\u80FD\u91CF\u9053\u5740\u5B9E\u9A8C\u2014\u20141.15/\u6570\u636E\
+    //190_Eu152_15min_ch3_observe.dat"
+  metadata:
+    energy: 344.0
+  use: true
+  channels: null
+- id: 191_Co60_2min_observe.dat
+  branch: ec_source
+  science_files:
+  - "raw_data/src/\u80FD\u91CF\u9053\u5740\u5B9E\u9A8C\u2014\u20141.15/\u6570\u636E\
+    //191_Co60_2min_observe.dat"
+  hk_files: []
+  aux_files:
+  - "raw_data/src/\u80FD\u91CF\u9053\u5740\u5B9E\u9A8C\u2014\u20141.15/\u6570\u636E\
+    //192_Co60_15min_ch3_observe.dat"
+  metadata:
+    energy: 1332.0
+  use: true
+  channels: null

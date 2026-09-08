@@ -1,0 +1,107 @@
+version: 03B
+branch: ec_xray
+measurements:
+- id: 18p0
+  branch: ec_xray
+  science_files:
+  - raw_data/20210429_Xray_03B/jly_18p0_ch0_30s_rundata2021-04-29-15-21-50.dat
+  - raw_data/20210429_Xray_03B/jly_18p0_ch1_30s_rundata2021-04-29-15-27-53.dat
+  - raw_data/20210429_Xray_03B/jly_18p0_ch2_30s_rundata2021-04-29-15-24-51.dat
+  - raw_data/20210429_Xray_03B/jly_18p0_ch3_30s_rundata2021-04-29-15-26-29.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 18.0
+  use: true
+  channels: null
+- id: 24p2
+  branch: ec_xray
+  science_files:
+  - raw_data/20210429_Xray_03B/jly_24p2_ch0_30s_rundata2021-04-29-15-10-52.dat
+  - raw_data/20210429_Xray_03B/jly_24p2_ch1_30s_rundata2021-04-29-15-04-57.dat
+  - raw_data/20210429_Xray_03B/jly_24p2_ch2_30s_rundata2021-04-29-15-09-12.dat
+  - raw_data/20210429_Xray_03B/jly_24p2_ch3_30s_rundata2021-04-29-15-07-38.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 24.2
+  use: true
+  channels: null
+- id: 31p2
+  branch: ec_xray
+  science_files:
+  - raw_data/20210429_Xray_03B/jly_31p2_ch0_30s_rundata2021-04-29-14-54-19.dat
+  - raw_data/20210429_Xray_03B/jly_31p2_ch1_30s_rundata2021-04-29-14-59-26.dat
+  - raw_data/20210429_Xray_03B/jly_31p2_ch2_30s_rundata2021-04-29-14-56-04.dat
+  - raw_data/20210429_Xray_03B/jly_31p2_ch3_30s_rundata2021-04-29-14-57-31.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 31.2
+  use: true
+  channels: null
+- id: 38p2
+  branch: ec_xray
+  science_files:
+  - raw_data/20210429_Xray_03B/jly_38p2_ch0_30s_rundata2021-04-29-14-38-47.dat
+  - raw_data/20210429_Xray_03B/jly_38p2_ch1_30s_rundata2021-04-29-14-34-04.dat
+  - raw_data/20210429_Xray_03B/jly_38p2_ch2_30s_rundata2021-04-29-14-37-19.dat
+  - raw_data/20210429_Xray_03B/jly_38p2_ch3_30s_rundata2021-04-29-14-35-52.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 38.2
+  use: true
+  channels: null
+- id: 45p9
+  branch: ec_xray
+  science_files:
+  - raw_data/20210429_Xray_03B/jly_45p9_ch0_30s_rundata2021-04-29-17-41-58.dat
+  - raw_data/20210429_Xray_03B/jly_45p9_ch1_30s_rundata2021-04-29-17-40-34.dat
+  - raw_data/20210429_Xray_03B/jly_45p9_ch2_30s_rundata2021-04-29-17-36-37.dat
+  - raw_data/20210429_Xray_03B/jly_45p9_ch3_30s_rundata2021-04-29-17-38-24.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 45.9
+  use: true
+  channels: null
+- id: 50p3
+  branch: ec_xray
+  science_files:
+  - raw_data/20210429_Xray_03B/jly_50p3_ch0_30s_rundata2021-04-29-17-50-46.dat
+  - raw_data/20210429_Xray_03B/jly_50p3_ch1_30s_rundata2021-04-29-17-59-27.dat
+  - raw_data/20210429_Xray_03B/jly_50p3_ch2_30s_rundata2021-04-29-17-53-14.dat
+  - raw_data/20210429_Xray_03B/jly_50p3_ch3_30s_rundata2021-04-29-17-56-22.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 50.3
+  use: true
+  channels: null
+- id: 64p7
+  branch: ec_xray
+  science_files:
+  - raw_data/20210429_Xray_03B/jly_64p7_ch0_30s_rundata2021-04-29-18-48-19.dat
+  - raw_data/20210429_Xray_03B/jly_64p7_ch1_30s_rundata2021-04-29-18-42-36.dat
+  - raw_data/20210429_Xray_03B/jly_64p7_ch2_30s_rundata2021-04-29-18-46-34.dat
+  - raw_data/20210429_Xray_03B/jly_64p7_ch3_30s_rundata2021-04-29-18-44-46.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 64.7
+  use: true
+  channels: null
+- id: 77p0
+  branch: ec_xray
+  science_files:
+  - raw_data/20210429_Xray_03B/jly_77p0_ch0_30s_rundata2021-04-29-18-56-09.dat
+  - raw_data/20210429_Xray_03B/jly_77p0_ch1_30s_rundata2021-04-29-19-02-08.dat
+  - raw_data/20210429_Xray_03B/jly_77p0_ch2_30s_rundata2021-04-29-18-58-20.dat
+  - raw_data/20210429_Xray_03B/jly_77p0_ch3_30s_rundata2021-04-29-19-00-01.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 77.0
+  use: true
+  channels: null

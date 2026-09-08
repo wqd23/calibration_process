@@ -1,0 +1,563 @@
+version: 03B
+branch: tb
+measurements:
+- id: -10C_265_4m_rundata2021-05-01-14-27-37.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-10C_265_4m_rundata2021-05-01-14-27-37.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -10C_270_4m_rundata2021-05-01-14-34-30.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-10C_270_4m_rundata2021-05-01-14-34-30.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -10C_275_4m_rundata2021-05-01-14-41-59.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-10C_275_4m_rundata2021-05-01-14-41-59.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -10C_280_4m_rundata2021-05-01-14-49-45.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-10C_280_4m_rundata2021-05-01-14-49-45.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -10C_283_4m_rundata2021-05-01-14-57-24.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-10C_283_4m_rundata2021-05-01-14-57-24.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -10C_285_4m_rundata2021-05-01-15-04-33.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-10C_285_4m_rundata2021-05-01-15-04-33.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -10C_287_4m_rundata2021-05-01-15-12-06.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-10C_287_4m_rundata2021-05-01-15-12-06.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -10C_290_4m_rundata2021-05-01-15-18-58.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-10C_290_4m_rundata2021-05-01-15-18-58.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -20C_265_4m_rundata2021-05-01-12-38-07.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-20C_265_4m_rundata2021-05-01-12-38-07.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -20C_270_4m_rundata2021-05-01-12-49-18.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-20C_270_4m_rundata2021-05-01-12-49-18.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -20C_275_4m_rundata2021-05-01-12-56-33.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-20C_275_4m_rundata2021-05-01-12-56-33.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -20C_280_4m_rundata2021-05-01-13-04-54.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-20C_280_4m_rundata2021-05-01-13-04-54.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -20C_283_4m_rundata2021-05-01-13-12-09.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-20C_283_4m_rundata2021-05-01-13-12-09.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -20C_285_4m_rundata2021-05-01-13-18-52.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-20C_285_4m_rundata2021-05-01-13-18-52.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -20C_287_4m_rundata2021-05-01-13-26-29.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-20C_287_4m_rundata2021-05-01-13-26-29.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: -20C_290_4m_rundata2021-05-01-13-34-07.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/-20C_290_4m_rundata2021-05-01-13-34-07.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 0C_265_4m_rundata2021-05-01-15-56-52.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/0C_265_4m_rundata2021-05-01-15-56-52.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 0C_270_4m_rundata2021-05-01-16-04-23.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/0C_270_4m_rundata2021-05-01-16-04-23.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 0C_275_4m_rundata2021-05-01-16-11-36.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/0C_275_4m_rundata2021-05-01-16-11-36.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 0C_280_4m_rundata2021-05-01-16-18-30.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/0C_280_4m_rundata2021-05-01-16-18-30.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 0C_283_4m_rundata2021-05-01-16-25-48.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/0C_283_4m_rundata2021-05-01-16-25-48.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 0C_285_4m_rundata2021-05-01-16-33-20.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/0C_285_4m_rundata2021-05-01-16-33-20.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 0C_287_4m_rundata2021-05-01-16-40-53.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/0C_287_4m_rundata2021-05-01-16-40-53.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 0C_290_4m_rundata2021-05-01-16-47-32.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/0C_290_4m_rundata2021-05-01-16-47-32.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 10C_265_4m_rundata2021-05-01-18-24-35.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/10C_265_4m_rundata2021-05-01-18-24-35.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 10C_270_4m_rundata2021-05-01-18-35-48.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/10C_270_4m_rundata2021-05-01-18-35-48.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 10C_275_4m_rundata2021-05-01-18-47-35.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/10C_275_4m_rundata2021-05-01-18-47-35.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 10C_280_4m_rundata2021-05-01-19-00-18.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/10C_280_4m_rundata2021-05-01-19-00-18.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 10C_283_4m_rundata2021-05-01-19-08-12.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/10C_283_4m_rundata2021-05-01-19-08-12.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 10C_285_4m_rundata2021-05-01-19-18-53.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/10C_285_4m_rundata2021-05-01-19-18-53.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 10C_287_4m_rundata2021-05-01-19-27-52.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/10C_287_4m_rundata2021-05-01-19-27-52.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 10C_290_4m_rundata2021-05-01-19-40-33.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/10C_290_4m_rundata2021-05-01-19-40-33.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 20C_265_4m_rundata2021-05-01-20-55-15.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/20C_265_4m_rundata2021-05-01-20-55-15.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 20C_270_4m_rundata2021-05-01-21-02-50.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/20C_270_4m_rundata2021-05-01-21-02-50.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 20C_275_4m_rundata2021-05-01-21-14-04.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/20C_275_4m_rundata2021-05-01-21-14-04.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 20C_280_4m_rundata2021-05-01-21-22-26.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/20C_280_4m_rundata2021-05-01-21-22-26.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 20C_283_4m_rundata2021-05-01-21-31-03.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/20C_283_4m_rundata2021-05-01-21-31-03.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 20C_285_4m_rundata2021-05-01-21-39-09.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/20C_285_4m_rundata2021-05-01-21-39-09.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 20C_287_4m_rundata2021-05-01-21-47-41.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/20C_287_4m_rundata2021-05-01-21-47-41.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 20C_290_4m_rundata2021-05-01-21-58-31.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/20C_290_4m_rundata2021-05-01-21-58-31.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 30C_265_4m_rundata2021-05-02-11-57-14.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/30C_265_4m_rundata2021-05-02-11-57-14.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 30C_270_4m_rundata2021-05-02-12-07-01.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/30C_270_4m_rundata2021-05-02-12-07-01.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 30C_275_4m_rundata2021-05-02-12-14-55.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/30C_275_4m_rundata2021-05-02-12-14-55.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 30C_280_4m_rundata2021-05-02-12-21-53.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/30C_280_4m_rundata2021-05-02-12-21-53.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 30C_283_4m_rundata2021-05-02-12-30-12.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/30C_283_4m_rundata2021-05-02-12-30-12.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 30C_285_4m_rundata2021-05-02-12-37-05.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/30C_285_4m_rundata2021-05-02-12-37-05.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 30C_287_4m_rundata2021-05-02-12-43-36.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/30C_287_4m_rundata2021-05-02-12-43-36.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 30C_290_4m_rundata2021-05-02-12-50-32.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/30C_290_4m_rundata2021-05-02-12-50-32.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 40C_265_4m_rundata2021-05-02-13-39-28.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/40C_265_4m_rundata2021-05-02-13-39-28.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 40C_270_4m_rundata2021-05-02-13-55-04.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/40C_270_4m_rundata2021-05-02-13-55-04.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 40C_275_4m_rundata2021-05-02-14-04-10.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/40C_275_4m_rundata2021-05-02-14-04-10.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 40C_280_4m_rundata2021-05-02-14-10-59.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/40C_280_4m_rundata2021-05-02-14-10-59.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 40C_283_4m_rundata2021-05-02-14-18-28.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/40C_283_4m_rundata2021-05-02-14-18-28.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 40C_285_4m_rundata2021-05-02-14-26-47.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/40C_285_4m_rundata2021-05-02-14-26-47.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 40C_287_4m_rundata2021-05-02-14-34-29.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/40C_287_4m_rundata2021-05-02-14-34-29.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
+- id: 40C_290_4m_rundata2021-05-02-14-43-22.dat
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_03B/40C_290_4m_rundata2021-05-02-14-43-22.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: null
+  use: true
+  channels: null
