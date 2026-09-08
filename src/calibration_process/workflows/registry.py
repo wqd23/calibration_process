@@ -12,6 +12,8 @@ import importlib
 _MODULE = {
     "09": "calibration_process.workflows.versions.v09",
     "12B": "calibration_process.workflows.versions.v12B",
+    "04": "calibration_process.workflows.versions.v04",
+    "07": "calibration_process.workflows.versions.v07",
 }
 
 

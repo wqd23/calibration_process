@@ -1,0 +1,159 @@
+version: '07'
+branch: ec_xray
+measurements:
+- id: 22p0
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111161420_bnu01_22p0_30s_ch0_COM7-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111161901_bnu01_22p0_30s_ch1_COM7-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111161629_bnu01_22p0_30s_ch2_COM7-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111161740_bnu01_22p0_30s_ch3_COM7-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 22.0
+  use: true
+  channels: null
+- id: 29p0
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111163336_bnu01_29p0_30s_ch0_COM7-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111163950_bnu01_29p0_30s_ch1_COM7-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111163717_bnu01_29p0_30s_ch2_COM7-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111163835_bnu01_29p0_30s_ch3_COM7-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 29.0
+  use: true
+  channels: null
+- id: 35p0
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111164553_bnu01_35p0_30s_ch0_COM7-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111165051_bnu01_35p0_30s_ch1_COM7-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111164729_bnu01_35p0_30s_ch2_COM7-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111164941_bnu01_35p0_30s_ch3_COM7-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 35.0
+  use: true
+  channels: null
+- id: 45p0
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111210336_bnu01_45p0_30s_ch0_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111210653_bnu01_45p0_30s_ch1_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111210453_bnu01_45p0_30s_ch2_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111210548_bnu01_45p0_30s_ch3_COM8-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 45.0
+  use: true
+  channels: null
+- id: 47p1
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111211223_bnu01_47p1_30s_ch0_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111211516_bnu01_47p1_30s_ch1_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111211325_bnu01_47p1_30s_ch2_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111211417_bnu01_47p1_30s_ch3_COM8-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 47.1
+  use: true
+  channels: null
+- id: 49p1
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111212057_bnu01_49p1_30s_ch0_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111212438_bnu01_49p1_30s_ch1_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111212205_bnu01_49p1_30s_ch2_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111212325_bnu01_49p1_30s_ch3_COM8-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 49.1
+  use: true
+  channels: null
+- id: 51p1
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111212855_bnu01_51p1_30s_ch0_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111213152_bnu01_51p1_30s_ch1_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111212959_bnu01_51p1_30s_ch2_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111213051_bnu01_51p1_30s_ch3_COM8-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 51.1
+  use: true
+  channels: null
+- id: 53p1
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111213658_bnu01_53p1_30s_ch0_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111214009_bnu01_53p1_30s_ch1_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111213809_bnu01_53p1_30s_ch2_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111213908_bnu01_53p1_30s_ch3_COM8-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 53.1
+  use: true
+  channels: null
+- id: 55p1
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111215117_bnu01_55p1_30s_ch0_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111215418_bnu01_55p1_30s_ch1_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111215218_bnu01_55p1_30s_ch2_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111215310_bnu01_55p1_30s_ch3_COM8-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 55.1
+  use: true
+  channels: null
+- id: 64p8
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111215955_bnu01_64p8_30s_ch0_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111220302_bnu01_64p8_30s_ch1_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111220059_bnu01_64p8_30s_ch2_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111220157_bnu01_64p8_30s_ch3_COM8-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 64.8
+  use: true
+  channels: null
+- id: 74p8
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111220918_bnu01_74p8_30s_ch0_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111221215_bnu01_74p8_30s_ch1_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111221021_bnu01_74p8_30s_ch2_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111221112_bnu01_74p8_30s_ch3_COM8-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 74.8
+  use: true
+  channels: null
+- id: 79p9
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111221716_bnu01_79p9_30s_ch0_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111222021_bnu01_79p9_30s_ch1_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111221817_bnu01_79p9_30s_ch2_COM8-Data.txt"
+  - "raw_data/X\u5149\u673A\u6807\u5B9A\u5B9E\u9A8C/\u6B63\u6837/211111221919_bnu01_79p9_30s_ch3_COM8-Data.txt"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 79.9
+  use: true
+  channels: null

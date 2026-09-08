@@ -1,0 +1,38 @@
+version: '04'
+tb:
+  reader: '04'
+  bin_width: 6
+  adc_max: 65535.0
+  science_dir: raw_data/20210501_tempbias_Am241_GRID04
+  fit_range_file: fit_range_tb.yaml
+ec:
+  reader: '04'
+  bin_width: 10
+  adc_max: 65535.0
+  x_path: raw_data/20210429_Xray_GRID04/data_GRID
+  src_path: raw_data/20210504_source_GRID04
+  energy_split_low: 49.0
+  energy_split_high: 55.0
+  ref_temp: 25.0
+  ref_bias: 28.5
+  tb_ref_path: single_process/20231120140952_temp_bias_fit.json
+  fit_range_file: fit_range_ec_xray.yaml
+  energy_map:
+    18p0: 18.2
+    24p2: 24.2
+    31p2: 31.2
+    38p2: 38.2
+    45p9: 45.9
+    50p3: 50.3
+    64p7: 64.7
+    77p0: 77.0
+    210504162829_COM6_src_Co60_10m_10cm-Data.txt: 1332.2
+    210504170604_COM6_src_Na22_30m_10cm-Data.txt: 511.0
+    210505120306_COM6_src_Cs137_15m_10cm-Data.txt: 661.7
+    210505151551_COM6_src_Am241_5m_10cm-Data.txt: 59.5
+  resolution_method: exprfit
+  channel_count: 4
+  xray_bkg_rotation: circle
+  xray_drop_substrs:
+  - _18p0_
+  xray_name_index: 3

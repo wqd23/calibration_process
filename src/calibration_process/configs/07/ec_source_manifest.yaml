@@ -1,0 +1,47 @@
+version: '07'
+branch: ec_source
+measurements:
+- id: 211127154145_COM3-bnu_src_Cs137_45min_10cm.txt
+  branch: ec_source
+  science_files:
+  - "raw_data/\u5317\u5E08\u5927\u8C41\u514D\u6E90\u6807\u5B9A\u6570\u636E-20211127/211127154145_COM3-bnu_src_Cs137_45min_10cm.txt"
+  hk_files: []
+  aux_files:
+  - "raw_data/\u5317\u5E08\u5927\u8C41\u514D\u6E90\u6807\u5B9A\u6570\u636E-20211127/211127152103_COM3-bnu_src_bkgCs_15min_10cm.txt"
+  metadata:
+    energy: 661.657
+  use: true
+  channels: null
+- id: 211127164103_COM3-bnu_src_Co60_30min_10cm.txt
+  branch: ec_source
+  science_files:
+  - "raw_data/\u5317\u5E08\u5927\u8C41\u514D\u6E90\u6807\u5B9A\u6570\u636E-20211127/211127164103_COM3-bnu_src_Co60_30min_10cm.txt"
+  hk_files: []
+  aux_files:
+  - "raw_data/\u5317\u5E08\u5927\u8C41\u514D\u6E90\u6807\u5B9A\u6570\u636E-20211127/211127162945_COM3-bnu_src_bkgCo_10min_10cm.txt"
+  metadata:
+    energy: 1332.492
+  use: true
+  channels: null
+- id: 211127173549_COM3-bnu_src_Am241_6min_10cm.txt
+  branch: ec_source
+  science_files:
+  - "raw_data/\u5317\u5E08\u5927\u8C41\u514D\u6E90\u6807\u5B9A\u6570\u636E-20211127/211127173549_COM3-bnu_src_Am241_6min_10cm.txt"
+  hk_files: []
+  aux_files:
+  - "raw_data/\u5317\u5E08\u5927\u8C41\u514D\u6E90\u6807\u5B9A\u6570\u636E-20211127/211127172622_COM3-bnu_src_bkgAm_6min_10cm.txt"
+  metadata:
+    energy: 59.5409
+  use: true
+  channels: null
+- id: 211127175108_COM3-bnu_src_Na22_30min_20cm.txt
+  branch: ec_source
+  science_files:
+  - "raw_data/\u5317\u5E08\u5927\u8C41\u514D\u6E90\u6807\u5B9A\u6570\u636E-20211127/211127175108_COM3-bnu_src_Na22_30min_20cm.txt"
+  hk_files: []
+  aux_files:
+  - "raw_data/\u5317\u5E08\u5927\u8C41\u514D\u6E90\u6807\u5B9A\u6570\u636E-20211127/211127172622_COM3-bnu_src_bkgNa_10min_20cm.txt"
+  metadata:
+    energy: 511.004
+  use: true
+  channels: null

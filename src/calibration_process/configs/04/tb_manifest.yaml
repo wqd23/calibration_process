@@ -1,0 +1,489 @@
+version: '04'
+branch: tb
+measurements:
+- id: 210501124621_COM7_tb_-20C_27p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501124621_COM7_tb_-20C_27p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501125622_COM7_tb_-20C_27p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501125622_COM7_tb_-20C_27p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501130447_COM7_tb_-20C_28p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501130447_COM7_tb_-20C_28p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501131226_COM7_tb_-20C_28p3V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501131226_COM7_tb_-20C_28p3V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501131844_COM7_tb_-20C_28p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501131844_COM7_tb_-20C_28p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501132600_COM7_tb_-20C_28p7V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501132600_COM7_tb_-20C_28p7V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501133229_COM7_tb_-20C_29p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501133229_COM7_tb_-20C_29p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501133835_COM7_tb_-20C_26p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501133835_COM7_tb_-20C_26p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501141950_COM7_tb_-10C_26p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501141950_COM7_tb_-10C_26p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501142804_COM7_tb_-10C_27p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501142804_COM7_tb_-10C_27p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501144040_COM7_tb_-10C_27p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501144040_COM7_tb_-10C_27p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501144751_COM7_tb_-10C_28p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501144751_COM7_tb_-10C_28p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501145740_COM7_tb_-10C_28p3V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501145740_COM7_tb_-10C_28p3V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501150455_COM7_tb_-10C_28p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501150455_COM7_tb_-10C_28p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501151254_COM7_tb_-10C_28p7V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501151254_COM7_tb_-10C_28p7V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501151925_COM7_tb_-10C_29p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501151925_COM7_tb_-10C_29p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501160451_COM7_tb_0C_26p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501160451_COM7_tb_0C_26p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501161115_COM7_tb_0C_27p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501161115_COM7_tb_0C_27p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501161900_COM7_tb_0C_27p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501161900_COM7_tb_0C_27p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501162553_COM7_tb_0C_28p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501162553_COM7_tb_0C_28p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501163506_COM7_tb_0C_28p3V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501163506_COM7_tb_0C_28p3V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501164548_COM7_tb_0C_28p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501164548_COM7_tb_0C_28p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501165303_COM7_tb_0C_28p7V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501165303_COM7_tb_0C_28p7V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501170235_COM7_tb_0C_29p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501170235_COM7_tb_0C_29p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501185822_COM7_tb_10C_26p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501185822_COM7_tb_10C_26p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501191856_COM7_tb_10C_27p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501191856_COM7_tb_10C_27p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501192755_COM7_tb_10C_27p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501192755_COM7_tb_10C_27p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501194036_COM7_tb_10C_28p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501194036_COM7_tb_10C_28p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501194814_COM7_tb_10C_28p3V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501194814_COM7_tb_10C_28p3V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501195529_COM7_tb_10C_28p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501195529_COM7_tb_10C_28p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501200242_COM7_tb_10C_28p7V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501200242_COM7_tb_10C_28p7V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501201006_COM7_tb_10C_29p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501201006_COM7_tb_10C_29p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501213459_COM7_tb_20C_26p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501213459_COM7_tb_20C_26p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501214226_COM7_tb_20C_27p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501214226_COM7_tb_20C_27p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501215016_COM7_tb_20C_27p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501215016_COM7_tb_20C_27p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501215804_COM7_tb_20C_28p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501215804_COM7_tb_20C_28p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501220457_COM7_tb_20C_28p3V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501220457_COM7_tb_20C_28p3V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501221434_COM7_tb_20C_28p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501221434_COM7_tb_20C_28p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501222143_COM7_tb_20C_28p7V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501222143_COM7_tb_20C_28p7V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210501222837_COM7_tb_20C_29p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210501222837_COM7_tb_20C_29p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502110424_COM7_tb_30C_27p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502110424_COM7_tb_30C_27p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502111238_COM7_tb_30C_27p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502111238_COM7_tb_30C_27p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502112052_COM7_tb_30C_28p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502112052_COM7_tb_30C_28p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502113639_COM7_tb_30C_28p3V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502113639_COM7_tb_30C_28p3V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502114344_COM7_tb_30C_28p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502114344_COM7_tb_30C_28p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502115302_COM7_tb_30C_28p7V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502115302_COM7_tb_30C_28p7V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502120043_COM7_tb_30C_29p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502120043_COM7_tb_30C_29p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502140114_COM7_tb_40C_27p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502140114_COM7_tb_40C_27p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502141544_COM7_tb_40C_27p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502141544_COM7_tb_40C_27p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502142322_COM7_tb_40C_28p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502142322_COM7_tb_40C_28p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502143051_COM7_tb_40C_28p3V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502143051_COM7_tb_40C_28p3V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502143746_COM7_tb_40C_28p5V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502143746_COM7_tb_40C_28p5V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502144444_COM7_tb_40C_28p7V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502144444_COM7_tb_40C_28p7V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 210502145128_COM7_tb_40C_29p0V_4m_5cm-Data.txt
+  branch: tb
+  science_files:
+  - raw_data/20210501_tempbias_Am241_GRID04/210502145128_COM7_tb_40C_29p0V_4m_5cm-Data.txt
+  hk_files: []
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null

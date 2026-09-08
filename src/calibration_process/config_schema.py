@@ -93,13 +93,22 @@ class ECParams(_StrictBase):
     energy_map: Dict[str, float] = {}
     resolution_method: str = "polyfit"  # polyfit | exprfit | lmfit
     channel_count: int = 4
+    # how the energy name is derived from an X-ray file name (split index)
+    xray_name_index: int = 0
+    # substrings (in the file name) that mark a file to be dropped
+    xray_drop_substrs: Optional[List[str]] = None
+    # X-ray single-4-channel-file mode (05B) vs per-channel file grouping
+    xray_single_file: bool = False
+    xray_drop_old: bool = False
+    xray_require_hk: bool = False
+    xray_require_fit_range: bool = False
+    xray_bkg_rotation: str = "circle"  # circle (ch+1) | fixed [1,2,0,0]
     # optional per-version extras
     src_bkg_map: Optional[Dict[str, List[str]]] = None
     xray_drop_energies: Optional[List[str]] = None
-    xray_require_hk: bool = False
-    xray_require_fit_range: bool = False
-    xray_drop_old: bool = False
-    xray_bkg_rotation: str = "circle"  # circle (ch+1) | fixed [1,2,0,0]
+    xray_config_file: Optional[str] = None
+    # 05B-style per-file time cut (dict of basename -> [[lo,hi]*4])
+    time_cut: Optional[Dict[str, Any]] = None
 
 
 class PayloadSchema(_StrictBase):

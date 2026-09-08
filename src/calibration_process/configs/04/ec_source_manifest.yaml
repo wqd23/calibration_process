@@ -1,0 +1,47 @@
+version: '04'
+branch: ec_source
+measurements:
+- id: 210504162829_COM6_src_Co60_10m_10cm-Data.txt
+  branch: ec_source
+  science_files:
+  - raw_data/20210504_source_GRID04/210504162829_COM6_src_Co60_10m_10cm-Data.txt
+  hk_files: []
+  aux_files:
+  - raw_data/20210504_source_GRID04/210504164227_COM6_src_bkg_5m_10cm-Data.txt
+  metadata:
+    energy: 1332.2
+  use: true
+  channels: null
+- id: 210504170604_COM6_src_Na22_30m_10cm-Data.txt
+  branch: ec_source
+  science_files:
+  - raw_data/20210504_source_GRID04/210504170604_COM6_src_Na22_30m_10cm-Data.txt
+  hk_files: []
+  aux_files:
+  - raw_data/20210504_source_GRID04/210504175217_COM6_src_bkg_5m_10cm-Data.txt
+  metadata:
+    energy: 511.0
+  use: true
+  channels: null
+- id: 210505120306_COM6_src_Cs137_15m_10cm-Data.txt
+  branch: ec_source
+  science_files:
+  - raw_data/20210504_source_GRID04/210505120306_COM6_src_Cs137_15m_10cm-Data.txt
+  hk_files: []
+  aux_files:
+  - raw_data/20210504_source_GRID04/210505123401_COM6_src_bkg_5m_10cm-Data.txt
+  metadata:
+    energy: 661.7
+  use: true
+  channels: null
+- id: 210505151551_COM6_src_Am241_5m_10cm-Data.txt
+  branch: ec_source
+  science_files:
+  - raw_data/20210504_source_GRID04/210505151551_COM6_src_Am241_5m_10cm-Data.txt
+  hk_files: []
+  aux_files:
+  - raw_data/20210504_source_GRID04/210505145547_COM6_src_bkg_5m_10cm-Data.txt
+  metadata:
+    energy: 59.5
+  use: true
+  channels: null

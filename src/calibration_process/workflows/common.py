@@ -67,8 +67,30 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
 
     if branch == "ec_xray":
         pb = rt.payload.ec
+        if pb.xray_single_file:
+            # 05B style: one 4-channel file, background = the same file with a
+            # rotated (cyclically shifted per channel) time cut
+            basename = os.path.basename(m.science_files[-1])
+            read = file_lib.Read_config(
+                abspath(m.science_files[-1]), ending=pb.reader,
+                config_file=pb.xray_config_file or "",
+                time_cut=_time_cut(pb, basename),
+            )
+            bkg = file_lib.Read_config(
+                abspath(m.science_files[-1]), ending=pb.reader,
+                config_file=pb.xray_config_file or "",
+                time_cut=_bkg_time_cut(pb, basename),
+            )
+            spec = file_lib.Spectrum_config(
+                corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
+            )
+            fit = file_lib.Fit_config(rt.fit_range(branch, m.id), rt.bkg_form(branch, m.id))
+            return FileRunSpec(read, bkg, spec, fit)
+
         reads = [
-            file_lib.Read_config(abspath(f), ending=pb.reader) for f in m.science_files
+            file_lib.Read_config(abspath(f), ending=pb.reader,
+                                 config_file=pb.xray_config_file or "")
+            for f in m.science_files
         ]
         n = pb.channel_count
         rotation = pb.xray_bkg_rotation
@@ -80,6 +102,20 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
         return FileRunSpec(reads, bkg_reads, spec, fit)
 
     raise ValueError(f"unknown branch {branch!r}")
+
+
+def _time_cut(pb, basename: str):
+    tc = getattr(pb, "time_cut", None) or {}
+    return tc.get(basename)
+
+
+def _bkg_time_cut(pb, basename: str):
+    tc = getattr(pb, "time_cut", None) or {}
+    v = tc.get(basename)
+    if v is None:
+        return None
+    # legacy bkg_time_cut rotation: [v[1], v[2], v[3], v[0]]
+    return [v[1], v[2], v[3], v[0]]
 
 
 def channel_use(m, ch: int) -> bool:
@@ -108,7 +144,7 @@ def build_fit_operation(rt, branch, fc: FileRunSpec, nocache=False) -> object:
     """Construct a File_operation_05b from a resolved spec (protected kernel)."""
     from ..operation import __get_fp03B, __get_fp05B
 
-    if branch == "ec_xray":
+    if branch == "ec_xray" and not rt.payload.ec.xray_single_file:
         fp = __get_fp03B(
             [fc.read_config, fc.bkg_read_config, fc.spectrum_config, fc.fit_config],
             nocache=nocache,
