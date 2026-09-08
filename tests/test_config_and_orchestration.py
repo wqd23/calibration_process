@@ -99,7 +99,6 @@ def test_versions_enumerate_matches_legacy(ver, branch):
         expected = legacy_ec(ver).src_list
     else:
         expected = list(legacy_ec(ver).x_list)
-    got_sorted = sorted(got)
     # enumerate order may differ from legacy's os.listdir order; compare as sets
     # and also keep the same measurement count
     assert set(got) == set(expected), f"{ver}/{branch}: {sorted(set(got) ^ set(expected))}"
