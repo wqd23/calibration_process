@@ -15,15 +15,19 @@ cargo install just                                  # 安装 just（或 brew ins
 git clone <repo-url> && cd calibration_process
 uv sync                              # 安装依赖
 just init {ver} {data-path}          # 软链数据 + 创建目录（ver 用 just 查看）
-just check {ver}                     # 验证部署
+just check {ver}                     # 验证部署（新配置/manifest 层）
 ```
 
-**跑数据：**
+**跑数据（显式 workflow）：**
 ```bash
-just all {ver}                       # 处理全部 TB + EC 数据
-just tbfit {ver}                     # TB 二维面拟合
-just ecfit {ver}                     # E-C 关系拟合
+just all {ver}                       # 处理该版本全部 TB + EC 数据（单拟合 + 全局拟合）
+just fit-one {ver} tb {id}           # 单 measurement 单拟合
+just global {ver} tb                 # TB 二维面拟合
+just global {ver} ec                 # E-C 关系拟合
+just discover {ver} {branch}         # 扫描目录 -> manifest 草稿
 ```
+
+新版本由**显式 workflow** 驱动：配置在 `src/calibration_process/configs/{ver}/`（YAML + strict schema），每一步都调用同一个未改动的科学内核，因此结果与历史实现一致。
 
 ## 文档
 
@@ -42,16 +46,18 @@ just ecfit {ver}                     # E-C 关系拟合
 
 | 命令 | 说明 |
 |------|------|
-| `just` | 查看所有命令和可用版本 |
+| `just` | 查看所有命令 |
 | `just init {ver} {path}` | 初始化版本：软链数据 + 建目录 |
-| `just check {ver}` | 验证部署完整性（`--fix` 自动创建缺失目录） |
-| `just all {ver}` | 处理该版本全部数据 |
-| `just tb {ver} run {idx}` | 处理单个 TB 文件 |
-| `just ec {ver} x run {idx}` | 处理单个 EC X光机文件 |
-| `just ec {ver} src run {idx}` | 处理单个 EC 放射源文件 |
-| `just tbfit {ver}` | TB 二维面拟合 |
-| `just ecfit {ver}` | E-C 关系拟合 |
-| `just new-payload {ver}` | 为新载荷生成配置和目录骨架 |
+| `just check {ver}` | 校验新配置/manifest 层与数据链接（`--fix` 建缺失目录） |
+| `just all {ver}` | 处理该版本全部数据（单拟合 + TB/EC 全局拟合） |
+| `just fit-one {ver} {branch} {id}` | 处理单个 measurement 单拟合 |
+| `just fit {ver} {branch}` | 处理单个分支单拟合 |
+| `just global {ver} {branch}` | TB/EC 全局拟合 |
+| `just discover {ver} {branch}` | 扫描目录生成 manifest 草稿 |
+| `just list {ver} {branch}` | 列出已确认 measurement |
+| `just config {ver} {branch} {id}` | 查看单个 measurement 的 resolved 配置 |
+| `just new-payload {ver}` | 为新载荷生成 YAML 配置/目录骨架 |
+| `just compare {ver}` | 新流程 vs 冻结 legacy oracle 差异对比 |
 
 ## 仓库结构
 
@@ -73,15 +79,20 @@ just ecfit {ver}                     # E-C 关系拟合
 ├── lib_reader/                     # 各版本数据读取库（workspace 子包）
 ├── lib_plot/                       # 绘图库（workspace 子包）
 ├── src/calibration_process/
-│   ├── process.py                  # CLI 入口（惰性加载）
-│   ├── cmd.py                      # 命令行包装
-│   ├── operation.py                # TB/EC 操作类
-│   ├── file_lib.py                 # 单文件读取与拟合
-│   ├── fitting.py                  # 通用峰型拟合
-│   ├── util_lib.py                 # 工具函数（拟合、缓存、阈值）
-│   ├── check.py                    # 部署校验
-│   ├── scaffold.py                 # 新版本脚手架
-│   └── config.json                 # 各版本配置（模板化）
+│   ├── cli.py                      # calib 命令入口
+│   ├── pipeline.py                 # 高层编排（discover/list/fit/global/all）
+│   ├── config_schema.py            # strict Pydantic schema（payload/analysis/fit_range/manifest）
+│   ├── manifest.py                 # manifest 发现与加载（运行时不再扫目录）
+│   ├── runtime.py                  # 解析后的运行时配置（resolved context）
+│   ├── deploy.py                   # 部署校验 + 新载荷脚手架（calib check/scaffold）
+│   ├── products.py                 # typed 中间产物（SingleFitResult/TBPoint/ECPoint）
+│   ├── file_lib.py                 # 单文件读取与拟合（protected kernel）
+│   ├── util_lib.py                 # 工具函数（拟合、缓存、阈值，protected kernel）
+│   ├── configs/{ver}/              # 每版本 YAML 配置 + manifest
+│   └── workflows/
+│       ├── common.py               # 复用内核的 stage（single fit/points/global）
+│       ├── registry.py             # 版本 -> workflow 模块（选择只发生一次）
+│       └── versions/v{ver}.py      # 每版本显式 workflow（文件选择规则）
 ├── pyproject.toml
 ├── uv.lock
 └── justfile
