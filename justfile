@@ -1,46 +1,45 @@
+py := ".venv/bin/python"
+
 default:
   just --list
-  @echo "Available ver: $(python3 -c "import json; print(' '.join(json.load(open('src/calibration_process/config.json')).keys()))")"
-run any:
-  python3 -m calibration_process.{{any}}
-tb ver *flags:
-  python3 -m calibration_process.process {{ver}} tb {{flags}}
-tbfit ver:
-  python3 -m calibration_process.process {{ver}} tbfit
-ec ver *flags:
-  python3 -m calibration_process.process {{ver}} ec {{flags}}
-ecfit ver:
-  python3 -m calibration_process.process {{ver}} ecfit
 
-check ver *flags:
-  python3 -m calibration_process.check {{ver}} {{flags}}
-
-new-payload ver *flags:
-  python3 -m calibration_process.scaffold {{ver}} {{flags}}
-
-test ver n:
-  @just tb {{ver}} list
-  @just tb {{ver}} run {{n}}
-  @just ec {{ver}} x list
-  @just ec {{ver}} x run {{n}}
-  @just ec {{ver}} src list
-  @just ec {{ver}} src run {{n}}
-
-all ver:
-  @just tb {{ver}} run all
-  @just ec {{ver}} src run all
-  @just ec {{ver}} x run all
-
-cover:
-  coverage run --source src/ -m pytest tests/ && coverage report -m
-
-# --- explicit-workflow (calib) thin wrappers --------------------------------
+# --- explicit workflow (calib) thin wrappers --------------------------------
 calib *args:
-  python3 -m calibration_process.cli {{args}}
+  {{py}} -m calibration_process.cli {{args}}
 
-# new explicit workflow: full formal run for one version
-new-all ver:
-  python3 -m calibration_process.cli all {{ver}}
+# full formal workflow for one version (no discover/preview)
+all ver:
+  {{py}} -m calibration_process.cli all {{ver}}
+
+# single-fit one measurement / whole branch
+fit-one ver branch id:
+  {{py}} -m calibration_process.cli fit-one {{ver}} {{branch}} {{id}}
+fit ver branch:
+  {{py}} -m calibration_process.cli fit {{ver}} {{branch}}
+
+# global fit (tb / ec)
+global ver branch:
+  {{py}} -m calibration_process.cli global {{ver}} {{branch}}
+
+# discovery / manifest / config introspection
+discover ver branch:
+  {{py}} -m calibration_process.cli discover {{ver}} {{branch}}
+list ver branch:
+  {{py}} -m calibration_process.cli list {{ver}} {{branch}}
+config ver branch id:
+  {{py}} -m calibration_process.cli config {{ver}} {{branch}} {{id}}
+
+# deployment check / new-payload scaffold
+check ver *flags:
+  {{py}} -m calibration_process.cli check {{ver}} {{flags}}
+new-payload ver *flags:
+  {{py}} -m calibration_process.cli scaffold {{ver}} {{flags}}
+
+# differential regression: new vs frozen legacy oracle
+compare ver:
+  {{py}} scripts/compare_full.py {{ver}}
+compare-10b:
+  {{py}} scripts/compare_10b.py
 
 # freeze a legacy oracle snapshot: copy data/{{ver}} outputs into .oracle/{{ver}}
 oracle ver:
@@ -51,15 +50,14 @@ oracle ver:
   @cp -r data/{{ver}}/tb_logs .oracle/{{ver}}/tb_logs
   @cp -r data/{{ver}}/ec_logs .oracle/{{ver}}/ec_logs
 
-# differential comparison: legacy oracle vs new output
-compare ver:
-  python3 scripts/compare_full.py {{ver}}
-
+# initialize a version data dir: link raw data + create output dirs
 init ver path:
   -ln -s {{path}} ./data/{{ver}}/raw_data
-  mkdir ./data/{{ver}}/ec_logs
-  mkdir ./data/{{ver}}/tb_logs
   mkdir -p ./data/{{ver}}/single_process/TB_fit_result
   mkdir -p ./data/{{ver}}/single_process/EC_fit_result
   mkdir -p ./data/{{ver}}/single_process/single_fit_fig
+  mkdir -p ./data/{{ver}}/tb_logs
+  mkdir -p ./data/{{ver}}/ec_logs
 
+cover:
+  {{py}} -m coverage run --source src/ -m pytest tests/ && {{py}} -m coverage report -m
