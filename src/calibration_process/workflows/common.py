@@ -151,23 +151,70 @@ def _rotate_bkg(reads: List, rotation: str, n: int) -> List:
 
 
 # --------------------------------------------------------------------------- #
+# File_operation_05b construction (thin wrappers over the protected kernel)
+# --------------------------------------------------------------------------- #
+def _dict_4ch_reconstruct(dict_4ch):
+    """Rebuild a per-channel dict from a list of 4 single-channel dicts.
+
+    Mirrors legacy ``__dict_4ch_reconstruct``: for each key the value is the
+    list of per-channel values, with the i-th channel taken from the i-th
+    single-channel dict (falling back to the whole value when it is not
+    length-4).
+    """
+    out = {}
+    for key in dict_4ch[0].keys():
+        out[key] = []
+        for i in range(4):
+            if len(dict_4ch[i][key]) == 4:
+                out[key].append(dict_4ch[i][key][i])
+            else:
+                out[key].append(dict_4ch[i][key])
+    return out
+
+
+def _build_fp05b(config, nocache=False) -> "file_lib.File_operation_05b":
+    return file_lib.File_operation_05b(config[0].path, *config, nocache=nocache)
+
+
+def _build_fp03b(config, nocache=False) -> "file_lib.File_operation_05b":
+    """Build a 4-channel File_operation_05b by reading each channel file.
+
+    The four per-channel operations are read independently and then merged back
+    into a single 4-channel object (exactly the legacy ``__get_fp03B``
+    behaviour).
+    """
+    read_config, bkg_read_config, spectrum_config, fit_config = config
+    fps = [
+        file_lib.File_operation_05b(
+            read_config[i].path, read_config[i], bkg_read_config[i],
+            spectrum_config, fit_config, nocache=nocache,
+        )
+        for i in range(4)
+    ]
+    sci = _dict_4ch_reconstruct([fps[i].sci for i in range(4)])
+    tel = _dict_4ch_reconstruct([fps[i].tel for i in range(4)])
+    bkg_sci = _dict_4ch_reconstruct([fps[i].bkg_sci for i in range(4)])
+    bkg_tel = _dict_4ch_reconstruct([fps[i].bkg_tel for i in range(4)])
+    fp = fps[0]
+    fp.sci, fp.tel = sci, tel
+    fp.bkg_sci, fp.bkg_tel = bkg_sci, bkg_tel
+    return fp
+
+
+# --------------------------------------------------------------------------- #
 # Single-fit stage
 # --------------------------------------------------------------------------- #
 def build_fit_operation(rt, branch, fc: FileRunSpec, nocache=False) -> object:
     """Construct a File_operation_05b from a resolved spec (protected kernel)."""
-    from ..operation import __get_fp03B, __get_fp05B
-
     if branch == "ec_xray" and not rt.payload.ec.xray_single_file:
-        fp = __get_fp03B(
+        return _build_fp03b(
             [fc.read_config, fc.bkg_read_config, fc.spectrum_config, fc.fit_config],
             nocache=nocache,
         )
-    else:
-        fp = __get_fp05B(
-            [fc.read_config, fc.bkg_read_config, fc.spectrum_config, fc.fit_config],
-            nocache=nocache,
-        )
-    return fp
+    return _build_fp05b(
+        [fc.read_config, fc.bkg_read_config, fc.spectrum_config, fc.fit_config],
+        nocache=nocache,
+    )
 
 
 def qa_category(output_dir: str, branch: str) -> str:
