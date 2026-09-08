@@ -13,10 +13,11 @@ cargo install just                                  # 安装 just（或 brew ins
 **部署：**
 ```bash
 git clone <repo-url> && cd calibration_process
-uv sync                              # 安装依赖
-just init {ver} {data-path}          # 软链数据 + 创建目录（ver 用 just 查看）
-just check {ver}                     # 验证部署（新配置/manifest 层）
+uv sync                              # 安装依赖到 .venv
+just init {ver} {data-path}          # 软链 data/{ver}/raw_data + 建输出目录（{ver} 用 `just` 查看）
+just check {ver} [--fix]             # 校验新配置/manifest 层与数据链接（--fix 自动建缺失输出目录）
 ```
+> 详细部署步骤（装 uv/just、挂数据、新载荷初始化等）见仓库根 [`AGENTS.md`](AGENTS.md) 的「部署」一节。
 
 **跑数据（显式 workflow）：**
 ```bash
@@ -88,7 +89,6 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 |------|------|
 | [docs/workflows.md](docs/workflows.md) | 每个载荷各自的显式 workflow（选点、reader、背景轮转、分辨率、特殊处理） |
 | [docs/workflow_matrix.md](docs/workflow_matrix.md) | 历史 workflow 完整审计矩阵（每个版本实际做了什么） |
-| [docs/deploy.md](docs/deploy.md) | 部署指南：新机器上装环境、挂数据、`calib check` 验证 |
 | [docs/data.md](docs/data.md) | 数据准备与目录约定：新配置/manifest 格式、新载荷接入流程与方法论 |
 | [docs/results.md](docs/results.md) | 结果产物与 QA 指标说明 |
 | [docs/12B_13B/data.md](docs/12B_13B/data.md) | 12B/13B 类载荷的数据说明（点位对照表、各文件的特殊情况） |
@@ -123,7 +123,6 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 │   ├── README.md                   # 文档目录说明与清单
 │   ├── workflows.md                # 每个载荷各自的显式 workflow
 │   ├── workflow_matrix.md          # 历史 workflow 审计矩阵
-│   ├── deploy.md                   # 部署指南
 │   ├── data.md                     # 数据准备与目录约定、接入方法论
 │   ├── results.md                  # 结果产物与 QA 指标
 │   ├── payloads_data.md            # 其它 7 个载荷的数据说明（简化版）

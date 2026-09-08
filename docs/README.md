@@ -10,7 +10,6 @@
 
 | 编号 | 文档 | 内容 |
 |------|------|------|
-| D1 | [deploy.md](deploy.md) | 部署指南：新机器上从 GitHub 拉取后如何装环境、挂数据、`calib check` 验证 |
 | D2 | [data.md](data.md) | 数据准备与目录约定：新配置（`configs/{ver}/*.yaml` + manifest）的格式、新载荷接入流程、以及方法论经验（找峰、HK 截取、质量筛查、拟合技巧） |
 | D3 | [results.md](results.md) | 结果产物清单与质量判定指标（pickle 字段、redchi、qa_flag）的含义 |
 | D4 | [workflows.md](workflows.md) | 每个载荷各自的显式 workflow：文件选择、reader、背景轮转、分辨率方法、特殊处理，一步可从 `v{ver}.py` 读出 |
