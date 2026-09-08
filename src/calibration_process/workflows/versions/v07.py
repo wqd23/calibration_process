@@ -69,7 +69,7 @@ def _enumerate_ec_xray(rt: RuntimeConfig, data_dir: Path) -> List[dict]:
     out = []
     for energy in x_list:
         ch_files = []
-        for i in range(rt.payload.ec.channel_count):
+        for i in range(4):
             matched = [f for f in x_ch if energy in f and f"_ch{i}_" in f]
             ch_files.append(f"{x_dir}/{matched[0]}")
         out.append({
