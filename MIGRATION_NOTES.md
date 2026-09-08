@@ -68,6 +68,13 @@
 - **影响**：能量点要么 4 通道齐全、要么整点丢弃；缺失的通道不会被半途使用。
 - **保留原因**：新 `v12B.py` 以 `xray_require_hk` / `xray_require_fit_range` 复现。
 
+## B12. 05B 的 X 光机单 4 通道文件 + 时间窗（time_cut）
+
+- **现象**：05B 的 EC X-ray 每个管压在**同一个文件**里带 4 通道（不是每通道一个文件）；背景是**同一个文件**按通道循环移位的时间窗（`bkg_time_cut = {k:[v[1],v[2],v[3],v[0]]}`）再读一次；reader 为 `xray` 并需要 `x_config`。能量分界为 49/52 keV。
+- **影响**：这是与其它版本（03B/04/07/09/10B/11B/12B 的每通道文件）完全不同的 X 光机路径。
+- **保留原因**：新 `v05B.py` 以 `xray_single_file` + `time_cut` + `xray_config_file` 复现；`common.single_run_spec` 对 `xray_single_file` 走单文件 fp05B 路径。
+- **备注**：`xray_config_file` 保留 config.json 的**完整** `data/<ver>/...` 字符串（而非 manifest 相对路径），以与 legacy 的 `config_file` 字段逐字符一致。
+
 ## B11. 12B TB 的定制拟合参数与 bias 过滤
 
 - **现象**：`TB_operation_12B` 覆盖 `TB_FIT_P0=[-0.02,0.07,24.4,-35.0,-1000.0]`、`TB_FIT_MAXFEV=100000`，且 `load_data` 把参与 2D 拟合的点限制在 `bias>=27.25 V`。文档注释说明这是为了适配 12B 增益响应。
