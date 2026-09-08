@@ -85,7 +85,7 @@ def test_registry_unknown_version_raises():
         get_workflow("99X")
 
 
-@pytest.mark.parametrize("ver", ["09", "04", "07", "12B"])
+@pytest.mark.parametrize("ver", ["09", "04", "05B", "07", "12B"])
 @pytest.mark.parametrize("branch", ["tb", "ec_source", "ec_xray"])
 def test_versions_enumerate_matches_legacy(ver, branch):
     from legacy_ops import legacy_tb, legacy_ec
@@ -103,6 +103,16 @@ def test_versions_enumerate_matches_legacy(ver, branch):
     # and also keep the same measurement count
     assert set(got) == set(expected), f"{ver}/{branch}: {sorted(set(got) ^ set(expected))}"
     assert len(got) == len(expected), f"{ver}/{branch}: {len(got)} != {len(expected)}"
+
+
+@pytest.mark.parametrize("ver", ["09", "04", "05B", "07", "12B"])
+def test_migration_writes_valid_yaml(tmp_path, ver):
+    root = tmp_path / "configs" / ver
+    migration.migrate_version(ver, config_root=root)
+    PayloadSchema.model_validate(yaml.safe_load(open(root / "payload.yaml")))
+    AnalysisSchema.model_validate(yaml.safe_load(open(root / "analysis.yaml")))
+    for fname in ("fit_range_tb.yaml", "fit_range_ec_source.yaml", "fit_range_ec_xray.yaml"):
+        FitRangeSet.model_validate(yaml.safe_load(open(root / fname)))
 
 
 def test_migration_writes_valid_yaml_12b(tmp_path):
