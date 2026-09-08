@@ -11,7 +11,7 @@ import importlib
 
 _MODULE = {
     "09": "calibration_process.workflows.versions.v09",
-    # only 09 is fully migrated; add more versions as their Gate B completes
+    "12B": "calibration_process.workflows.versions.v12B",
 }
 
 

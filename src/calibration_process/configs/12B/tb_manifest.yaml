@@ -1,0 +1,547 @@
+version: 12B
+branch: tb
+measurements:
+- id: -10C_265
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/032_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_092.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -10C_270
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/033_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_093.hk"
+  aux_files: []
+  metadata:
+    sci_half: first
+    hk_bias: 27.0
+  use: true
+  channels: null
+- id: -10C_275
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/033_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_093.hk"
+  aux_files: []
+  metadata:
+    sci_half: second
+    hk_bias: 27.5
+  use: true
+  channels: null
+- id: -10C_280
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/034_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_094.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -10C_283
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/037_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_097.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -10C_285
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/036_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_096.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -10C_287
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/078_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_158.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -10C_290
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/038_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_099.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -20C_265
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/019_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_067.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -20C_270
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/018_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_066.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -20C_280
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/016_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_059.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -20C_283
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/015_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_058.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -20C_287
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/021_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_069.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -20C_290
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/020_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_068.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -30C_265
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/022_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_075.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -30C_270
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/023_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_077.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -30C_275
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/025_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_081.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -30C_280
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/026_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_082.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -30C_283
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/027_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_083.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -30C_285
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/028_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_085.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -30C_287
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/029_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_086.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: -30C_290
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/030_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_088.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0C_265
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/039_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_100.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0C_270
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/040_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_101.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0C_275
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/041_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_102.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0C_280
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/042_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_103.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0C_283
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/043_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_104.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0C_285
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/044_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_105.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0C_287
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/045_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_106.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 0C_290
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/046_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_107.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 10C_265
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/047_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_108.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 10C_270
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/049_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_112.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 10C_275
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/050_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_113.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 10C_280
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/051_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_114.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 10C_283
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/052_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_115.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 10C_285
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/053_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_116.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 10C_287
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/054_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_117.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 10C_290
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/055_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_120.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 20C_265
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/058_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_126.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 20C_270
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/060_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_129.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 20C_275
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/061_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_130.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 20C_280
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/062_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_131.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 20C_283
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/063_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_132.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 20C_285
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/064_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_133.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 20C_287
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/065_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_134.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 20C_290
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/066_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_135.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 30C_265
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/068_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_140.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 30C_270
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/069_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_141.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 30C_275
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/070_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_142.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 30C_280
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/075_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_152.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 30C_283
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/071_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_144.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 30C_285
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/072_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_145.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 30C_287
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/073_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_146.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null
+- id: 30C_290
+  branch: tb
+  science_files:
+  - "raw_data/\u5907\u4EFD/072/sample/074_observe.dat"
+  hk_files:
+  - "raw_data/\u5907\u4EFD/072/hk/ecu_1_151.hk"
+  aux_files: []
+  metadata: {}
+  use: true
+  channels: null

@@ -18,21 +18,24 @@ class _StrictBase(BaseModel):
 
 
 class FitRangeSet(_StrictBase):
-    """One fit-range file: measurement_id -> [ [lo,hi] x4 channels ].
+    """One fit-range file: measurement_id -> [ range x4 channels ].
 
-    Each measurement must define exactly 4 channels of 2-element ranges, the
-    same shape the legacy ``fit_range.json`` used (list of 4 ``[lo, hi]``).
+    Each measurement defines exactly 4 channel ranges; any of them may be
+    ``null`` (that channel is not fitted for this measurement), the same shape
+    the legacy ``fit_range.json`` used (list of 4 ``[lo, hi]`` or ``None``).
     """
 
-    measurements: Dict[str, List[List[float]]]
+    measurements: Dict[str, List[Optional[List[float]]]]
 
     @field_validator("measurements")
     @classmethod
-    def _check_shape(cls, v: Dict[str, List[List[float]]]) -> Dict[str, List[List[float]]]:
+    def _check_shape(cls, v: Dict[str, List[Optional[List[float]]]]) -> Dict[str, List[Optional[List[float]]]]:
         for mid, ranges in v.items():
             if len(ranges) != 4:
                 raise ValueError(f"measurement {mid!r} must define exactly 4 channels, got {len(ranges)}")
             for ch, r in enumerate(ranges):
+                if r is None:
+                    continue
                 if len(r) != 2:
                     raise ValueError(f"measurement {mid!r} channel {ch} range must be [lo, hi], got {r}")
                 lo, hi = r
@@ -70,6 +73,8 @@ class TBParams(_StrictBase):
     tb_fit_p0: Optional[List[float]] = None
     tb_fit_maxfev: int = 10000
     bias_min_filter: Optional[float] = None
+    # explicit file_map (12B-style) instead of a directory scan, manifest-relative
+    tb_file_map: Optional[str] = None
 
 
 class ECParams(_StrictBase):

@@ -1,0 +1,47 @@
+version: 12B
+branch: ec_source
+measurements:
+- id: 0611_Na22_10min_240f0032.dat
+  branch: ec_source
+  science_files:
+  - "raw_data/\u653E\u5C04\u6E90/072/0611_Na22_10min_240f0032.dat"
+  hk_files: []
+  aux_files:
+  - "raw_data/\u653E\u5C04\u6E90/072/0611env.dat"
+  metadata:
+    energy: 511.004
+  use: true
+  channels: null
+- id: 0611_Cs137_30min_240f0064.dat
+  branch: ec_source
+  science_files:
+  - "raw_data/\u653E\u5C04\u6E90/072/0611_Cs137_30min_240f0064.dat"
+  hk_files: []
+  aux_files:
+  - "raw_data/\u653E\u5C04\u6E90/072/0611env.dat"
+  metadata:
+    energy: 661.657
+  use: true
+  channels: null
+- id: 0611_Co60_25min_240f0032.dat
+  branch: ec_source
+  science_files:
+  - "raw_data/\u653E\u5C04\u6E90/072/0611_Co60_25min_240f0032.dat"
+  hk_files: []
+  aux_files:
+  - "raw_data/\u653E\u5C04\u6E90/072/0611env.dat"
+  metadata:
+    energy: 1332.492
+  use: true
+  channels: null
+- id: 0611_Am241_12min_240f0032.dat
+  branch: ec_source
+  science_files:
+  - "raw_data/\u653E\u5C04\u6E90/072/0611_Am241_12min_240f0032.dat"
+  hk_files: []
+  aux_files:
+  - "raw_data/\u653E\u5C04\u6E90/072/0611env.dat"
+  metadata:
+    energy: 59.5409
+  use: true
+  channels: null

@@ -36,7 +36,15 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
 
     if branch == "tb":
         pb = rt.payload.tb
-        read = file_lib.Read_config(abspath(m.science_files[-1]), ending=pb.reader)
+        kwarg: dict = {}
+        if m.hk_files:
+            kwarg["hk_path"] = abspath(m.hk_files[-1])
+        if m.metadata.get("sci_half"):
+            kwarg["sci_half"] = m.metadata["sci_half"]
+        if m.metadata.get("hk_bias") is not None:
+            kwarg["hk_bias"] = m.metadata["hk_bias"]
+        read = file_lib.Read_config(abspath(m.science_files[-1]), ending=pb.reader,
+                                    kwarg=kwarg)
         bkg = file_lib.Read_config()
         spec = file_lib.Spectrum_config(bin_width=pb.bin_width, adc_max=pb.adc_max)
         fit = file_lib.Fit_config(rt.fit_range(branch, m.id), rt.bkg_form(branch, m.id))

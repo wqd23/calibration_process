@@ -36,6 +36,9 @@ ec:
     0827_10C_285_Cs137_20m_0x010F.txt: 662.0
   resolution_method: polyfit
   channel_count: 4
+  xray_bkg_rotation: circle
   xray_drop_energies:
   - 65keV
-  xray_bkg_rotation: circle
+  xray_drop_old: false
+  xray_require_hk: false
+  xray_require_fit_range: false

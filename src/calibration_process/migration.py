@@ -69,34 +69,38 @@ def migrate_version(ver: str, config_root: Path = None) -> None:
 
 def _build_payload(ver, cfg, params, energy) -> dict:
     tb, ec = params["tb"], params["ec"]
-    return {
-        "version": ver,
-        "tb": {
-            "reader": tb["reader"],
-            "bin_width": tb["bin_width"],
-            "adc_max": tb["adc_max"],
-            "science_dir": tb["science_dir"],
-            "fit_range_file": "fit_range_tb.yaml",
-        },
-        "ec": {
-            "reader": ec["reader"],
-            "bin_width": ec["bin_width"],
-            "adc_max": ec["adc_max"],
-            "x_path": ec["x_path"],
-            "src_path": ec["src_path"],
-            "energy_split_low": ec["energy_split_low"],
-            "energy_split_high": ec["energy_split_high"],
-            "ref_temp": ec["ref_temp"],
-            "ref_bias": ec["ref_bias"],
-            "tb_ref_path": ec["tb_ref_path"],
-            "fit_range_file": "fit_range_ec_xray.yaml",
-            "energy_map": dict(energy),
-            "resolution_method": ec["resolution_method"],
-            "channel_count": ec["channel_count"],
-            "xray_drop_energies": ec["xray_drop_energies"],
-            "xray_bkg_rotation": ec["xray_bkg_rotation"],
-        },
+    tb_out = {
+        "reader": tb["reader"],
+        "bin_width": tb["bin_width"],
+        "adc_max": tb["adc_max"],
+        "science_dir": tb["science_dir"],
+        "fit_range_file": "fit_range_tb.yaml",
     }
+    for k in ("tb_fit_p0", "tb_fit_maxfev", "bias_min_filter", "tb_file_map"):
+        if tb.get(k) is not None:
+            tb_out[k] = tb[k]
+    ec_out = {
+        "reader": ec["reader"],
+        "bin_width": ec["bin_width"],
+        "adc_max": ec["adc_max"],
+        "x_path": ec["x_path"],
+        "src_path": ec["src_path"],
+        "energy_split_low": ec["energy_split_low"],
+        "energy_split_high": ec["energy_split_high"],
+        "ref_temp": ec["ref_temp"],
+        "ref_bias": ec["ref_bias"],
+        "tb_ref_path": ec["tb_ref_path"],
+        "fit_range_file": "fit_range_ec_xray.yaml",
+        "energy_map": dict(energy),
+        "resolution_method": ec["resolution_method"],
+        "channel_count": ec["channel_count"],
+        "xray_bkg_rotation": ec["xray_bkg_rotation"],
+    }
+    for k in ("xray_drop_energies", "xray_drop_old", "xray_require_hk",
+              "xray_require_fit_range", "src_bkg_map"):
+        if ec.get(k) is not None:
+            ec_out[k] = ec[k]
+    return {"version": ver, "tb": tb_out, "ec": ec_out}
 
 
 def _build_analysis(bkg_form, params) -> dict:
@@ -115,7 +119,16 @@ def _build_analysis(bkg_form, params) -> dict:
     return branches
 
 
+# per-version parameter table (reader, scientific params, file-selection rules)
 def _scan_tb_ids(ver, cfg) -> list:
+    if ver == "12B":
+        from .workflows.versions.v12B import EXCLUDE
+        import json
+        tm = json.load(open(cfg["tb"]["file_map"].replace("{ver}", ver)))
+        return sorted(
+            f"{p['temp_setpoint_C']}C_{p['bias_code']}"
+            for p in tm if (p["temp_setpoint_C"], p["bias_code"]) not in EXCLUDE
+        )
     full = Path(cfg["tb"]["path"])
     files = [f for f in os.listdir(full) if os.path.splitext(f)[1] == ".txt"]
     for excl in v09.TB_EXCLUDE:
@@ -123,7 +136,19 @@ def _scan_tb_ids(ver, cfg) -> list:
     return files
 
 
-def _scan_ec_xray_ids(ver, cfg) -> list:
+def _scan_ec_source_ids(ver) -> list:
+    if ver == "12B":
+        from .workflows.versions.v12B import SRC_LIST
+        return list(SRC_LIST)
+    return list(v09.SRC_LIST)
+
+
+def _scan_ec_xray_ids(ver, cfg, fit_range) -> list:
+    if ver == "12B":
+        full = Path(cfg["ec"]["x_path"])
+        x_ch = [f for f in os.listdir(full) if f.endswith(".dat") and "_ch" in f and "old" not in f]
+        energies = sorted({f.split("_")[1] for f in x_ch}, key=int)
+        return [e for e in energies if e in fit_range]
     full = Path(cfg["ec"]["x_path"])
     x_ch = [f for f in os.listdir(full) if "_ch" in f and "65keV_" not in f]
     return sorted({f.split("_")[0] for f in x_ch})
@@ -132,35 +157,76 @@ def _scan_ec_xray_ids(ver, cfg) -> list:
 def _params(ver: str, cfg: dict) -> dict:
     tb = cfg["tb"]
     ec = cfg["ec"]
-    return {
-        "selected_ids": {
-            "tb": _scan_tb_ids(ver, cfg),
-            "ec_source": list(v09.SRC_LIST),
-            "ec_xray": _scan_ec_xray_ids(ver, cfg),
-        },
-        "tb": {
-            "reader": "09", "bin_width": 6, "adc_max": 65535.0,
-            "science_dir": _rel(tb["path"]),
-        },
-        "ec": {
-            "reader": "09", "bin_width": 10, "adc_max": 65535.0,
-            "x_path": _rel(ec["x_path"]), "src_path": _rel(ec["src_path"]),
-            "energy_split_low": 49.0, "energy_split_high": 55.0,
-            "ref_temp": 25.0, "ref_bias": 28.5,
-            "tb_ref_path": _rel(ec["tb_result_path"]),
-            "resolution_method": "polyfit", "channel_count": 4,
-            "xray_drop_energies": ["65keV"], "xray_bkg_rotation": "circle",
-        },
-        "analysis": {
-            "tb": {"default_bkg": "lin"},
-            "ec_source": {"default_bkg": "lin"},
-            "ec_xray": {"default_bkg": None},
-        },
-    }
+    return _PARAMS[ver](ver, cfg, tb, ec)
+
+
+_P09 = {
+    "selected_ids": None,  # filled per-version below via scan
+    "tb": {"reader": "09", "bin_width": 6, "adc_max": 65535.0},
+    "ec": {
+        "reader": "09", "bin_width": 10, "adc_max": 65535.0,
+        "energy_split_low": 49.0, "energy_split_high": 55.0,
+        "ref_temp": 25.0, "ref_bias": 28.5,
+        "resolution_method": "polyfit", "channel_count": 4,
+        "xray_drop_energies": ["65keV"], "xray_bkg_rotation": "circle",
+        "xray_drop_old": False, "xray_require_hk": False,
+        "xray_require_fit_range": False,
+    },
+    "analysis": {"tb": {"default_bkg": "lin"},
+                 "ec_source": {"default_bkg": "lin"},
+                 "ec_xray": {"default_bkg": None}},
+}
+
+
+def _p09(ver, cfg, tb, ec):
+    p = dict(_P09)
+    p["tb"] = {**_P09["tb"], "science_dir": _rel(tb["path"])}
+    p["ec"] = {**_P09["ec"], "x_path": _rel(ec["x_path"]), "src_path": _rel(ec["src_path"]),
+               "tb_ref_path": _rel(ec["tb_result_path"])}
+    p["selected_ids"] = {"tb": _scan_tb_ids(ver, cfg),
+                         "ec_source": _scan_ec_source_ids(ver),
+                         "ec_xray": _scan_ec_xray_ids(ver, cfg, json.load(open(_load(ver, "fit_range.json"))))}
+    return p
+
+
+_P12B = {
+    "tb": {"reader": "12b", "bin_width": 6, "adc_max": 16384.0,
+           "tb_fit_p0": [-0.02, 0.07, 24.4, -35.0, -1000.0],
+           "tb_fit_maxfev": 100000, "bias_min_filter": 27.25,
+           "science_dir": "raw_data", "tb_file_map": "single_process/tb_file_map.json"},
+    "ec": {
+        "reader": "12b", "bin_width": 4, "adc_max": 16384.0,
+        "energy_split_low": 49.0, "energy_split_high": 55.0,
+        "ref_temp": 25.0, "ref_bias": 28.5,
+        "resolution_method": "polyfit", "channel_count": 4,
+        "xray_drop_old": True, "xray_require_hk": True, "xray_require_fit_range": True,
+        "xray_bkg_rotation": "fixed",
+    },
+    "analysis": {"tb": {"default_bkg": "lin"},
+                 "ec_source": {"default_bkg": "lin"},
+                 "ec_xray": {"default_bkg": None}},
+}
+
+
+def _p12b(ver, cfg, tb, ec):
+    p = dict(_P12B)
+    p["ec"] = {**_P12B["ec"], "x_path": _rel(ec["x_path"]), "src_path": _rel(ec["src_path"]),
+               "tb_ref_path": _rel(ec["tb_result_path"])}
+    p["selected_ids"] = {"tb": _scan_tb_ids(ver, cfg),
+                         "ec_source": _scan_ec_source_ids(ver),
+                         "ec_xray": _scan_ec_xray_ids(ver, cfg, json.load(open(_load(ver, "fit_range.json"))))}
+    return p
+
+
+def _load(ver, name):
+    return f"data/{ver}/single_process/{name}"
+
+
+_PARAMS = {"09": _p09, "12B": _p12b}
 
 
 def main():
-    for ver in ["09"]:
+    for ver in ["09", "12B"]:
         migrate_version(ver)
 
 

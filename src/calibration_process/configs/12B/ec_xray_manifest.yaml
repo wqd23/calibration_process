@@ -1,0 +1,185 @@
+version: 12B
+branch: ec_xray
+measurements:
+- id: '20'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/171_20_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/172_20_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/170_20_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/169_20_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 20.0
+  use: true
+  channels: null
+- id: '25'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/167_25_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/168_25_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/166_25_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/165_25_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 25.0
+  use: true
+  channels: null
+- id: '30'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/163_30_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/164_30_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/162_30_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/161_30_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 30.0
+  use: true
+  channels: null
+- id: '35'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/159_35_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/160_35_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/158_35_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/157_35_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 35.0
+  use: true
+  channels: null
+- id: '40'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/088_40_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/089_40_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/091_40_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/090_40_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 40.0
+  use: true
+  channels: null
+- id: '45'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/093_45_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/094_45_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/096_45_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/095_45_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 45.0
+  use: true
+  channels: null
+- id: '51'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/105_51_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/106_51_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/108_51_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/107_51_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 51.0
+  use: true
+  channels: null
+- id: '53'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/109_53_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/110_53_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/114_53_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/111_53_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 53.0
+  use: true
+  channels: null
+- id: '55'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/115_55_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/116_55_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/118_55_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/117_55_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 55.0
+  use: true
+  channels: null
+- id: '60'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/119_60_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/120_60_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/122_60_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/121_60_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 60.0
+  use: true
+  channels: null
+- id: '65'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/123_65_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/124_65_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/126_65_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/125_65_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 65.0
+  use: true
+  channels: null
+- id: '70'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/127_70_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/128_70_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/130_70_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/129_70_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 70.0
+  use: true
+  channels: null
+- id: '80'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/136_80_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/137_80_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/139_80_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/138_80_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 80.0
+  use: true
+  channels: null
+- id: '100'
+  branch: ec_xray
+  science_files:
+  - "raw_data/X\u5149\u673A/072/146_100_ch0.dat"
+  - "raw_data/X\u5149\u673A/072/148_100_ch1.dat"
+  - "raw_data/X\u5149\u673A/072/150_100_ch2.dat"
+  - "raw_data/X\u5149\u673A/072/149_100_ch3.dat"
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 100.0
+  use: true
+  channels: null
