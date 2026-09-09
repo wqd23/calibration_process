@@ -210,6 +210,36 @@ calib all {ver}
 `docs/{载荷族}/data.md` 里（如 `docs/12B_13B/data.md`；其余载荷见
 `docs/payloads_data.md`）。
 
+## 回归策略：本地 .oracle + git 内小体积 Golden Test
+
+回归分两层，**基准都是 legacy（旧实现）产物**，绝不用当前版本输出当基准（自我验证发现不了重构引入的偏差）：
+
+1. **本地冻结 oracle（不入库）**：`just oracle {ver}` 会把旧实现的产物快照到
+   `.oracle/{ver}/`（flat 布局：`TB_fit_result`/`EC_fit_result`/`single_fit_fig`/
+   `tb_logs`/`ec_logs`）。`tests/test_pipeline_run.py` 用 `calib all` 的完整输出逐项
+   与 `.oracle` 比对（pickle/json/npy + 图），`.oracle` 存在就跑、缺失则 skip。
+   `.oracle/` 与 `.new/` 都在 `.gitignore`，仅本机有效，无法入库。
+2. **git 内小数据 Golden（自包含、全新 clone 可跑、零 raw 依赖）**：
+   `tests/golden/` 提交 ≈240KB 的精简真实点 + 冻结系数，`tests/test_golden.py`
+   在测试时重建点→跑全局拟合→对齐系数。覆盖编排层行为差异与全局拟合：
+   - `single_run_spec`（tb / ec_source / ec_xray 单文件 / 多文件 circle vs fixed
+     旋转、hk/sci_half/hk_bias 透传），全 8 版本冒烟；
+   - `global_tb`：09 curvefit、11B lmfit、12B bias filter；
+   - `global_ec`：09 polyfit(4ch)、03B lmfit、11B 3ch（channel_count=3）。
+   - 04（exprfit 分辨率）/10B（3ch）不做全局 golden：legacy 对这些版本没产出
+     EC 全局系数，无权威基准；它们由 `tests/test_stages.py` 单测覆盖。
+   - 重新生成：`python scripts/gen_golden.py`（需先跑一次 `calib fit` 填 store，
+     再执行；脚本 docstring 写明步骤）。golden 的 `.npy` 靠 `.gitignore` 里
+     `!tests/golden/**/*.npy` 例外被提交。
+
+已知的三处「新 vs legacy」差异均为**非科学结果**差异，已在 `tests/compare.py`/
+`tests/test_pipeline_run.py` 里显式豁免并注明原因：
+- `qa_flag`：新流程计算并落盘（QA 元数据），legacy pickle 没存；其余科学字段逐字节一致。
+- legacy **EC** pickle 用 dill 绑定了已删除的 `operation.py`（含 `ref_bias`/`ref_temp`），
+  新包无法反序列化；EC 科学一致性改由全局 `ec_logs` 的 json/npy 比对承载。
+- legacy 存档单拟合图可能含历史陈旧图（如 12B 被弃用的 `15` 点），图对比只要求
+  新图 ⊆ legacy 且形状一致。
+
 ## 迁移与合法性提醒
 
 - 本次已从 legacy（`operation.py`/`cmd.py`/`process.py`/`config.json` 等）迁到

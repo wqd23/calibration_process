@@ -87,6 +87,11 @@ def compare_fit_result(new_fr, legacy_fr, kind):
         for k in nf:
             if k == "bkg":
                 continue  # bkg holds a lambda; compared separately
+            if k == "qa_flag" and lf.get(k) is None:
+                # qa_flag is QA metadata added by the refactor; the frozen legacy
+                # pickles do not record it.  All scientific fields match exactly,
+                # so this is a benign added-field, not a result change.
+                continue
             vn, vl = nf.get(k), lf.get(k)
             if isinstance(vn, (np.ndarray, list)) or isinstance(vl, (np.ndarray, list)):
                 assert_array_equal(vn, vl, kind, f"fit.ch{ch}.{k}")

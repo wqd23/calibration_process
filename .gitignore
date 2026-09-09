@@ -17,6 +17,11 @@ raw_data
 *.png
 *.pickle
 
+# committed golden fixtures (override the binary-artifact ignores above)
+!tests/golden/**/*.npy
+!tests/golden/**/*.png
+!tests/golden/**/*.pickle
+
 # cache data
 .cache
 .coverage
