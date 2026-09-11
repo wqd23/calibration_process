@@ -2,7 +2,7 @@ from ..packet_parser import parse_grid_data_new
 from addict import Dict
 from pathlib import Path
 from ..reader11.tb_cut import tel_cut
-from ..l1_cache import with_l1_cache
+from ..l1_cache import with_l1_cache, get_l2_processed
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
 
@@ -36,10 +36,8 @@ def getHK(sciFile):
     hkFile = hkFile[0]
     return hkFile
 
-def single_read11(path:str, mode='wf', **kwargs):
-    observe_name = path
-    hk_name = getHK(observe_name)
-    wf_data_l = readSci(observe_name, mode=mode, overwrite_cache=kwargs.get('overwrite_cache', False))
+def _single_read11_impl(path, mode, hk_name, overwrite):
+    wf_data_l = readSci(path, mode=mode, overwrite_cache=overwrite)
     hk_data = readHK(hk_name)
     sciExtracted, telExtracted = wf_data_l, hk_data
     
@@ -69,4 +67,15 @@ def single_read11(path:str, mode='wf', **kwargs):
             sciExtracted[k] = [v[sciExtracted.channel_n == i] for i in range(4)]
     del n
 
+    sciExtracted.pop('waveform_data', None)
     return sciExtracted, telExtracted
+
+
+def single_read11(path: str, mode='wf', **kwargs):
+    overwrite = kwargs.get('overwrite_cache', False)
+
+    def process():
+        return _single_read11_impl(path, mode, getHK(path), overwrite)
+
+    return get_l2_processed("11B", "11b", path, {"mode": mode}, process,
+                            overwrite=overwrite)

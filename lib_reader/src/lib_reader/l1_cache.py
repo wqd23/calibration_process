@@ -286,19 +286,23 @@ def _classify_section(d: dict):
     shape) and empty/scalar descriptors. Raises for anything unsupported."""
     channel = {}
     flat = {}
+    flat2d = {}
     empties = {}
     for k, v in d.items():
         if isinstance(v, np.ndarray):
-            if v.ndim != 1:
+            if v.ndim == 1:
+                flat.setdefault(v.shape, []).append((k, v))
+            elif v.ndim == 2:
+                flat2d.setdefault(v.shape, []).append((k, v))
+            else:
                 raise ValueError(f"flat key {k!r} has ndim {v.ndim}; cache bails")
-            flat.setdefault(v.shape, []).append((k, v))
         elif isinstance(v, list):
             if len(v) == 0:
                 empties[k] = {"kind": "empty_list"}
             elif len(v) == 4 and all(isinstance(x, (np.ndarray, list)) for x in v):
                 arrs = [np.asarray(x) for x in v]
-                if any(a.ndim == 0 for a in arrs):
-                    raise ValueError(f"channel key {k!r} has 0-d entries; cache bails")
+                if any(a.ndim != 1 for a in arrs):
+                    raise ValueError(f"channel key {k!r} has ndim != 1; cache bails")
                 sublens = tuple(int(a.shape[0]) for a in arrs)
                 channel.setdefault(sublens, []).append((k, arrs))
             else:
@@ -307,7 +311,7 @@ def _classify_section(d: dict):
             empties[k] = {"kind": "none"}
         else:
             raise ValueError(f"key {k!r} type {type(v).__name__}; cache bails")
-    return channel, flat, empties
+    return channel, flat, flat2d, empties
 
 
 def serialize_processed(result):
@@ -323,7 +327,7 @@ def serialize_processed(result):
     section_d = {}
     section_meta = {}
     for name, d in zip(("sci", "tel"), result):
-        channel, flat, empties = _classify_section(d)
+        channel, flat, flat2d, empties = _classify_section(d)
         frames = []
         for i, (sublens, items) in enumerate(channel.items()):
             cols = {}
@@ -355,6 +359,17 @@ def serialize_processed(result):
             frames.append({
                 "file": fname,
                 "kind": "flat",
+                "shape": [int(x) for x in shape],
+                "keys": [k for k, _ in items],
+                "dtypes": {k: str(v.dtype) for k, v in items},
+            })
+        for i, (shape, items) in enumerate(flat2d.items()):
+            cols = {k: [v[j] for j in range(v.shape[0])] for k, v in items}
+            fname = f"{name}__flat2d__{i}.parquet"
+            section_d[fname] = cols
+            frames.append({
+                "file": fname,
+                "kind": "flat2d",
                 "shape": [int(x) for x in shape],
                 "keys": [k for k, _ in items],
                 "dtypes": {k: str(v.dtype) for k, v in items},

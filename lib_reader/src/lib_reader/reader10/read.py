@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ..packet_parser import parse_grid_data_new
 from .tb_cut import tel_cut
-from ..l1_cache import with_l1_cache
+from ..l1_cache import with_l1_cache, get_l2_processed
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
 
@@ -35,11 +35,8 @@ def readHK(path):
     return _readHK_impl(path)
 
 
-def single_read10(path: str, **kwargs):
-    observe_name = path
-    hk_name = observe_name.replace('observe', 'hk')
-    overwrite = kwargs.get('overwrite_cache', False)
-    wf_data_l = readSci(observe_name, overwrite_cache=overwrite)
+def _single_read10_impl(path, hk_name, overwrite):
+    wf_data_l = readSci(path, overwrite_cache=overwrite)
     hk_data = readHK(hk_name, overwrite_cache=overwrite)
     sciExtracted, telExtracted = wf_data_l, hk_data
 
@@ -69,4 +66,14 @@ def single_read10(path: str, **kwargs):
     # time cut
     telExtracted = tel_cut(sciExtracted, telExtracted, path)
 
+    sciExtracted.pop('waveform_data', None)
     return sciExtracted, telExtracted
+
+
+def single_read10(path: str, **kwargs):
+    overwrite = kwargs.get('overwrite_cache', False)
+
+    def process():
+        return _single_read10_impl(path, path.replace('observe', 'hk'), overwrite)
+
+    return get_l2_processed("10B", "10b", path, {}, process, overwrite=overwrite)

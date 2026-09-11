@@ -27,7 +27,7 @@ import numpy as np
 from addict import Dict
 
 from ..packet_parser import parse_grid_data_new
-from ..l1_cache import with_l1_cache
+from ..l1_cache import with_l1_cache, get_l2_processed
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
 
@@ -79,11 +79,9 @@ def getHK(sciFile):
     raise FileNotFoundError(f"HK file for {sciFile} does not exist.")
 
 
-def single_read12(path: str, mode="ft", hk_path=None, hk_bias=None, sci_half=None, **kwargs):
-    observe_name = path
-    hk_name = Path(hk_path) if hk_path else getHK(observe_name)
-    sciExtracted = readSci(observe_name, mode=mode, overwrite_cache=kwargs.get("overwrite_cache", False))
-    telExtracted = readHK(str(hk_name), overwrite_cache=kwargs.get("overwrite_cache", False))
+def _single_read12_impl(path, mode, hk_name, hk_bias, sci_half, overwrite):
+    sciExtracted = readSci(path, mode=mode, overwrite_cache=overwrite)
+    telExtracted = readHK(str(hk_name), overwrite_cache=overwrite)
 
     # keep only one half of the events in file order (file order == time
     # order; the 32-bit timestamp wraps on long runs, so index is the robust
@@ -144,4 +142,21 @@ def single_read12(path: str, mode="ft", hk_path=None, hk_bias=None, sci_half=Non
             sciExtracted[k] = [v[sciExtracted.channel_n == i] for i in range(4)]
     del n
 
+    sciExtracted.pop("waveform_data", None)
     return sciExtracted, telExtracted
+
+
+def single_read12(path: str, mode="ft", hk_path=None, hk_bias=None, sci_half=None, **kwargs):
+    overwrite = kwargs.get("overwrite_cache", False)
+    params = {
+        "mode": mode,
+        "hk_path": None if hk_path is None else str(hk_path),
+        "hk_bias": hk_bias,
+        "sci_half": sci_half,
+    }
+
+    def process():
+        hk_name = Path(hk_path) if hk_path else getHK(path)
+        return _single_read12_impl(path, mode, hk_name, hk_bias, sci_half, overwrite)
+
+    return get_l2_processed("12B", "12b", path, params, process, overwrite=overwrite)
