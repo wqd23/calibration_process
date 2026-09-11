@@ -55,7 +55,7 @@ def readSci(path, mode="ft"):
     return _readSci_impl(path, mode=mode)
 
 
-@with_l1_cache(ver="12B", reader="12b", kind="tel")
+@with_l1_cache(ver="12B", reader="12b", kind="hk")
 def readHK(path):
     return _readHK_impl(path)
 

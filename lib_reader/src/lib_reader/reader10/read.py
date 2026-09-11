@@ -30,7 +30,7 @@ def readSci(path):
     return _readSci_impl(path)
 
 
-@with_l1_cache(ver="10B", reader="10b", kind="tel")
+@with_l1_cache(ver="10B", reader="10b", kind="hk")
 def readHK(path):
     return _readHK_impl(path)
 

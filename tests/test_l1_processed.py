@@ -122,9 +122,9 @@ def test_miss_then_hit(tmp_path):
     assert calls["n"] == 1, "second call must hit the cache"
     _assert_pair_equal(a, b, "miss_hit")
 
-    index = json.loads((l1_cache._cache_root("L1TEST") / "index.json").read_text())
+    index = json.loads((l1_cache._l2_root("L1TEST") / "index.json").read_text())
     rec = next(r for r in index if r["raw_ptr"] == p and r["kind"] == "single")
-    assert (l1_cache._cache_root("L1TEST") / "cache" / rec["key"] / "meta.json").exists()
+    assert (l1_cache._l2_root("L1TEST") / rec["key"] / "meta.json").exists()
 
 
 def test_overwrite_forces_recompute(tmp_path):
@@ -151,9 +151,9 @@ def test_corrupt_falls_back(tmp_path):
 
     p = str(tmp_path / "corrupt.dat")
     a = read(p)
-    index = json.loads((l1_cache._cache_root("L1TEST") / "index.json").read_text())
+    index = json.loads((l1_cache._l2_root("L1TEST") / "index.json").read_text())
     rec = next(r for r in index if r["raw_ptr"] == p and r["kind"] == "single")
-    files = list((l1_cache._cache_root("L1TEST") / "cache" / rec["key"]).glob("*.parquet"))
+    files = list((l1_cache._l2_root("L1TEST") / rec["key"]).glob("*.parquet"))
     assert files
     files[0].write_bytes(b"\x00garbage")
     b = read(p)

@@ -21,7 +21,7 @@ def _readHK_impl(path):
 def readSci(path, mode='wf'):
     return _readSci_impl(path, mode=mode)
 
-@with_l1_cache(ver="11B", reader="11b", kind="tel")
+@with_l1_cache(ver="11B", reader="11b", kind="hk")
 def readHK(path):
     return _readHK_impl(path)
 

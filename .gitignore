@@ -27,6 +27,8 @@ raw_data
 .coverage
 .pytest_cache
 data/*/l1_cache/
+data/*/l1/
+data/*/l2/
 
 # result
 tb_logs/

@@ -160,8 +160,8 @@ def test_l1_miss_then_hit(monkeypatch, tmp_path):
 
     index = json.loads((l1_cache._cache_root("12B") / "index.json").read_text())
     rec = next(r for r in index if r["raw_ptr"] == fake_path and r["kind"] == "sci")
-    assert (l1_cache._cache_root("12B") / "cache" / rec["key"] / "meta.json").exists()
-    assert (l1_cache._cache_root("12B") / "cache" / rec["key"] / "events.parquet").exists()
+    assert (l1_cache._cache_root("12B") / rec["key"] / "sci.meta.json").exists()
+    assert (l1_cache._cache_root("12B") / rec["key"] / "sci.parquet").exists()
 
 
 def test_overwrite_cache_forces_reparse(monkeypatch, tmp_path):

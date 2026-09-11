@@ -1,12 +1,15 @@
 # -*- coding:utf-8 -*-
-"""Unified frame-based reader for the GRID 04/07/09 (hexprint text) payloads.
+"""Unified reader for the GRID 04/07/09 (hexprint text) payloads.
 
-These three payloads share one packet format and one reader; the only
-differences are two per-payload constants (``internal_resistance`` and the
-``iMon`` scale divisor).  The byte stream is decoded by the shared
-``packet_parser`` (``reader07/grid_packet.xml``) and post-processed here into
-the same ``(sci, tel)`` dicts the legacy ``gridBasicFunctions02.dataReadout``
-produced, so the scientific output is unchanged.
+Decoding (L1) and processing (L2) are split:
+
+* :func:`_read_sci_frames` / :func:`_read_tel_frames` flatten the parsed packets
+  into one row per particle / per telemetry sample (faithful L1 frames);
+* :func:`frames_to_processed` reproduces the legacy ``single_read_hex``
+  ``(sci, tel)`` output from those frames.
+
+The three payloads share one packet format; the only differences are two
+per-payload constants (``internal_resistance`` and the ``iMon`` scale divisor).
 """
 from pathlib import Path
 
@@ -15,10 +18,13 @@ import numpy as np
 from ..packet_parser import parse_grid_data_new
 from ..frame_io import load_hex_text
 from ..parity_check import crc16_xmodem_nd
+from ..l1_cache import get_l1_frames, get_l2_processed
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
 
 _INTERNAL_FREQ = 24.05e6
+_SUB = 43
+_ROWS_PER_PACKET = _SUB + 1
 
 # per-payload constants (only the science-relevant differences between 04/07/09)
 _PARAMS = {
@@ -36,57 +42,104 @@ def _crc_check(buf, start, nbytes, crc_offset):
     return calc == stored
 
 
-def _read_sci(path, buf):
+def _empty_sci_frames():
+    return {
+        "packet_idx": np.array([], dtype=np.int64),
+        "event_idx": np.array([], dtype=np.int8),
+        "channel": np.array([], dtype=np.uint8),
+        "uscount": np.array([], dtype=np.uint64),
+        "amp": np.array([], dtype=np.uint16),
+        "effective_count": np.array([], dtype=np.int64),
+        "missing_count": np.array([], dtype=np.int64),
+        "crc_check": np.array([], dtype=bool),
+    }
+
+
+def _empty_tel_frames():
+    out = {
+        "crc_check": np.array([], dtype=bool),
+        "utc": np.array([], dtype=np.uint32),
+        "uscount": np.array([], dtype=np.uint64),
+    }
+    for name in ("temp_sipm", "temp_adc", "v_mon", "i_mon"):
+        for i in range(4):
+            out[f"{name}{i}"] = np.array([], dtype=np.uint16)
+    return out
+
+
+def _read_sci_frames(buf):
+    """Decode the science hex stream into one row per particle (primary + 43 sub)."""
     data, index = parse_grid_data_new(
-        path, xml_file=_XML, data_tag="hex_sci_packet", endian="MSB",
-        multi_evt=43, multi_step=11, data=buf,
+        "", xml_file=_XML, data_tag="hex_sci_packet", endian="MSB",
+        multi_evt=_SUB, multi_step=11, data=buf,
     )
-    if index.size == 0:
-        return data, index
-    good = np.array([
-        _crc_check(buf, int(s), 510, int(s) + 510) for s in index[:, 0]
-    ])
-    return data, index[good]
+    if index.size == 0 or np.asarray(data["channel"]).size == 0:
+        return _empty_sci_frames()
+
+    good = np.array([_crc_check(buf, int(s), 510, int(s) + 510) for s in index[:, 0]])
+    n = int(np.asarray(data["channel"]).size)
+    prim_ch = np.asarray(data["channel"]).reshape(n)
+    prim_us = np.asarray(data["uscount"]).reshape(n)
+    prim_amp = np.asarray(data["data_max"]).reshape(n)
+    sub_ch = np.asarray(data["sub_channel"]).reshape(n, _SUB)
+    sub_us = np.asarray(data["sub_uscount"]).reshape(n, _SUB)
+    sub_amp = np.asarray(data["sub_amp"]).reshape(n, _SUB)
+
+    channel = np.concatenate([prim_ch[:, None], sub_ch], axis=1).ravel()
+    uscount = np.concatenate([prim_us[:, None], sub_us], axis=1).ravel()
+    amp = np.concatenate([prim_amp[:, None], sub_amp], axis=1).ravel()
+
+    return {
+        "packet_idx": np.repeat(np.arange(n, dtype=np.int64), _ROWS_PER_PACKET),
+        "event_idx": np.tile(np.arange(_ROWS_PER_PACKET, dtype=np.int8), n),
+        "channel": channel,
+        "uscount": uscount,
+        "amp": amp,
+        "effective_count": np.repeat(
+            np.asarray(data["effective_count"], dtype=np.int64), _ROWS_PER_PACKET),
+        "missing_count": np.repeat(
+            np.asarray(data["missing_count"], dtype=np.int64), _ROWS_PER_PACKET),
+        "crc_check": np.repeat(good.astype(bool), _ROWS_PER_PACKET),
+    }
 
 
-def _read_tel(path, buf):
+def _read_tel_frames(buf):
+    """Decode the telemetry hex stream into one row per sample (7 per packet)."""
     data, index = parse_grid_data_new(
-        path, xml_file=_XML, data_tag="hex_tel_packet", endian="MSB",
+        "", xml_file=_XML, data_tag="hex_tel_packet", endian="MSB",
         multi_evt=7, multi_step=70, data=buf,
     )
-    if index.size == 0:
-        return data, index
-    good = np.array([
-        _crc_check(buf, int(s), 496, int(s) + 496) for s in index[:, 0]
-    ])
-    return data, index[good]
+    if index.size == 0 or np.asarray(data["utc"]).size == 0:
+        return _empty_tel_frames()
+
+    good = np.array([_crc_check(buf, int(s), 496, int(s) + 496) for s in index[:, 0]])
+    out = {
+        "utc": np.asarray(data["utc"], dtype=np.uint32),
+        "uscount": np.asarray(data["uscount"], dtype=np.uint64),
+        "crc_check": np.repeat(good.astype(bool), 7),
+    }
+    for name in ("temp_sipm", "temp_adc", "v_mon", "i_mon"):
+        arr = np.asarray(data[name])
+        for i in range(4):
+            out[f"{name}{i}"] = arr[:, i]
+    return out
 
 
-def single_read_hex(path, internal_resistance, imon_div):
-    """Return ``(sci, tel)`` for a 04/07/09 hexprint file (legacy-shaped)."""
-    buf = load_hex_text(path)
-
-    sci, _ = _read_sci(path, buf)
-    tel, _ = _read_tel(path, buf)
-
+def frames_to_processed(sci_frames, tel_frames, internal_resistance, imon_div):
+    """Reproduce the legacy 04/07/09 ``(sci, tel)`` output from L1 frames."""
     freq = _INTERNAL_FREQ
 
     # ---- science: primary event + 43 sub-events, per channel ----------------
-    # The legacy loop walks each packet in order (primary event first, then its
-    # 43 sub-events), so per-channel order follows packet order.  Reproduce that
-    # order exactly via a stable group-by on the channel index.
-    n = sci["channel"].size
-    sub = 43
-    prim_ch = sci["channel"] + 1
-    prim_amp = sci["data_max"]
-    prim_ts = sci["uscount"] / freq
-    sub_ch = sci["sub_channel"].reshape(n, sub) + 1
-    sub_amp = sci["sub_amp"].reshape(n, sub)
-    sub_ts = sci["sub_uscount"].reshape(n, sub) / freq
+    # Drop packets that failed the per-frame CRC (the legacy reader kept only
+    # the good packet index, so this filter is part of the scientific output).
+    # The legacy loop then walks each packet in order (primary event first, then
+    # its 43 sub-events), so per-channel order follows packet order; reproduce
+    # that order exactly via a stable group-by on the channel index.
+    keep = np.asarray(sci_frames["crc_check"], dtype=bool)
+    all_ch = sci_frames["channel"][keep].astype(np.int64) + 1
+    all_amp = sci_frames["amp"][keep]
+    all_ts = sci_frames["uscount"][keep].astype(np.float64) / freq
 
-    all_ch = np.concatenate([prim_ch[:, None], sub_ch], axis=1).ravel()
-    all_amp = np.concatenate([prim_amp[:, None], sub_amp], axis=1).ravel()
-    all_ts = np.concatenate([prim_ts[:, None], sub_ts], axis=1).ravel()
     valid = (all_ch > 0) & (all_ch < 5)
     all_ch = all_ch[valid]
     all_amp = all_amp[valid].astype(np.int64)
@@ -100,17 +153,27 @@ def single_read_hex(path, internal_resistance, imon_div):
     amp = [amp_sorted[bounds[i]:bounds[i + 1]] for i in range(4)]
     uscount_evt = [ts_sorted[bounds[i]:bounds[i + 1]] for i in range(4)]
 
-    effective_count = np.asarray(sci["effective_count"], dtype=np.int64)
-    missing_count = np.asarray(sci["missing_count"], dtype=np.int64)
+    # one value per packet was repeated on every particle row at L1
+    crc_per_packet = np.asarray(sci_frames["crc_check"], dtype=bool)[::_ROWS_PER_PACKET]
+    eff_per_packet = np.asarray(sci_frames["effective_count"])[::_ROWS_PER_PACKET]
+    miss_per_packet = np.asarray(sci_frames["missing_count"])[::_ROWS_PER_PACKET]
+    effective_count = np.asarray(eff_per_packet[crc_per_packet], dtype=np.int64)
+    missing_count = np.asarray(miss_per_packet[crc_per_packet], dtype=np.int64)
 
     # ---- telemetry: 7 records per packet, 4 channels ------------------------
-    utc = np.asarray(tel["utc"], dtype=np.float64)
-    uscount = np.asarray(tel["uscount"], dtype=np.float64) / freq
+    # Same per-frame CRC filter as the science path.
+    tkeep = np.asarray(tel_frames["crc_check"], dtype=bool)
+    utc = np.asarray(tel_frames["utc"][tkeep], dtype=np.float64)
+    uscount = np.asarray(tel_frames["uscount"][tkeep], dtype=np.float64) / freq
 
-    temp_sipm = np.asarray(tel["temp_sipm"], dtype=np.float64)
-    temp_adc = np.asarray(tel["temp_adc"], dtype=np.float64)
-    v_mon = np.asarray(tel["v_mon"], dtype=np.float64)
-    i_mon = np.asarray(tel["i_mon"], dtype=np.float64)
+    temp_sipm = np.stack(
+        [np.asarray(tel_frames[f"temp_sipm{i}"][tkeep], dtype=np.float64) for i in range(4)], axis=1)
+    temp_adc = np.stack(
+        [np.asarray(tel_frames[f"temp_adc{i}"][tkeep], dtype=np.float64) for i in range(4)], axis=1)
+    v_mon = np.stack(
+        [np.asarray(tel_frames[f"v_mon{i}"][tkeep], dtype=np.float64) for i in range(4)], axis=1)
+    i_mon = np.stack(
+        [np.asarray(tel_frames[f"i_mon{i}"][tkeep], dtype=np.float64) for i in range(4)], axis=1)
 
     temp_sipm = np.where(temp_sipm > 2048, (temp_sipm - 4096) / 16.0, temp_sipm / 16.0)
     temp_adc = np.where(temp_adc > 2048, (temp_adc - 4096) / 16.0, temp_adc / 16.0)
@@ -118,7 +181,6 @@ def single_read_hex(path, internal_resistance, imon_div):
     i_mon = i_mon / 4096.0 * 3.3 / imon_div
     bias = v_mon - i_mon * internal_resistance
 
-    # ---- legacy output shape (data_refactor applies 4-channel split) --------
     sci_extracted = {
         "amp": [np.asarray(amp[i]) for i in range(4)],
         "timestampEvt": [np.asarray(uscount_evt[i]) for i in range(4)],
@@ -140,11 +202,39 @@ def single_read_hex(path, internal_resistance, imon_div):
     return sci_extracted, tel_extracted
 
 
-def single_read07(path):
+def _process(path, ver, internal_resistance, imon_div):
+    buf = load_hex_text(path)
+    frames = get_l1_frames(ver, ver, path, {
+        "sci": lambda: _read_sci_frames(buf),
+        "tl": lambda: _read_tel_frames(buf),
+    })
+    return frames_to_processed(
+        frames["sci"], frames["tl"], internal_resistance, imon_div)
+
+
+def single_read_hex(path, internal_resistance, imon_div, ver="07", overwrite_cache=False):
+    """Return ``(sci, tel)`` for a 04/07/09 hexprint file (legacy-shaped)."""
+    params = {"internal_resistance": internal_resistance, "imon_div": imon_div}
+    return get_l2_processed(
+        ver, ver, path, params,
+        lambda: _process(path, ver, internal_resistance, imon_div),
+        overwrite=overwrite_cache,
+    )
+
+
+def single_read07(path, **kwargs):
     p = _PARAMS["07"]
-    return single_read_hex(path, p["internal_resistance"], p["imon_div"])
+    return single_read_hex(path, p["internal_resistance"], p["imon_div"], ver="07",
+                           overwrite_cache=kwargs.get("overwrite_cache", False))
 
 
-def single_read04(path):
+def single_read09(path, **kwargs):
+    p = _PARAMS["09"]
+    return single_read_hex(path, p["internal_resistance"], p["imon_div"], ver="09",
+                           overwrite_cache=kwargs.get("overwrite_cache", False))
+
+
+def single_read04(path, **kwargs):
     p = _PARAMS["04"]
-    return single_read_hex(path, p["internal_resistance"], p["imon_div"])
+    return single_read_hex(path, p["internal_resistance"], p["imon_div"], ver="04",
+                           overwrite_cache=kwargs.get("overwrite_cache", False))
