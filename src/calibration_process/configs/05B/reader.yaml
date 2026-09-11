@@ -1,0 +1,7 @@
+version: "05B"
+engine: grid03b
+readers:
+  normal:
+    handler: single_read05b_normal
+  xray:
+    handler: single_read05b_xray

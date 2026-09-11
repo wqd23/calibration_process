@@ -28,6 +28,8 @@ class Read_config:
     time_cut: Optional[List[List[float]]] = None
     # other param for read_out
     kwarg: dict = field(default_factory=dict)
+    # version-specific reader params (from configs/{ver}/reader.yaml)
+    reader_params: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -105,39 +107,14 @@ class File_operation_05b:
     def __read(
         self, config: Read_config, nocache: bool = False
     ) -> Tuple[Dict[str, Float_array_4channel], Dict[str, Float_array_4channel]]:
-        if config.ending == "normal":
-            data = ver.single_read05b_normal(config.path, overwrite_cache=nocache)
-        elif config.ending == "xray":
-            data = ver.single_read05b_xray(
-                config.path, config.config_file, overwrite_cache=nocache
-            )
-        elif config.ending == "03b":
-            data = ver.single_read03b(
-                config.path, config.config_file, overwrite_cache=nocache
-            )
-        elif config.ending == "03b-src":
-            data = ver.src_read03b(
-                config.path, config.config_file, overwrite_cache=nocache
-            )
-        elif config.ending == "07":
-            data = ver.single_read07(config.path, overwrite_cache=nocache)
-        elif config.ending == "04":
-            data = ver.single_read04(config.path, overwrite_cache=nocache)
-        elif config.ending == "10b":
-            data = ver.single_read10(config.path, overwrite_cache=nocache)
-        elif config.ending == "11b":
-            data = ver.single_read11(
-                config.path, config.kwarg.get("mode", "wf"), overwrite_cache=nocache
-            )
-        elif config.ending == "12b":
-            data = ver.single_read12(
-                config.path, overwrite_cache=nocache, **config.kwarg
-            )
-        elif config.ending == "09":
-            data = ver.single_read09(config.path, overwrite_cache=nocache)
-        else:
+        handler = ver.READERS.get(config.ending)
+        if handler is None:
             raise ValueError(f"ending {config.ending} not supported")
-        if config.time_cut != None:
+        kwargs = dict(config.kwarg)
+        kwargs.update(config.reader_params)
+        kwargs["overwrite_cache"] = nocache
+        data = handler(config.path, config.config_file, **kwargs)
+        if config.time_cut is not None:
             data = self.__time_cut(data, config.time_cut)
         return data
 

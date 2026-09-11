@@ -73,6 +73,10 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
     def abspath(rel: str) -> str:
         return str(data_dir / rel)
 
+    def rc(path: str, ending: str, **kwargs) -> "file_lib.Read_config":
+        params = getattr(rt, "reader_params", lambda _e: {})(ending)
+        return file_lib.Read_config(path, ending=ending, reader_params=params, **kwargs)
+
     if branch == "tb":
         pb = rt.payload.tb
         kwarg: dict = {}
@@ -82,9 +86,8 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
             kwarg["sci_half"] = m.metadata["sci_half"]
         if m.metadata.get("hk_bias") is not None:
             kwarg["hk_bias"] = m.metadata["hk_bias"]
-        read = file_lib.Read_config(abspath(m.science_files[-1]), ending=pb.reader,
-                                    kwarg=kwarg)
-        bkg = file_lib.Read_config()
+        read = rc(abspath(m.science_files[-1]), pb.reader, kwarg=kwarg)
+        bkg = rc("", "normal")
         spec = file_lib.Spectrum_config(bin_width=pb.bin_width, adc_max=pb.adc_max)
         fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
         return FileRunSpec(read, bkg, spec, fit)
@@ -92,12 +95,12 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
     if branch == "ec_source":
         pb = rt.payload.ec
         src_reader = pb.src_reader or pb.reader
-        read = file_lib.Read_config(abspath(m.science_files[-1]), ending=src_reader)
+        read = rc(abspath(m.science_files[-1]), src_reader)
         bkg_rel = m.aux_files[-1] if m.aux_files else ""
         bkg = (
-            file_lib.Read_config(abspath(bkg_rel), ending=src_reader)
+            rc(abspath(bkg_rel), src_reader)
             if bkg_rel
-            else file_lib.Read_config("", ending=src_reader)
+            else rc("", src_reader)
         )
         spec = file_lib.Spectrum_config(
             corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
@@ -112,13 +115,13 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
             # rotated (cyclically shifted per channel) time cut
             basename = os.path.basename(m.science_files[-1])
             reader = pb.xray_reader or pb.reader
-            read = file_lib.Read_config(
-                abspath(m.science_files[-1]), ending=reader,
+            read = rc(
+                abspath(m.science_files[-1]), reader,
                 config_file=pb.xray_config_file or "",
                 time_cut=_time_cut(pb, basename),
             )
-            bkg = file_lib.Read_config(
-                abspath(m.science_files[-1]), ending=reader,
+            bkg = rc(
+                abspath(m.science_files[-1]), reader,
                 config_file=pb.xray_config_file or "",
                 time_cut=_bkg_time_cut(pb, basename),
             )
@@ -129,8 +132,7 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
             return FileRunSpec(read, bkg, spec, fit)
 
         reads = [
-            file_lib.Read_config(abspath(f), ending=pb.reader,
-                                 config_file=pb.xray_config_file or "")
+            rc(abspath(f), pb.reader, config_file=pb.xray_config_file or "")
             for f in m.science_files
         ]
         n = pb.channel_count

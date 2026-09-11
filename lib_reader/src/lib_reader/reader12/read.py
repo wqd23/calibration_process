@@ -146,7 +146,7 @@ def _single_read12_impl(path, mode, hk_name, hk_bias, sci_half, overwrite):
     return sciExtracted, telExtracted
 
 
-def single_read12(path: str, mode="ft", hk_path=None, hk_bias=None, sci_half=None, **kwargs):
+def single_read12(path: str, config=None, mode="ft", hk_path=None, hk_bias=None, sci_half=None, **kwargs):
     overwrite = kwargs.get("overwrite_cache", False)
     params = {
         "mode": mode,

@@ -14,7 +14,7 @@ from typing import Dict, List, Optional
 
 import yaml
 
-from .config_schema import AnalysisSchema, FitRangeSet, PayloadSchema
+from .config_schema import AnalysisSchema, FitRangeSet, PayloadSchema, ReaderSchema
 
 
 def _load_yaml(path: Path):
@@ -30,6 +30,7 @@ class RuntimeConfig:
     config_root: Path
     payload: PayloadSchema
     analysis: AnalysisSchema
+    reader: Optional[ReaderSchema] = None
     # branch -> measurement_id -> list-of-4 [lo, hi]
     fit_ranges: Dict[str, Dict[str, List[List[float]]]] = field(default_factory=dict)
     # branch -> measurement_id -> bkg_form (resolved: override or default)
@@ -53,6 +54,18 @@ class RuntimeConfig:
         }[branch]
         return b.default_bkg
 
+    def reader_handler(self, ending: str) -> Optional[str]:
+        """Registry name of the reader handler for ``ending`` (or None)."""
+        if self.reader and ending in self.reader.readers:
+            return self.reader.readers[ending].handler
+        return None
+
+    def reader_params(self, ending: str) -> Dict:
+        """Version-specific reader parameters for ``ending`` (empty if none)."""
+        if self.reader and ending in self.reader.readers:
+            return dict(self.reader.readers[ending].params)
+        return {}
+
 
 def _resolve_bkg(branch: str, analysis: AnalysisSchema) -> Dict[str, Optional[str]]:
     b = {
@@ -71,6 +84,10 @@ def load_runtime(version: str, config_root: Path, data_dir: Path,
     analysis = AnalysisSchema.model_validate(
         _load_yaml(config_root / "analysis.yaml")
     )
+    reader = None
+    reader_path = config_root / "reader.yaml"
+    if reader_path.exists():
+        reader = ReaderSchema.model_validate(_load_yaml(reader_path))
     rt = RuntimeConfig(
         version=version,
         data_dir=data_dir,
@@ -78,6 +95,7 @@ def load_runtime(version: str, config_root: Path, data_dir: Path,
         config_root=config_root,
         payload=payload,
         analysis=analysis,
+        reader=reader,
         energies=dict(payload.ec.energy_map),
     )
     # fit range files: order tb, ec_source, ec_xray

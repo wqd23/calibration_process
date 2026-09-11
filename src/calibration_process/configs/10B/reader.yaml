@@ -1,0 +1,5 @@
+version: "10B"
+engine: grid1x
+readers:
+  "10b":
+    handler: single_read10

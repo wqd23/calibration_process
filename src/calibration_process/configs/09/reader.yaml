@@ -1,0 +1,8 @@
+version: "09"
+engine: hex
+readers:
+  "09":
+    handler: single_read09
+    params:
+      internal_resistance: 1.1
+      imon_div: 1.0

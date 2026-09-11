@@ -1,0 +1,7 @@
+version: "03B"
+engine: grid03b
+readers:
+  "03b":
+    handler: single_read03b
+  "03b-src":
+    handler: src_read03b

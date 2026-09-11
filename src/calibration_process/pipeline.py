@@ -84,18 +84,19 @@ def fit_branch(ver: str, branch: str, nocache: bool = False, out: Path | None = 
     return n
 
 
-def global_tb(ver: str, out: Path | None = None) -> list:
+def build_tb_points(ver: str, out: Path | None = None):
+    """L4: build per-channel TB points from the L3/L2 artefacts."""
     rt = load_rt(ver, out)
     manifest = man.load_manifest(_manifest_path(ver, "tb"))
     items = []
     for m in man.filtered_measurements(manifest):
         fp = stages.load_single_fp_from_store(rt, "tb", m, rt.output_root)
         items.append((m, fp))
-    per_channel = stages.build_tb_points(rt, items)
-    return stages.global_tb(rt, per_channel, rt.output_root / "tb_logs")
+    return rt, stages.build_tb_points(rt, items)
 
 
-def global_ec(ver: str, out: Path | None = None) -> list:
+def build_ec_points(ver: str, out: Path | None = None):
+    """L4: build per-channel EC points (source + xray) from the L3/L2 artefacts."""
     rt = load_rt(ver, out)
     src_items, x_items = [], []
     for branch in ("ec_source", "ec_xray"):
@@ -106,12 +107,52 @@ def global_ec(ver: str, out: Path | None = None) -> list:
             items.append((m, fp))
     src_pts = stages.build_ec_points(rt, src_items, "src")
     x_pts = stages.build_ec_points(rt, x_items, "xray")
+    return rt, src_pts, x_pts
+
+
+def global_tb(ver: str, out: Path | None = None) -> list:
+    rt, per_channel = build_tb_points(ver, out)
+    return stages.global_tb(rt, per_channel, rt.output_root / "tb_logs")
+
+
+def global_ec(ver: str, out: Path | None = None) -> list:
+    rt, src_pts, x_pts = build_ec_points(ver, out)
     return stages.global_ec(rt, src_pts, x_pts, rt.output_root / "ec_logs")
 
 
-def all_version(ver: str, nocache: bool = False, out: Path | None = None) -> None:
+# Declarative step list: L1/L2 are produced together by the reader call (L1
+# faithful frames + L2 processed output), L3 is the single fit, L4 builds the
+# points and L5 runs the global fits.  ``--until`` stops after a given layer.
+STEP_ORDER = ("L1", "L2", "L3", "L4", "L5")
+
+
+def process_version(ver: str, nocache: bool = False, out: Path | None = None) -> None:
+    """L1+L2 only: run the readers for every measurement without fitting."""
+    rt = load_rt(ver, out)
+    for branch in ("tb", "ec_source", "ec_xray"):
+        manifest = man.load_manifest(_manifest_path(ver, branch))
+        for m in man.filtered_measurements(manifest):
+            fc = stages.single_run_spec(rt, branch, m)
+            stages.build_fit_operation(rt, branch, fc, nocache=nocache)
+
+
+def all_version(ver: str, nocache: bool = False, out: Path | None = None,
+                until: str = "L5") -> None:
+    until = until.upper()
+    if until not in STEP_ORDER:
+        raise ValueError(f"unknown layer {until!r}; choose from {STEP_ORDER}")
+    idx = STEP_ORDER.index(until)
+    if idx <= STEP_ORDER.index("L2"):
+        process_version(ver, nocache, out)
+        return
     fit_branch(ver, "tb", nocache, out)
-    global_tb(ver, out)
     fit_branch(ver, "ec-src", nocache, out)
     fit_branch(ver, "ec-xray", nocache, out)
-    global_ec(ver, out)
+    if idx == STEP_ORDER.index("L3"):
+        return
+    rt, tb_points = build_tb_points(ver, out)
+    _rt_ec, src_pts, x_pts = build_ec_points(ver, out)
+    if idx == STEP_ORDER.index("L4"):
+        return
+    stages.global_tb(rt, tb_points, rt.output_root / "tb_logs")
+    stages.global_ec(rt, src_pts, x_pts, rt.output_root / "ec_logs")

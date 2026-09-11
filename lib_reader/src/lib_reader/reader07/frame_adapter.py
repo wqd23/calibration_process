@@ -222,19 +222,22 @@ def single_read_hex(path, internal_resistance, imon_div, ver="07", overwrite_cac
     )
 
 
-def single_read07(path, **kwargs):
+def single_read07(path, config=None, **kwargs):
     p = _PARAMS["07"]
-    return single_read_hex(path, p["internal_resistance"], p["imon_div"], ver="07",
+    return single_read_hex(path, kwargs.get("internal_resistance", p["internal_resistance"]),
+                           kwargs.get("imon_div", p["imon_div"]), ver="07",
                            overwrite_cache=kwargs.get("overwrite_cache", False))
 
 
-def single_read09(path, **kwargs):
+def single_read09(path, config=None, **kwargs):
     p = _PARAMS["09"]
-    return single_read_hex(path, p["internal_resistance"], p["imon_div"], ver="09",
+    return single_read_hex(path, kwargs.get("internal_resistance", p["internal_resistance"]),
+                           kwargs.get("imon_div", p["imon_div"]), ver="09",
                            overwrite_cache=kwargs.get("overwrite_cache", False))
 
 
-def single_read04(path, **kwargs):
+def single_read04(path, config=None, **kwargs):
     p = _PARAMS["04"]
-    return single_read_hex(path, p["internal_resistance"], p["imon_div"], ver="04",
+    return single_read_hex(path, kwargs.get("internal_resistance", p["internal_resistance"]),
+                           kwargs.get("imon_div", p["imon_div"]), ver="04",
                            overwrite_cache=kwargs.get("overwrite_cache", False))

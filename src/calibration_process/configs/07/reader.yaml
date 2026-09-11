@@ -1,0 +1,8 @@
+version: "07"
+engine: hex
+readers:
+  "07":
+    handler: single_read07
+    params:
+      internal_resistance: 1.1
+      imon_div: 1.0

@@ -13,7 +13,7 @@ from pathlib import Path
 import yaml
 
 from . import manifest as man
-from .config_schema import AnalysisSchema, PayloadSchema
+from .config_schema import AnalysisSchema, PayloadSchema, ReaderSchema
 
 CONFIG_ROOT = Path("src/calibration_process/configs")
 DATA = Path("data")
@@ -66,6 +66,18 @@ def check_version(ver: str, fix: bool = False,
         except Exception as e:
             print(f"  INVALID  configs/{ver}/{fname}: {e}")
             ok = False
+
+    # reader.yaml is optional for backwards compatibility but must be valid
+    rp = root / "reader.yaml"
+    if rp.exists():
+        try:
+            ReaderSchema.model_validate(yaml.safe_load(open(rp)))
+            print(f"  OK       configs/{ver}/reader.yaml")
+        except Exception as e:
+            print(f"  INVALID  configs/{ver}/reader.yaml: {e}")
+            ok = False
+    else:
+        print(f"  NOTE     configs/{ver}/reader.yaml absent (run `calib scaffold {ver}`)")
 
     data_dir = _data_dir(ver, data_root)
     raw = data_dir / "raw_data"
@@ -165,7 +177,7 @@ def scaffold_version(ver: str, data_dir: str = None,
     else:
         print(f"  exists   configs/{ver}/payload.yaml (skipping)")
 
-    for fname in ("analysis.yaml", "fit_range_tb.yaml",
+    for fname in ("analysis.yaml", "reader.yaml", "fit_range_tb.yaml",
                   "fit_range_ec_source.yaml", "fit_range_ec_xray.yaml",
                   "tb_manifest.yaml", "ec_source_manifest.yaml",
                   "ec_xray_manifest.yaml"):
@@ -178,6 +190,9 @@ def scaffold_version(ver: str, data_dir: str = None,
                                       "peak_overrides": {}, "qa": {}},
                         "ec_xray": {"default_bkg": "lin", "background_overrides": {},
                                     "peak_overrides": {}, "qa": {}}}
+            elif fname == "reader.yaml":
+                data = {"version": ver, "engine": "grid1x",
+                        "readers": {"normal": {"handler": "single_read05b_normal"}}}
             elif fname == "fit_range_tb.yaml":
                 data = {"measurements": {}}
             elif fname in ("fit_range_ec_source.yaml", "fit_range_ec_xray.yaml"):

@@ -65,7 +65,8 @@ def cmd_global(args) -> int:
 
 
 def cmd_all(args) -> int:
-    pipeline.all_version(args.version, nocache=args.nocache, out=args.out)
+    pipeline.all_version(args.version, nocache=args.nocache, out=args.out,
+                         until=args.until)
     return 0
 
 
@@ -125,6 +126,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("all", help="full formal workflow (no discover/preview)")
     sp.add_argument("version")
     sp.add_argument("--nocache", action="store_true")
+    sp.add_argument("--until", default="L5", choices=["L1", "L2", "L3", "L4", "L5"],
+                    help="stop after this layer (default L5 = full workflow)")
     sp.add_argument("-o", "--out")
     sp.set_defaults(func=cmd_all)
     sp = sub.add_parser("config", help="show resolved config")

@@ -1,0 +1,8 @@
+version: "04"
+engine: hex
+readers:
+  "04":
+    handler: single_read04
+    params:
+      internal_resistance: 2.1
+      imon_div: 2.0

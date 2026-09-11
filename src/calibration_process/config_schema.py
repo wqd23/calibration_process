@@ -127,6 +127,26 @@ class PayloadSchema(_StrictBase):
     ec: ECParams
 
 
+class ReaderSpec(_StrictBase):
+    """One reader handler: a registry name plus version-specific parameters."""
+
+    handler: str
+    params: Dict[str, Any] = {}
+
+
+class ReaderSchema(_StrictBase):
+    """The reader.yaml file: reader engine and per-reader handler/params.
+
+    ``engine`` names the byte-layer family (``grid1x`` / ``grid03b`` / ``hex``)
+    for documentation and validation; ``readers`` maps the ``ending`` strings
+    used by the payload config to the ``lib_reader`` handler registry.
+    """
+
+    engine: str
+    version: str
+    readers: Dict[str, ReaderSpec] = {}
+
+
 class ManifestEntry(_StrictBase):
     """One human-confirmed measurement in a manifest."""
 

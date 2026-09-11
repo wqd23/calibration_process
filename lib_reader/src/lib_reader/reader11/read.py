@@ -71,7 +71,7 @@ def _single_read11_impl(path, mode, hk_name, overwrite):
     return sciExtracted, telExtracted
 
 
-def single_read11(path: str, mode='wf', **kwargs):
+def single_read11(path: str, config=None, mode='wf', **kwargs):
     overwrite = kwargs.get('overwrite_cache', False)
 
     def process():

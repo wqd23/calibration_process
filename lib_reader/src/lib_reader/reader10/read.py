@@ -70,7 +70,7 @@ def _single_read10_impl(path, hk_name, overwrite):
     return sciExtracted, telExtracted
 
 
-def single_read10(path: str, **kwargs):
+def single_read10(path: str, config=None, **kwargs):
     overwrite = kwargs.get('overwrite_cache', False)
 
     def process():
