@@ -27,7 +27,7 @@ import numpy as np
 import polars as pl
 from addict import Dict
 
-SCHEMA_VER = 3
+SCHEMA_VER = 4
 SCHEMA_VER_PROCESSED = 5
 
 
@@ -185,12 +185,15 @@ def _load_kind_meta(cache_dir: Path, kind: str):
 
 
 def get_l1_frames(ver: str, reader: str, raw_path, decoders: dict,
-                  parse_kwargs: dict = None, overwrite: bool = False) -> dict:
+                  parse_kwargs: dict = None, overwrite: bool = False,
+                  extra_meta: dict = None) -> dict:
     """Return ``{kind: frames}`` for one raw file, using the L1 parquet cache.
 
     ``decoders`` maps each kind (``sci``/``hk``/``tl``) to a zero-argument
     callable that performs the fresh decode.  On a full hit nothing is decoded;
     a corrupt/missing entry falls back to a fresh decode and rewrites the cache.
+    ``extra_meta`` is merged into every written kind meta (e.g. a reader-specific
+    note about frames dropped for legacy compatibility).
     """
     parse_kwargs = dict(parse_kwargs or {})
     key = _make_key(ver, reader, raw_path, parse_kwargs)
@@ -228,6 +231,8 @@ def get_l1_frames(ver: str, reader: str, raw_path, decoders: dict,
                 "ncols": len(cols),
                 "parse_kwargs": parse_kwargs,
             }
+            if extra_meta:
+                meta.update(extra_meta)
             _kind_meta_path(cache_dir, kind).write_text(
                 json.dumps(meta, ensure_ascii=False, indent=2))
             rel_parquet = os.path.relpath(cache_dir / f"{kind}.parquet", get_project_root())
@@ -245,6 +250,18 @@ def get_l1_frames(ver: str, reader: str, raw_path, decoders: dict,
     except Exception:
         pass  # never let the cache put the pipeline at risk
     return result
+
+
+def get_l1_meta(ver: str, reader: str, raw_path, parse_kwargs: dict, kind: str) -> dict:
+    """Read a written L1 kind meta (empty dict when absent)."""
+    key = _make_key(ver, reader, raw_path, parse_kwargs or {})
+    path = _kind_meta_path(_cache_root(ver) / key, kind)
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text())
+    except (json.JSONDecodeError, OSError):
+        return {}
 
 
 def with_l1_cache(ver: str, reader: str, kind: str):
