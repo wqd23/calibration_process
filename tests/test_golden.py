@@ -190,6 +190,8 @@ def test_global_ec_golden(tmp_path, ver):
 
 
 def test_golden_points_file_is_small():
-    # sanity: committed golden must stay tiny (guard against bloat)
+    # sanity: committed golden must stay tiny (guard against bloat).  The B/C
+    # reader golden adds small truncated raw samples + frozen npz, so the budget
+    # is larger than the points-only golden (~240 KB).
     total = sum(f.stat().st_size for f in GOLDEN.rglob("*") if f.is_file())
-    assert total < 800 * 1024, f"golden grew to {total} bytes"
+    assert total < 3 * 1024 * 1024, f"golden grew to {total} bytes"

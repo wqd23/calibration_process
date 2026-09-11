@@ -1,9 +1,12 @@
 import numpy as np
 from addict import Dict
+from pathlib import Path
 
-from ..util import data_refactor
-from .parse_grid_data import parse_grid_data_new
+from ..packet_parser import parse_grid_data_new
 from .tb_cut import tel_cut
+from ..l1_cache import with_l1_cache
+
+_XML = str(Path(__file__).with_name("grid_packet.xml"))
 
 
 def temp_rebuild(temp:np.ndarray):
@@ -13,13 +16,33 @@ def temp_rebuild(temp:np.ndarray):
     assert not ((t>60) | (t<-30)).any(), "temp error. temp > 60 or temp < -30"
     return t
 
-def single_read10(path:str):
+
+def _readSci_impl(path):
+    return Dict(parse_grid_data_new(path, xml_file=_XML, data_tag='grid1x_wf_packet', endian='MSB')[0])
+
+
+def _readHK_impl(path):
+    return Dict(parse_grid_data_new(path, xml_file=_XML, data_tag='hk_grid1x_packet', endian='MSB')[0])
+
+
+@with_l1_cache(ver="10B", reader="10b", kind="sci")
+def readSci(path):
+    return _readSci_impl(path)
+
+
+@with_l1_cache(ver="10B", reader="10b", kind="tel")
+def readHK(path):
+    return _readHK_impl(path)
+
+
+def single_read10(path: str, **kwargs):
     observe_name = path
     hk_name = observe_name.replace('observe', 'hk')
-    wf_data_l = Dict(parse_grid_data_new(observe_name,data_tag='grid1x_wf_packet',endian='MSB')[0])
-    hk_data = Dict(parse_grid_data_new(hk_name,data_tag='hk_grid1x_packet',endian='MSB')[0])
+    overwrite = kwargs.get('overwrite_cache', False)
+    wf_data_l = readSci(observe_name, overwrite_cache=overwrite)
+    hk_data = readHK(hk_name, overwrite_cache=overwrite)
     sciExtracted, telExtracted = wf_data_l, hk_data
-    
+
     # amp
     if len(sciExtracted.data_max) == len(sciExtracted.data_base):
         amp = sciExtracted.data_max - sciExtracted.data_base/4.
@@ -40,7 +63,7 @@ def single_read10(path:str):
     # bias monitor, unit V
     telExtracted.vMon = [20.57*2.5*telExtracted[f'sipm_voltage{i}']/4096 for i in range(4)]
     telExtracted.bias = [20.57*2.5*telExtracted[f'sipm_voltage{i}']/4096 - 499*2.5*telExtracted[f'sipm_current{i}']/4096/548.88 for i in range(4)]
-    
+
     sciExtracted['timestampEvt'] = sciExtracted.timestamp
 
     # time cut

@@ -1,17 +1,18 @@
-from cachier import cachier
 from pathlib import Path
 import os
-from .reader05.version_lib import (
-    src_read03b as original_src_read03b,
-    single_read03b as original_single_read03b,
-    single_read05b_normal as original_single_read05b_normal,
-    single_read05b_xray as original_single_read05b_xray,
+from .reader05.frame_adapter import (
+    src_read03b as _src_read03b,
+    single_read03b as _single_read03b,
+    single_read05b_normal as _single_read05b_normal,
+    single_read05b_xray as _single_read05b_xray,
 )
-from .reader07.read import single_read07 as original_single_read07
-from .reader04.read import single_read04 as original_single_read04
-from .reader10.read import single_read10 as original_single_read10
-from .reader11.read import single_read11 as original_single_read11
-from .reader12.read import single_read12 as original_single_read12
+from .reader07.read import single_read07 as _single_read07
+from .reader04.read import single_read04 as _single_read04
+from .reader10.read import single_read10 as single_read10
+from .reader11.read import single_read11 as single_read11
+from .reader12.read import single_read12 as single_read12
+from .l1_cache import with_l1_cache_processed
+
 
 def get_project_root() -> Path:
     current_path = Path(os.getcwd())
@@ -26,17 +27,13 @@ def get_project_root() -> Path:
 
 
 PROJECT_ROOT = get_project_root()
-CACHE_DIR = PROJECT_ROOT / ".cache"
 
-src_read03b = cachier(cache_dir=CACHE_DIR)(original_src_read03b)
-single_read03b = cachier(cache_dir=CACHE_DIR)(original_single_read03b)
-single_read05b_normal = cachier(cache_dir=CACHE_DIR)(original_single_read05b_normal)
-single_read05b_xray = cachier(cache_dir=CACHE_DIR)(original_single_read05b_xray)
-single_read07 = cachier(cache_dir=CACHE_DIR)(original_single_read07)
-single_read04 = cachier(cache_dir=CACHE_DIR)(original_single_read04)
-single_read10 = cachier(cache_dir=CACHE_DIR / "10B", separate_files=True)(
-    original_single_read10
-)
-single_read11 = original_single_read11
-single_read12 = original_single_read12
-single_read09 = cachier(cache_dir=CACHE_DIR / "09", separate_files=True)(original_single_read07)
+# Pipeline entry points: L1 parquet cache of the final processed (sci, tel)
+# output, stored as channel-stacked parquet tables.
+src_read03b = with_l1_cache_processed(ver="03B", reader="03b-src", kind="single")(_src_read03b)
+single_read03b = with_l1_cache_processed(ver="03B", reader="03b", kind="single")(_single_read03b)
+single_read05b_normal = with_l1_cache_processed(ver="05B", reader="normal", kind="single")(_single_read05b_normal)
+single_read05b_xray = with_l1_cache_processed(ver="05B", reader="xray", kind="single")(_single_read05b_xray)
+single_read07 = with_l1_cache_processed(ver="07", reader="07", kind="single")(_single_read07)
+single_read04 = with_l1_cache_processed(ver="04", reader="04", kind="single")(_single_read04)
+single_read09 = with_l1_cache_processed(ver="09", reader="07", kind="single")(_single_read07)

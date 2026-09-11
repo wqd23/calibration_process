@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<grid>
+    <!-- GRID 04/07/09 (hexprint text). Science packet: 3-byte head + 504-byte
+         body + 3-byte tail, then a 2-byte CRC outside the 510-byte frame.
+         The body holds 1 primary event plus 43 sub-events (11-byte step). -->
+    <hex_sci_packet packet_len="510" head="0xaa;0xbb;0xcc" tail="0xdd;0xee;0xff">
+        <channel>
+            <start>3</start>
+            <size>1</size>
+            <len>1</len>
+        </channel>
+        <uscount>
+            <start>4</start>
+            <size>8</size>
+            <len>1</len>
+        </uscount>
+        <data_max>
+            <start>12</start>
+            <size>2</size>
+            <len>1</len>
+        </data_max>
+        <sub_channel repeat="1">
+            <start>26</start>
+            <size>1</size>
+            <len>1</len>
+        </sub_channel>
+        <sub_uscount repeat="1">
+            <start>27</start>
+            <size>8</size>
+            <len>1</len>
+        </sub_uscount>
+        <sub_amp repeat="1">
+            <start>35</start>
+            <size>2</size>
+            <len>1</len>
+        </sub_amp>
+        <effective_count>
+            <start>499</start>
+            <size>4</size>
+            <len>1</len>
+        </effective_count>
+        <missing_count>
+            <start>503</start>
+            <size>4</size>
+            <len>1</len>
+        </missing_count>
+    </hex_sci_packet>
+
+    <!-- Telemetry packet: 3-byte head + 7 records x 70 bytes + 3-byte tail
+         (496 bytes), then a 2-byte CRC outside the frame. -->
+    <hex_tel_packet packet_len="496" head="0x12;0x34;0x56" tail="0x78;0x9a;0xbc">
+        <utc repeat="1">
+            <start>3</start>
+            <size>4</size>
+            <len>1</len>
+        </utc>
+        <uscount repeat="1">
+            <start>15</start>
+            <size>8</size>
+            <len>1</len>
+        </uscount>
+        <temp_sipm repeat="1">
+            <start>23</start>
+            <size>2</size>
+            <len>4</len>
+        </temp_sipm>
+        <temp_adc repeat="1">
+            <start>31</start>
+            <size>2</size>
+            <len>4</len>
+        </temp_adc>
+        <v_mon repeat="1">
+            <start>39</start>
+            <size>2</size>
+            <len>4</len>
+        </v_mon>
+        <i_mon repeat="1">
+            <start>47</start>
+            <size>2</size>
+            <len>4</len>
+        </i_mon>
+    </hex_tel_packet>
+</grid>

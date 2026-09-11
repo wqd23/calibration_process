@@ -10,7 +10,7 @@
 
 | 数据 | 位置 | 格式 | 怎么读 |
 |------|------|------|--------|
-| 原始数据解析缓存 | `.cache/` | cachier 自带缓存（dill blob / 逐文件 dill，reader09/10/12 为 `separate_files`，reader04/03B/05B/07 为共享大 blob） | **不要直接读文件**；用 reader 函数 `single_readXX(path)`，缓存命中即返回解析结果 |
+| L1 解析缓存（全版本） | `data/{ver}/l1_cache/` | polars parquet（zstd）+ `meta.json` + `index.json` | 见本文「5. L1 parquet 缓存」；亦可脱离本项目用纯 polars 读 parquet |
 | 单谱拟合 pickle | `single_process/{TB,EC}_fit_result/*.pickle` | **dill** pickle 的 dict | `dill.load(path)` 或 `util_lib.pickle_load(path)` |
 | 单谱拟合图 | `single_process/single_fit_fig/*.png` | PNG | `matplotlib.image.imread` |
 | TB 二维面拟合 | `tb_logs/*_temp_bias_fit.json` | JSON（每通道 G0/k/V0/b/c+err+redchi+ndf） | `json.load` |
@@ -116,6 +116,135 @@ stages.global_tb(rt, custom, pipeline.output_root("09") / "tb_logs_custom")
 - 若只想做谱级二次分析且不想绑死在这套类上，稳妥做法是**存成 npz/CSV** 或在读
   pickle 后把需要字段另存为 npy/json；本项目若要加这类"可移植中间产物"，可再加
   一个 `calib export` 子命令（目前未做）。
+
+## 5. L1 parquet 缓存（全版本）
+
+修订日期：2026-09-10
+
+为了替代 dill，本仓库给 reader 结果加了一层 L1 parquet 缓存，统一放在
+`data/{ver}/l1_cache/`。按缓存边界分两种：
+
+- **帧缓存**（`schema_ver=1`，10B/11B/12B）：缓存 `readSci`/`readHK` 的**原始解析
+  结果**（每事件一行），命中后**重跑** `single_readXX` 的既有后处理（amp、遥测换算、
+  稳定段截取、按通道分组），对科学结果透明。
+- **最终输出缓存**（`schema_ver=2`，03B/04/05B/07/09）：缓存整个 `(sci, tel)` 的
+  **最终输出**，命中即返回（不重跑）。参差的四通道量按"四通道叠加"压成规整 parquet：
+  每个通道键把 4 个通道数组**首尾相连**成一列、并记录各通道长度（`sublens`），读回时
+  再按边界切回 4 个通道；共享数组与空条目分别存表/存 `meta.json`。
+
+一次性灌满全部版本用 `python scripts/warm_l1_cache.py [ver ...]`（只做读出、不拟合）。
+
+### 布局与缓存键
+
+```
+data/{ver}/l1_cache/
+  index.json                  # 原始文件 -> 缓存映射（每条记录一个原始文件）
+  cache/{key}/
+    events.parquet            # readSci 的 raw 解析结果（每事件一行）
+    tel.parquet               # readHK  的 raw 解析结果（每 HK 记录一行）
+    meta.json                 # schema_ver / reader / ver / kind / dtypes / rows
+```
+
+缓存键为 `sha256(f"{ver}|{reader}|{kind}|{raw_path}|{parse_kwargs 的排序 json}")[:16]`，
+`parse_kwargs` 只含影响解析的参数（如 `readSci` 的 `mode`；`readHK` 为空），
+**不含** `bin_width`/`adc_max`/`fit_range` 等后续拟合参数。`overwrite_cache=True`
+会强制重解析并覆盖缓存。kind 为 `sci`/`tel`，二者键不同、各占一个 `cache/{key}/`
+目录。
+
+### 为什么不建议直接读缓存文件
+
+- parquet 里存的是**原始整数/bool 数组**（`amp` 不缓存，由后处理重算），所以要读
+  出能用于分析的"峰"仍要走 `single_readXX`。
+- `index.json` 只是"哪个原始文件对应哪个 parquet"的发现表；`meta.json` 里记录各列
+  的 numpy dtype，用于读取时若有宽度提升则按原 dtype 回退。
+
+### 跨项目读取（纯 polars，无本包 import）
+
+```python
+import json, polars as pl
+idx = json.load(open("data/12B/l1_cache/index.json"))
+rec = next(r for r in idx if r["kind"] == "sci")
+df = pl.read_parquet(rec["events"])          # 每事件一行
+amp = df["data_max"] - df["data_base"].to_numpy() / 4.0
+```
+
+### 「四通道叠加」缓存布局（03B/04/05B/07/09）
+
+```
+data/{ver}/l1_cache/cache/{key}/
+  meta.json               # schema_ver=2, reader/ver/kind, sections{sci,tel}
+  sci__chan__0.parquet    # 通道键（同 sublens 的合一张表）：每键一列=concat(4通道) + __channel__
+  sci__flat__0.parquet    # 共享 1-D 数组（如 effectiveCount/missingCount）
+  tel__chan__0.parquet
+  tel__flat__0.parquet
+```
+
+`meta.json` 的 `sections.<name>.files` 记录每张表是 `channel`（含 `sublens`/`keys`）还是
+`flat`（含 `shape`/`keys`），`empties` 记录空条目（空 list / None）。读回外部工具时按
+`sublens` 用 `np.split` 切回四通道即可；`__channel__` 列给出每行归属的通道号。
+
+> 缓存键与 `schema_ver` 详见 `lib_reader/src/lib_reader/l1_cache.py`；命中校验同时检查
+> `schema_ver` 与 `kind`，任何格式/语义变化都必须 bump 常量以作废旧缓存。
+
+## 6. 读取层统一（packet_parser / frame_io）
+
+修订日期：2026-09-11
+
+各载荷的原始数据在**字节层**都是"一串按包成帧的数据"，只是存储方式有三类：
+直接二进制（10B/11B/12B）、UDP 包裹的二进制（03B/05B，内层才是科学帧）、
+空格分隔的十六进制文本（04/07/09，本质是字节流的 hexdump）。据此把读取的**帧层**
+统一：
+
+- `lib_reader/packet_parser.py` + `parity_check.py`：XML 驱动的包解析器
+  （`parse_grid_data_new`），已合并原来 reader10/11/12 的三份副本；每个载荷只保留
+  自己的 `grid_packet.xml`，调用时显式传 `xml_file`。
+- `lib_reader/frame_io.py`：字节来源层——`load_binary`（二进制）、`load_hex_text`
+  （hex 文本→字节）。03B/05B 的 UDP 分块与 HK/timeline 解码在
+  `lib_reader/reader05/readout.py`（见下）。
+
+各载荷的帧定义与适配层（均已切到统一解析器）：
+
+| 载荷族 | 帧 XML | 适配层（帧表→`(sci, tel)`） | 说明 |
+|--------|--------|------------------------------|------|
+| 10B/11B/12B | 各 `reader{10,11,12}/grid_packet.xml` | `readerXX/read.py` 的后处理 | 原始帧缓存（schema_ver=1） |
+| 04/07/09 | `reader07/grid_packet.xml` | `reader07/frame_adapter.py` | 三版合并为一个参数化 reader；`hex_sci_packet`（主事件 + 43 子事件，步进 11B）、`hex_tel_packet`（7×70B） |
+| 03B/05B | `reader05/grid_packet.xml` | `reader05/frame_adapter.py` + `reader05/readout.py` | `sci_wf_packet`（waveform）/`sci_ft_packet`（feature 20×24B）；HK/timeline 解码与 UTC 拟合在自包含的 `readout.py` |
+
+要点与坑：
+
+- **04 与 07 的差异是两个科学常量**：`internal_resistance`（04=2.1、07=1.1）与 iMon
+  除数（04 除以 2.0、07 除以 1.0）。合并时做成版本参数 `_PARAMS`，不"顺手统一"。
+- **C 组科学包不是纯 XML 直出**：主事件在包头，43 个子事件在 repeat 区（步进 11B），
+  适配层用 stable-argsort 按通道分组以复现 legacy 的"逐包、先主事件后子事件"顺序。
+- **B 组 UDP 分块读取会造成帧丢失**：legacy 以 `maxUdpReadout=10000` 个 UDP 包为一批
+  读取，跨批边界的科学帧被丢弃。适配层复用 `readout.extractSciRawData` 按同样的批次
+  切分，**忠实复现**这一行为（否则 03B 输出会与 legacy/oracle 不一致）。
+- **`cutFileRef` 逐文件时间截断**：部分 03B X 光机文件带按文件名指定的 time cut，
+  适配层在末尾复现该截断。
+- HK/timeline 解码（`extractHKData*`/`extractTimelineData*`/`getUTC`）与 `findPackPos`/
+  `doFitLin` 已从 legacy 单体逐字抽到 `reader05/readout.py`（约 300 行），B 族不再依赖
+  大文件。
+
+验证：
+- `tests/test_frame_io.py`：`load_binary` / `load_hex_text` 字节来源。
+- `tests/test_reader_golden.py`：B/C 各路径的截断真实样本冻结为 legacy `(sci,tel)`
+  输出，统一 reader 重跑逐字段（dtype + 值）对齐（见第 7 节）。
+
+迁移收尾已删除：C 组单体 `gridBasicFunctions02.py`（reader04/07）、B 组单体
+`gridBasicFunctions.py`/`gridParametersCommon.py`/`gridProcessFunctions*/`、
+`extractSciEvents`/`dataReadout`/`fitBaseline` 等编排函数、`*_legacy` 包装与全部
+`@cachier`（含依赖）。B 族现在只依赖 `reader05/readout.py` 的小函数；`util_lib` 用到的
+`getSpectrum`/`gehrelsErr`/`residualTempbias2D` 迁到 `reader05/fit_utils.py`。
+
+## 7. Reader golden（自包含回归）
+
+`tests/test_reader_golden.py` + `tests/golden/reader/<sample>/`：每个样本提交一小段
+截断真实原始文件（03B/05B 连同 HK/TimeLine/config 兄弟文件），并把 **legacy reader**
+的 `(sci, tel)` 输出冻结成 `expected.npz` + `structure.json`。测试用**当前统一 reader**
+在样本上重跑并逐字段对齐冻结值，零 `raw_data` 依赖、全新 clone 可跑。覆盖：C 组 hex
+解码（07/04）、B 组 waveform noUdp（05B normal）、大小端 HK（05B xray）、waveform UDP
+（03B src）、feature UDP 与逐文件 time cut（03B xray）。重新生成：
+`python scripts/gen_reader_golden.py`。
 
 ## 相关
 - 结构：`README.md` 仓库结构

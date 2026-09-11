@@ -1,0 +1,20 @@
+{
+  "sci": {
+    "amp": "list4",
+    "timestampEvt": "list4",
+    "timeCorrect": "empty",
+    "sciNum": "list4",
+    "effectiveCount": "flat",
+    "missingCount": "flat"
+  },
+  "tel": {
+    "tempSipm": "list4",
+    "tempAdc": "list4",
+    "vMon": "list4",
+    "iMon": "list4",
+    "bias": "list4",
+    "timestamp": "flat",
+    "utc": "flat",
+    "telNum": "empty"
+  }
+}

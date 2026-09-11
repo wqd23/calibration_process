@@ -16,7 +16,7 @@ Features:
 ---------------------------------
 """
 
-import lib_reader.reader05.gridBasicFunctions as basic
+import lib_reader.reader05.fit_utils as basic
 from lib_reader.reader05.my_type import *
 import nptyping as npt
 

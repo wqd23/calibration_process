@@ -1,0 +1,1 @@
+{"bias_value": [11702, 11702, 11702, 11702], "time_line_cycle": 1, "detection_cycle": 1, "trigger_threshold": [90, 90, 82, 82], "sampling_depth": 256, "base_line_length": 128, "ref_value": [32768, 32768, 32768, 32768], "polarity": 1, "charge_injection_fre": 1000, "charge_injection_width": 10, "charge_injection_control": 0, "data_ack": 1, "wave_sel": 0, "channel_control": 15}

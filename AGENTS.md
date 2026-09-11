@@ -47,8 +47,10 @@ just cover                                          # coverage run + report（.c
 - **每版本一个显式 workflow**：`workflows/versions/v{ver}.py`（`enumerate_measurements`
   复现历史选点规则）；共享 stage 在 `workflows/common.py`；版本选择只发生一次
   （`workflows/registry.py`，之后不再 `if version == ...`）。
-- **Protected scientific kernel（本次迁移未改）**：`file_lib.py` / `util_lib.py` /
-  `lib_reader/` / `lib_plot/`。单谱拟合、TB/EC 数学模型、reader 数据结构都归它们。
+- **Protected scientific kernel**：`file_lib.py` / `util_lib.py` / `lib_reader/` /
+  `lib_plot/`。单谱拟合、TB/EC 数学模型、reader 数据结构都归它们——读取层已统一
+  （见 [docs/intermediate_data.md](docs/intermediate_data.md) 第 6 节），但**科学数学
+  未改**。
 - 数据软链到 `data/{ver}/raw_data`（不复制），产物输出到 `data/{ver}/single_process/`、
   `tb_logs/`、`ec_logs/`。
 - 中间产物的格式与可移植性见 [docs/intermediate_data.md](docs/intermediate_data.md)：
@@ -109,10 +111,11 @@ calib all {ver}
 - 12B/13B 的 `.hk` 是 187 字节的 `grid1x_hk_packet`，11B 是 139 字节的
   `hk_grid1x_packet`，sipm 字段偏移不同（82 vs 111）。
 
-最稳妥的做法：把数据目录里随附的 `grid_packet.xml` 整体复制进新 reader，
-再从最近代的 reader（如 reader11）复制 `parse_grid_data.py` / `parity_check.py`
-（仓库版已改相对导入，数据目录版是绝对导入），read 逻辑仿照已有的
-`reader{ver}/read.py` 编写。
+最稳妥的做法：把数据目录里随附的 `grid_packet.xml` 整体复制进新 reader，解析走共享的
+`lib_reader/packet_parser.py`（`parse_grid_data_new`，调用时显式传 `xml_file=`），read
+逻辑仿照已有的 `reader{ver}/read.py` 编写——**不要再复制 `parse_grid_data.py` /
+`parity_check.py`**（已统一为一份，见 [docs/intermediate_data.md](docs/intermediate_data.md)
+第 6 节）。
 
 ### 2. 新 reader 必查四件事
 
@@ -220,7 +223,8 @@ calib all {ver}
    与 `.oracle` 比对（pickle/json/npy + 图），`.oracle` 存在就跑、缺失则 skip。
    `.oracle/` 与 `.new/` 都在 `.gitignore`，仅本机有效，无法入库。
 2. **git 内小数据 Golden（自包含、全新 clone 可跑、零 raw 依赖）**：
-   `tests/golden/` 提交 ≈240KB 的精简真实点 + 冻结系数，`tests/test_golden.py`
+   `tests/golden/` 提交精简真实点 + 冻结系数（≈240KB，另加 B/C reader 截断样本后
+   共约 1.7MB），`tests/test_golden.py`
    在测试时重建点→跑全局拟合→对齐系数。覆盖编排层行为差异与全局拟合：
    - `single_run_spec`（tb / ec_source / ec_xray 单文件 / 多文件 circle vs fixed
      旋转、hk/sci_half/hk_bias 透传），全 8 版本冒烟；
@@ -228,6 +232,12 @@ calib all {ver}
    - `global_ec`：09 polyfit(4ch)、03B lmfit、11B 3ch（channel_count=3）。
    - 04（exprfit 分辨率）/10B（3ch）不做全局 golden：legacy 对这些版本没产出
      EC 全局系数，无权威基准；它们由 `tests/test_stages.py` 单测覆盖。
+   - **reader golden**（`tests/test_reader_golden.py`）：`tests/golden/reader/<sample>/`
+     提交 B/C 各路径的**截断真实样本**（07/04 的 hex 文本、05B normal、05B xray、
+     03B src、03B xray 的 rundata+HK+TimeLine+config）冻结为 legacy `(sci,tel)` 输出
+     （`expected.npz` + `structure.json`）；测试用统一 reader 在样本上重跑并对齐冻结值，
+     零 raw 依赖。覆盖 hex 解码、UDP 解包、waveform/feature、大小端 HK、逐文件 time cut。
+     重新生成：`python scripts/gen_reader_golden.py`。
    - 重新生成：`python scripts/gen_golden.py`（需先跑一次 `calib fit` 填 store，
      再执行；脚本 docstring 写明步骤）。golden 的 `.npy` 靠 `.gitignore` 里
      `!tests/golden/**/*.npy` 例外被提交。

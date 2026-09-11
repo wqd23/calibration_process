@@ -6,7 +6,7 @@ GRID version independent Functions Library
 Basic functions for GRID data processing\n
 """
 
-import lib_reader.reader05.gridBasicFunctions as basic
+import lib_reader.reader05.fit_utils as basic
 from lib_reader.reader05.my_type import *
 
 import numpy as np

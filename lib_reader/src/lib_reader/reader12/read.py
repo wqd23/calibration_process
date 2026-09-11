@@ -25,28 +25,39 @@ from pathlib import Path
 
 import numpy as np
 from addict import Dict
-from cachier import cachier
 
-from .parse_grid_data import parse_grid_data_new
+from ..packet_parser import parse_grid_data_new
+from ..l1_cache import with_l1_cache
+
+_XML = str(Path(__file__).with_name("grid_packet.xml"))
 
 
-@cachier(cache_dir=Path(".cache") / "12B", separate_files=True)
-def readSci(path, mode="ft"):
+def _readSci_impl(path, mode="ft"):
     if mode == "wf":
-        return Dict(parse_grid_data_new(path, data_tag="grid1x_wf_packet", endian="MSB")[0])
+        return Dict(parse_grid_data_new(path, xml_file=_XML, data_tag="grid1x_wf_packet", endian="MSB")[0])
     elif mode == "ft":
         return Dict(
             parse_grid_data_new(
-                path, data_tag="grid1x_ft_packet", endian="MSB", multi_evt=41, multi_step=12
+                path, xml_file=_XML, data_tag="grid1x_ft_packet", endian="MSB", multi_evt=41, multi_step=12
             )[0]
         )
     else:
         raise ValueError("Invalid mode. Use 'wf' or 'ft'.")
 
 
-@cachier(cache_dir=Path(".cache") / "12B", separate_files=True)
+def _readHK_impl(path):
+    return Dict(parse_grid_data_new(path, xml_file=_XML, data_tag="grid1x_hk_packet", endian="MSB")[0])
+
+
+# L1 parquet cache path used by the pipeline:
+@with_l1_cache(ver="12B", reader="12b", kind="sci")
+def readSci(path, mode="ft"):
+    return _readSci_impl(path, mode=mode)
+
+
+@with_l1_cache(ver="12B", reader="12b", kind="tel")
 def readHK(path):
-    return Dict(parse_grid_data_new(path, data_tag="grid1x_hk_packet", endian="MSB")[0])
+    return _readHK_impl(path)
 
 
 def getHK(sciFile):

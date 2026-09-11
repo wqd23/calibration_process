@@ -1,26 +1,35 @@
-from .parse_grid_data import parse_grid_data_new
+from ..packet_parser import parse_grid_data_new
 from addict import Dict
 from pathlib import Path
 from ..reader11.tb_cut import tel_cut
-from cachier import cachier
+from ..l1_cache import with_l1_cache
 
-@cachier(cache_dir=Path('.cache') / '11B', separate_files=True)
-def readSci(path, mode='wf'):
+_XML = str(Path(__file__).with_name("grid_packet.xml"))
+
+def _readSci_impl(path, mode='wf'):
     if mode == 'wf':
-        return Dict(parse_grid_data_new(path,data_tag='grid1x_wf_packet',endian='MSB')[0])
+        return Dict(parse_grid_data_new(path,xml_file=_XML,data_tag='grid1x_wf_packet',endian='MSB')[0])
     elif mode == 'ft':
-        return Dict(parse_grid_data_new(path,data_tag='grid1x_ft_packet',endian='MSB')[0],multi_evt=41, multi_step=12)
+        return Dict(parse_grid_data_new(path,xml_file=_XML,data_tag='grid1x_ft_packet',endian='MSB')[0],multi_evt=41, multi_step=12)
     else:
         raise ValueError("Invalid mode. Use 'wf' or 'hk'.")
 
+def _readHK_impl(path):
+    return Dict(parse_grid_data_new(path,xml_file=_XML,data_tag='hk_grid1x_packet',endian='MSB')[0])
+
+@with_l1_cache(ver="11B", reader="11b", kind="sci")
+def readSci(path, mode='wf'):
+    return _readSci_impl(path, mode=mode)
+
+@with_l1_cache(ver="11B", reader="11b", kind="tel")
 def readHK(path):
-    return Dict(parse_grid_data_new(path,data_tag='hk_grid1x_packet',endian='MSB')[0])
+    return _readHK_impl(path)
 
 def getHK(sciFile):
     sciFile = Path(sciFile)
     idx = sciFile.stem.split('_')[0]
     # temp-bias, src data
-    Files = [f for f in sciFile.parent.glob(f'*')]
+    Files = [f for f in sciFile.parent.glob('*')]
     hkFile = [f for f in Files if f.stem.startswith(idx) and 'hk' in f.name]
     if len(hkFile) == 0:
         raise FileNotFoundError(f"HK file {hkFile} does not exist.")

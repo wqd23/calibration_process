@@ -1,0 +1,17 @@
+{
+  "sci": {
+    "amp": "list4",
+    "timestampEvt": "list4",
+    "eventID": "list4",
+    "sciNum": "list4"
+  },
+  "tel": {
+    "tempSipm": "list4",
+    "iMon": "list4",
+    "bias": "list4",
+    "iSys": "list4",
+    "timestamp": "flat",
+    "utc": "flat",
+    "telNum": "flat"
+  }
+}

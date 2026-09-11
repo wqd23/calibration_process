@@ -1,0 +1,20 @@
+{
+    "channel0Bias": "28.5",
+    "channel1Bias": "28.5",
+    "channel2Bias": "28.5",
+    "channel3Bias": "28.5",
+    "channel0TriggerThreshold": "14.0",
+    "channel1TriggerThreshold": "15.1",
+    "channel2TriggerThreshold": "13.0",
+    "channel3TriggerThreshold": "13.0",
+    "channel0BaseLine": "1400",
+    "channel1BaseLine": "1427",
+    "channel2BaseLine": "1415",
+    "channel3BaseLine": "1110",
+    "channel0Vmin": "-1.0",
+    "channel1Vmin": "-1.0",
+    "channel2Vmin": "-1.0",
+    "channel3Vmin": "-1.0",
+    "SamplingDepth": "256",
+    "BaselineLenth": "128"
+}
