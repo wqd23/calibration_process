@@ -28,7 +28,7 @@ import polars as pl
 from addict import Dict
 
 SCHEMA_VER = 3
-SCHEMA_VER_PROCESSED = 4
+SCHEMA_VER_PROCESSED = 5
 
 
 def get_project_root(marker=("justfile", ".gitignore")):
@@ -329,9 +329,15 @@ def serialize_processed(result):
             cols = {}
             dtypes = {}
             for k, arrs in items:
-                cat = np.concatenate(arrs)
+                # Channels can legitimately differ in dtype (e.g. an empty
+                # channel is float64 while the others are uint16), so record
+                # the dtype of every channel and store the concatenation at a
+                # common dtype that can represent all of them; a cache hit
+                # casts each channel back to its own dtype.
+                dt = np.result_type(*[a.dtype for a in arrs])
+                cat = np.concatenate([a.astype(dt, copy=False) for a in arrs])
                 cols[k] = cat
-                dtypes[k] = str(cat.dtype)
+                dtypes[k] = [str(a.dtype) for a in arrs]
             cols["__channel__"] = np.repeat(np.arange(4, dtype=np.int8), np.asarray(sublens))
             fname = f"{name}__chan__{i}.parquet"
             section_d[fname] = cols
@@ -371,10 +377,14 @@ def deserialize_processed(section_d, section_meta):
                 bounds = np.cumsum(fr["sublens"])[:-1]
                 for k in fr["keys"]:
                     arr = np.asarray(cols[k])
-                    want = np.dtype(fr["dtypes"][k])
-                    if arr.dtype != want:
-                        arr = arr.astype(want)
-                    d[k] = [np.asarray(part) for part in np.split(arr, bounds)]
+                    want = fr["dtypes"][k]
+                    parts = np.split(arr, bounds)
+                    if isinstance(want, list):
+                        d[k] = [np.asarray(parts[i]).astype(np.dtype(want[i]))
+                                for i in range(len(parts))]
+                    else:
+                        d[k] = [np.asarray(part).astype(np.dtype(want))
+                                for part in parts]
             else:
                 for k in fr["keys"]:
                     arr = np.asarray(cols[k])

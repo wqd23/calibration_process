@@ -4,6 +4,11 @@
          waveform + 32-byte trailer + 8-byte tail.  Only the event fields are
          declared; the waveform samples are skipped. -->
     <sci_wf_packet packet_len="560" head="0x5a;0x5a;0x5a;0x5a;0x5a;0x5a;0x5a;0x5a" tail="0xaa;0xaa;0xaa;0xaa;0xaa;0xaa;0xaa;0xaa">
+        <sample_length>
+            <start>10</start>
+            <size>2</size>
+            <len>1</len>
+        </sample_length>
         <channel>
             <start>8</start>
             <size>2</size>
@@ -14,11 +19,21 @@
             <size>4</size>
             <len>1</len>
         </event_number>
+        <waveform_data>
+            <start>16</start>
+            <size>2</size>
+            <len>256</len>
+        </waveform_data>
         <timestamp>
             <start>528</start>
             <size>8</size>
             <len>1</len>
         </timestamp>
+        <data_sum>
+            <start>536</start>
+            <size>8</size>
+            <len>1</len>
+        </data_sum>
         <data_max>
             <start>544</start>
             <size>2</size>
@@ -39,6 +54,11 @@
     <!-- GRID 03B feature science packet: 8-byte head + 20 events x 24 bytes +
          8-byte tail.  The CRC field is cumulative over the preceding events. -->
     <sci_ft_packet packet_len="504" head="0x5a;0x5a;0x99;0x66;0x99;0x66;0x5a;0x5a" tail="0xaa;0xaa;0x99;0x66;0x99;0x66;0xaa;0xaa">
+        <sample_length>
+            <start>10</start>
+            <size>2</size>
+            <len>1</len>
+        </sample_length>
         <channel>
             <start>8</start>
             <size>2</size>
@@ -54,6 +74,11 @@
             <size>8</size>
             <len>1</len>
         </evt_timestamp>
+        <evt_data_sum repeat="1">
+            <start>24</start>
+            <size>8</size>
+            <len>1</len>
+        </evt_data_sum>
         <evt_data_max repeat="1">
             <start>32</start>
             <size>2</size>

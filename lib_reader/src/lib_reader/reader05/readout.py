@@ -98,11 +98,10 @@ def extractSciRawData(rawData, udpPackPos, maxUdpReadout=-1, lastUdpPos=0, udpPa
     return sciRawData
 
 
-def extractHKData_03b(rawData, hkPackLen=52):
+def extractHKData_03b_raw(rawData, hkPackLen=52):
     udpPattern = re.compile(PATTERNS['HK_03b'], re.S)
     udpPos = findPackPos(rawData, udpPattern)
 
-    hkData = {}
     bias = []
     iMon = []
     temp = []
@@ -125,22 +124,19 @@ def extractHKData_03b(rawData, hkPackLen=52):
             iSys[ich].append(struct.unpack('>H', HKdata[32 + 2 * ich:32 + 2 * ich + 2])[0])
         timestamp.append(struct.unpack('>Q', HKdata[24:24 + 8])[0] / INTERNAL_FREQ)
 
-    hkData = {
-        'iMon': np.array(iMon) / 2 ** 12 * 2.5 / (1 + 49.9 / 499) / 499 * 1E6,
-        'bias': np.array(bias) / 2 ** 12 * 2.5 / (51.1 / (1000 + 51.1)),
-        'temp': np.array(temp) / 2 ** 4 * 0.0625,
-        'timestamp': np.array(timestamp) * 100.,
-        'iSys': np.array(iSys) / 2 ** 12 * 2.5 / (0.05 * 4.7E3 / 100),
+    return {
+        'iMon': np.array(iMon),
+        'bias': np.array(bias),
+        'temp': np.array(temp),
+        'timestamp': np.array(timestamp),
+        'iSys': np.array(iSys),
     }
-    hkData['bias'] = hkData['bias'] - hkData['iMon'] * 499 * 1E-6
-    return hkData
 
 
-def extractHKData_normal(rawData, hkPackLen=HK_DATA_LEN):
+def extractHKData_normal_raw(rawData, hkPackLen=HK_DATA_LEN):
     udpPattern = re.compile(PATTERNS['HK_new'], re.S)
     udpPos = findPackPos(rawData, udpPattern)
 
-    hkData = {}
     bias = []
     iMon = []
     temp = []
@@ -163,22 +159,19 @@ def extractHKData_normal(rawData, hkPackLen=HK_DATA_LEN):
             iSys[ich].append(struct.unpack('>H', HKdata[63 + 2 * ich:63 + 2 * ich + 2])[0])
         timestamp.append(struct.unpack('>Q', HKdata[55:55 + 8])[0] / INTERNAL_FREQ)
 
-    hkData = {
-        'iMon': np.array(iMon) / 2 ** 12 * 2.5 / (1 + 49.9 / 499) / 499 * 1E6,
-        'bias': np.array(bias) / 2 ** 12 * 2.5 / (51.1 / (1000 + 51.1)),
-        'temp': np.array(temp) / 2 ** 4 * 0.0625,
-        'timestamp': np.array(timestamp) * 100.,
-        'iSys': np.array(iSys) / 2 ** 12 * 2.5 / (0.05 * 4.7E3 / 100),
+    return {
+        'iMon': np.array(iMon),
+        'bias': np.array(bias),
+        'temp': np.array(temp),
+        'timestamp': np.array(timestamp),
+        'iSys': np.array(iSys),
     }
-    hkData['bias'] = hkData['bias'] - hkData['iMon'] * 499 * 1E-6
-    return hkData
 
 
-def extractHKData(rawData, hkPackLen=HK_DATA_LEN):
+def extractHKData_raw(rawData, hkPackLen=HK_DATA_LEN):
     udpPattern = re.compile(PATTERNS['HK_new'], re.S)
     udpPos = findPackPos(rawData, udpPattern)
 
-    hkData = {}
     bias = []
     iMon = []
     temp = []
@@ -202,18 +195,44 @@ def extractHKData(rawData, hkPackLen=HK_DATA_LEN):
 
         timestamp.append(struct.unpack('<Q', HKdata[55:55 + 8])[0] / INTERNAL_FREQ)
 
-    hkData = {
-        'iMon': np.array(iMon) / 2 ** 12 * 2.5 / (1 + 49.9 / 499) / 499 * 1E6,
-        'bias': np.array(bias) / 2 ** 12 * 2.5 / (51.1 / (1000 + 51.1)),
-        'temp': np.array(temp) / 2 ** 4 * 0.0625,
-        'timestamp': np.array(timestamp) * 100.,
-        'iSys': np.array(iSys) / 2 ** 12 * 2.5 / (0.05 * 4.7E3 / 100),
+    return {
+        'iMon': np.array(iMon),
+        'bias': np.array(bias),
+        'temp': np.array(temp),
+        'timestamp': np.array(timestamp),
+        'iSys': np.array(iSys),
     }
-    hkData['bias'] = hkData['bias'] - hkData['iMon'] * 499 * 1E-6
-    return hkData
 
 
-def extractTimelineData(rawData, tlPackLen=TIMELINE_DATA_LEN):
+def _hk_convert(hkData):
+    """Convert raw HK ADC counts to physical units (legacy formulas)."""
+    i_mon = hkData['iMon'] / 2 ** 12 * 2.5 / (1 + 49.9 / 499) / 499 * 1E6
+    bias = hkData['bias'] / 2 ** 12 * 2.5 / (51.1 / (1000 + 51.1))
+    temp = hkData['temp'] / 2 ** 4 * 0.0625
+    i_sys = hkData['iSys'] / 2 ** 12 * 2.5 / (0.05 * 4.7E3 / 100)
+    bias = bias - i_mon * 499 * 1E-6
+    return {
+        'iMon': i_mon,
+        'bias': bias,
+        'temp': temp,
+        'timestamp': hkData['timestamp'] * 100.,
+        'iSys': i_sys,
+    }
+
+
+def extractHKData_03b(rawData, hkPackLen=52):
+    return _hk_convert(extractHKData_03b_raw(rawData, hkPackLen))
+
+
+def extractHKData_normal(rawData, hkPackLen=HK_DATA_LEN):
+    return _hk_convert(extractHKData_normal_raw(rawData, hkPackLen))
+
+
+def extractHKData(rawData, hkPackLen=HK_DATA_LEN):
+    return _hk_convert(extractHKData_raw(rawData, hkPackLen))
+
+
+def extractTimelineData_raw(rawData, tlPackLen=TIMELINE_DATA_LEN):
     udpPattern = re.compile(PATTERNS['time_new'], re.S)
     udpPos = findPackPos(rawData, udpPattern)
 
@@ -231,13 +250,23 @@ def extractTimelineData(rawData, tlPackLen=TIMELINE_DATA_LEN):
     tlData = {
         'utc': np.array(utc),
         'pps': np.array(pps),
-        'timestamp': np.array(timestamp) * 100.,
+        'timestamp': np.array(timestamp),
     }
 
     return tlData
 
 
+def extractTimelineData(rawData, tlPackLen=TIMELINE_DATA_LEN):
+    tlData = extractTimelineData_raw(rawData, tlPackLen)
+    tlData['timestamp'] = tlData['timestamp'] * 100.
+    return tlData
+
+
 def extractTimelineData_03b(rawData, tlPackLen=TIMELINE_DATA_LEN):
+    return extractTimelineData_03b_raw(rawData, tlPackLen)
+
+
+def extractTimelineData_03b_raw(rawData, tlPackLen=TIMELINE_DATA_LEN):
     udpPattern = re.compile(PATTERNS['timeline'], re.S)
     udpPos = findPackPos(rawData, udpPattern)
 

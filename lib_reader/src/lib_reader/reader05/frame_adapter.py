@@ -1,11 +1,18 @@
 # -*- coding:utf-8 -*-
-"""Unified frame-based reader for the GRID 03B / 05B payloads.
+"""Unified reader for the GRID 03B / 05B payloads, split into L1 and L2.
 
-The science packets (waveform and feature) are decoded by the shared
-``packet_parser`` (``reader05/grid_packet.xml``); the HK / timeline extraction
-and the UTC fit are the same modular functions the legacy ``dataReadout`` uses,
-so the scientific output is unchanged.
+* L1 decoders (:func:`_decode_sci_l1` / :func:`_decode_hk_l1` /
+  :func:`_decode_tl_l1`) return the faithful raw fields of every science frame
+  (one row per particle) and every HK/timeline sample.
+* L2 (:func:`frames_to_processed`) reproduces the legacy ``(sci, tel)`` output:
+  CRC filtering, run splitting, unit conversion, UTC fit and the per-file time
+  cut.
+
+The science packets are decoded by the shared ``packet_parser``
+(``reader05/grid_packet.xml``); HK / timeline decoding lives in
+:mod:`reader05.readout`.
 """
+import functools
 import re
 from pathlib import Path
 
@@ -14,66 +21,137 @@ import numpy as np
 from ..packet_parser import parse_grid_data_new
 from ..frame_io import load_binary
 from ..util import data_refactor
+from ..l1_cache import get_l1_frames, get_l2_processed
 from . import readout
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
 
 _INTERNAL_FREQ = readout.INTERNAL_FREQ
+_FEATURE_EVENTS = 20
+_WF_SAMPLES = 256
 
 
-def _parse_sci_bytes(sci_raw, feature_mode):
-    """Decode a science byte chunk into the flat event dict ``extractSciEvents``
-    produced, in frame order with CRC filtering."""
-    buf = np.frombuffer(sci_raw, dtype=np.uint8)
-
+# --------------------------------------------------------------------------- #
+# L1 decoders (faithful raw frames)
+# --------------------------------------------------------------------------- #
+def _empty_sci(feature_mode):
+    zi = np.zeros(0, dtype=np.int32)
+    z32 = np.zeros(0, dtype=np.uint32)
+    z64 = np.zeros(0, dtype=np.uint64)
+    zb = np.zeros(0, dtype=bool)
     if feature_mode:
-        d, _ = parse_grid_data_new(
-            "", xml_file=_XML, data_tag="sci_ft_packet", endian="MSB",
-            multi_evt=20, multi_step=24, data=buf,
-        )
-        n = len(d["channel"])
-        ok = d["crc_check"].reshape(n, 20).all(axis=1)
-        okexp = np.repeat(ok, 20)
         return {
-            "timestampEvt": d["evt_timestamp"][okexp].astype(np.float64) / _INTERNAL_FREQ,
-            "channel": np.repeat(d["channel"][ok], 20).astype(np.uint8),
-            "eventID": np.repeat(d["event_number"][ok], 20).astype(np.uint32),
-            "amplitude": d["evt_data_max"][okexp].astype(np.uint16),
-            "meanBaseline": d["evt_data_base"][okexp].astype(np.uint16),
+            "chunk_idx": zi, "packet_idx": zi.copy(), "channel": z32,
+            "event_number": z32, "sample_length": z32, "evt_timestamp": z64,
+            "evt_data_sum": z64, "evt_data_max": z32, "evt_data_base": z32,
+            "evt_crc": z32, "crc_check": zb,
         }
-
-    d, _ = parse_grid_data_new(
-        "", xml_file=_XML, data_tag="sci_wf_packet", endian="MSB", data=buf,
-    )
-    ok = d["crc_check"]
     return {
-        "timestampEvt": d["timestamp"][ok].astype(np.float64) / _INTERNAL_FREQ,
-        "channel": d["channel"][ok].astype(np.uint8),
-        "eventID": d["event_number"][ok].astype(np.uint32),
-        "amplitude": d["data_max"][ok].astype(np.uint16),
-        "meanBaseline": d["data_base"][ok].astype(np.uint16),
+        "chunk_idx": zi, "channel": z32, "event_number": z32, "sample_length": z32,
+        "timestamp": z64, "data_sum": z64, "data_max": z32, "data_base": z32,
+        "CRC": z32, "crc_check": zb,
+        "waveform_data": np.zeros((0, _WF_SAMPLES), dtype=np.uint32),
     }
 
 
-def _sci_process(path, feature_mode, no_udp):
-    """Mirror ``dataReadout``'s chunked science loop: for UDP-wrapped payloads
-    the stream is read in ``maxUdpReadout`` runs (reusing ``extractSciRawData``,
-    so frames straddling a run boundary are lost exactly as legacy did)."""
+def _sci_chunks(path, no_udp):
     raw_data = load_binary(path).tobytes()
-
     if no_udp:
-        chunks = [raw_data]
-    else:
-        udp_pos = readout.findPackPos(raw_data, re.compile(readout.PATTERNS["udp"], re.S))
-        max_udp = readout.MAX_UDP_READOUT
-        total_runs = int(float(len(udp_pos)) / float(max_udp)) + 1
-        chunks = []
-        last_pos = 0
-        for _ in range(total_runs):
-            chunks.append(readout.extractSciRawData(raw_data, udp_pos, max_udp, last_pos))
-            last_pos += max_udp
+        return [raw_data]
+    udp_pos = readout.findPackPos(raw_data, re.compile(readout.PATTERNS["udp"], re.S))
+    max_udp = readout.MAX_UDP_READOUT
+    total_runs = int(float(len(udp_pos)) / float(max_udp)) + 1
+    chunks = []
+    last_pos = 0
+    for _ in range(total_runs):
+        chunks.append(readout.extractSciRawData(raw_data, udp_pos, max_udp, last_pos))
+        last_pos += max_udp
+    return chunks
 
+
+def _parse_sci_l1(sci_raw, feature_mode, chunk_idx):
+    buf = np.frombuffer(sci_raw, dtype=np.uint8)
+    if feature_mode:
+        d, _ = parse_grid_data_new(
+            "", xml_file=_XML, data_tag="sci_ft_packet", endian="MSB",
+            multi_evt=_FEATURE_EVENTS, multi_step=24, data=buf,
+        )
+        n = len(d["channel"])
+        rep = functools.partial(np.repeat, repeats=_FEATURE_EVENTS)
+        return {
+            "chunk_idx": np.full(n * _FEATURE_EVENTS, chunk_idx, dtype=np.int32),
+            "packet_idx": np.repeat(np.arange(n, dtype=np.int32), _FEATURE_EVENTS),
+            "channel": rep(d["channel"]),
+            "event_number": rep(d["event_number"]),
+            "sample_length": rep(d["sample_length"]),
+            "evt_timestamp": d["evt_timestamp"],
+            "evt_data_sum": d["evt_data_sum"],
+            "evt_data_max": d["evt_data_max"],
+            "evt_data_base": d["evt_data_base"],
+            "evt_crc": d["CRC"],
+            "crc_check": d["crc_check"],
+        }
+    d, _ = parse_grid_data_new(
+        "", xml_file=_XML, data_tag="sci_wf_packet", endian="MSB", data=buf,
+    )
+    n = len(d["channel"])
+    return {
+        "chunk_idx": np.full(n, chunk_idx, dtype=np.int32),
+        "channel": d["channel"],
+        "event_number": d["event_number"],
+        "sample_length": d["sample_length"],
+        "timestamp": d["timestamp"],
+        "data_sum": d["data_sum"],
+        "data_max": d["data_max"],
+        "data_base": d["data_base"],
+        "CRC": d["CRC"],
+        "crc_check": d["crc_check"],
+        "waveform_data": d["waveform_data"],
+    }
+
+
+def _decode_sci_l1(path, feature_mode, no_udp):
+    parts = [
+        _parse_sci_l1(chunk, feature_mode, i)
+        for i, chunk in enumerate(_sci_chunks(path, no_udp))
+        if len(chunk) > 0
+    ]
+    if not parts:
+        return _empty_sci(feature_mode)
+    return {k: np.concatenate([p[k] for p in parts], axis=0) for k in parts[0]}
+
+
+def _decode_hk_l1(hk_file, ending):
+    with open(hk_file, "rb") as fin:
+        hk_raw = fin.read()
+    extracter = {
+        "x_ray": readout.extractHKData_raw,
+        "normal": readout.extractHKData_normal_raw,
+        "03b": readout.extractHKData_03b_raw,
+    }
+    d = extracter[ending](hk_raw)
+    out = {"timestamp": np.asarray(d["timestamp"])}
+    for name in ("bias", "iMon", "temp", "iSys"):
+        arr = np.asarray(d[name])
+        for i in range(4):
+            out[f"{name}{i}"] = arr[i]
+    return out
+
+
+def _decode_tl_l1(timeline_file, ending):
+    with open(timeline_file, "rb") as fin:
+        tl_raw = fin.read()
+    d = (readout.extractTimelineData_03b_raw(tl_raw) if ending == "03b"
+         else readout.extractTimelineData_raw(tl_raw))
+    return {"utc": d["utc"], "pps": d["pps"], "timestamp": d["timestamp"]}
+
+
+# --------------------------------------------------------------------------- #
+# L2 processing (reproduces the legacy (sci, tel))
+# --------------------------------------------------------------------------- #
+def _sci_process(sci_frames, feature_mode):
     split_run_time = readout.SPLIT_RUN_TIME
+    freq = _INTERNAL_FREQ
     data_max = [[] for _ in range(4)]
     baseline = [[] for _ in range(4)]
     timestamp_evt = [[] for _ in range(4)]
@@ -82,9 +160,26 @@ def _sci_process(path, feature_mode, no_udp):
     empty_channel = []
 
     scisection = 1
-    for sci_raw in chunks:
-        sci_data = _parse_sci_bytes(sci_raw, feature_mode)
-        ts = sci_data["timestampEvt"]
+    for ci in np.unique(sci_frames["chunk_idx"]):
+        sel = sci_frames["chunk_idx"] == ci
+        d = {k: np.asarray(v)[sel] for k, v in sci_frames.items()}
+        if feature_mode:
+            n = len(d["crc_check"]) // _FEATURE_EVENTS
+            ok = d["crc_check"].reshape(n, _FEATURE_EVENTS).all(axis=1)
+            okexp = np.repeat(ok, _FEATURE_EVENTS)
+            ts = d["evt_timestamp"][okexp].astype(np.float64) / freq
+            channel = d["channel"][okexp].astype(np.uint8)
+            ev_id = d["event_number"][okexp].astype(np.uint32)
+            amplitude = d["evt_data_max"][okexp].astype(np.uint16)
+            mean_baseline = d["evt_data_base"][okexp].astype(np.uint16)
+        else:
+            ok = d["crc_check"]
+            ts = d["timestamp"][ok].astype(np.float64) / freq
+            channel = d["channel"][ok].astype(np.uint8)
+            ev_id = d["event_number"][ok].astype(np.uint32)
+            amplitude = d["data_max"][ok].astype(np.uint16)
+            mean_baseline = d["data_base"][ok].astype(np.uint16)
+
         q_sci = np.where(ts[:-1] > ts[1:] + split_run_time)[0]
         cur_sci_num = np.ones(len(ts)) * scisection
         if len(q_sci) > 0:
@@ -95,49 +190,42 @@ def _sci_process(path, feature_mode, no_udp):
                 last_sci_pos = q_sci[isci] + 1
 
         for ich in range(4):
-            if len(np.where(sci_data["channel"] == ich)[0]) == 0:
+            if len(np.where(channel == ich)[0]) == 0:
                 if ich not in empty_channel:
                     empty_channel.append(ich)
         for ich in range(4):
             if ich in empty_channel:
                 continue
-            q_ch = np.where(sci_data["channel"] == ich)[0]
-            data_max[ich].extend(list(sci_data["amplitude"][q_ch]))
-            baseline[ich].extend(list(sci_data["meanBaseline"][q_ch]))
-            timestamp_evt[ich].extend(list(sci_data["timestampEvt"][q_ch]))
-            event_id[ich].extend(list(sci_data["eventID"][q_ch]))
+            q_ch = np.where(channel == ich)[0]
+            data_max[ich].extend(list(amplitude[q_ch]))
+            baseline[ich].extend(list(mean_baseline[q_ch]))
+            timestamp_evt[ich].extend(list(ts[q_ch]))
+            event_id[ich].extend(list(ev_id[q_ch]))
             sci_num[ich].extend(list(cur_sci_num[q_ch]))
 
     amp = [[] for _ in range(4)]
     for ich in range(4):
         if ich not in empty_channel:
             amp[ich] = np.array(data_max[ich]) - np.array(baseline[ich])
-    amp = np.array(amp, dtype=object)
-    timestamp_evt = np.array(timestamp_evt, dtype=object)
-    event_id = np.array(event_id, dtype=object)
-    sci_num = np.array(sci_num, dtype=object)
-    return amp, timestamp_evt, event_id, sci_num
+    return (
+        np.array(amp, dtype=object),
+        np.array(timestamp_evt, dtype=object),
+        np.array(event_id, dtype=object),
+        np.array(sci_num, dtype=object),
+    )
 
 
-def _data_readout(path, feature_mode, no_udp, ending):
-    filename_no_path = re.split(r"\\|/", path)[-1]
-    file_path = path.split(filename_no_path)[0]
-    file_split = re.split(r"rundata|.dat", filename_no_path)
-    hk_file = file_path + file_split[0] + "HK" + file_split[1] + ".dat"
-    timeline_file = file_path + file_split[0] + "TimeLine" + file_split[1] + ".dat"
-
-    amp, timestamp_evt, event_id, sci_num = _sci_process(path, feature_mode, no_udp)
+def frames_to_processed(filename_no_path, sci_frames, hk_frames, tl_frames,
+                        feature_mode, ending):
     split_run_time = readout.SPLIT_RUN_TIME
 
+    amp, timestamp_evt, event_id, sci_num = _sci_process(sci_frames, feature_mode)
+
     # ---- HK ----------------------------------------------------------------
-    with open(hk_file, "rb") as fin:
-        hk_raw = fin.read()
-    hk_extracter = {
-        "x_ray": readout.extractHKData,
-        "normal": readout.extractHKData_normal,
-        "03b": readout.extractHKData_03b,
-    }
-    hk_data = hk_extracter[ending](hk_raw)
+    raw_hk = {name: np.stack([np.asarray(hk_frames[f"{name}{i}"]) for i in range(4)])
+              for name in ("bias", "iMon", "temp", "iSys")}
+    raw_hk["timestamp"] = np.asarray(hk_frames["timestamp"])
+    hk_data = readout._hk_convert(raw_hk)
 
     temp = hk_data["temp"]
     bias = hk_data["bias"]
@@ -163,20 +251,15 @@ def _data_readout(path, feature_mode, no_udp, ending):
     tel_num = np.array(tel_num)
 
     # ---- timeline ----------------------------------------------------------
-    with open(timeline_file, "rb") as fin:
-        tl_raw = fin.read()
-    if ending == "03b":
-        tl_data = readout.extractTimelineData_03b(tl_raw)
-    else:
-        tl_data = readout.extractTimelineData(tl_raw)
-
-    utc = readout.getUTC(filename_no_path, tl_data["timestamp"], tl_data["utc"], timestamp, False)
+    tl_timestamp = np.asarray(tl_frames["timestamp"], dtype=np.float64)
+    if ending != "03b":
+        tl_timestamp = tl_timestamp * 100.
+    utc = readout.getUTC(filename_no_path, tl_timestamp, np.asarray(tl_frames["utc"]),
+                         timestamp, False)
     utc = np.array(utc)
 
     # ---- time cut (per-file, from cutFileRef) -------------------------------
-    time_cut = None
-    if filename_no_path in readout.CUT_FILE_REF:
-        time_cut = readout.CUT_FILE_REF[filename_no_path]
+    time_cut = readout.CUT_FILE_REF.get(filename_no_path)
     if time_cut is not None:
         if isinstance(time_cut, list):
             q1 = (timestamp >= 0) * (timestamp <= time_cut[1])
@@ -217,17 +300,57 @@ def _data_readout(path, feature_mode, no_udp, ending):
     return data_refactor(sci_extracted), data_refactor(tel_extracted)
 
 
-def single_read05b_normal(path):
-    return _data_readout(path, feature_mode=False, no_udp=True, ending="normal")
+def _sibling_paths(path):
+    filename_no_path = re.split(r"\\|/", path)[-1]
+    file_path = path.split(filename_no_path)[0]
+    file_split = re.split(r"rundata|.dat", filename_no_path)
+    hk_file = file_path + file_split[0] + "HK" + file_split[1] + ".dat"
+    timeline_file = file_path + file_split[0] + "TimeLine" + file_split[1] + ".dat"
+    return filename_no_path, hk_file, timeline_file
 
 
-def single_read05b_xray(path, config):
-    return _data_readout(path, feature_mode=False, no_udp=True, ending="x_ray")
+def _process(path, ver, reader, feature_mode, no_udp, ending):
+    filename_no_path, hk_file, timeline_file = _sibling_paths(path)
+    sci_frames = get_l1_frames(
+        ver, reader, path, {"sci": lambda: _decode_sci_l1(path, feature_mode, no_udp)},
+        {"feature_mode": feature_mode, "no_udp": no_udp},
+    )["sci"]
+    hk_frames = get_l1_frames(
+        ver, reader, hk_file, {"hk": lambda: _decode_hk_l1(hk_file, ending)},
+        {"ending": ending},
+    )["hk"]
+    tl_frames = get_l1_frames(
+        ver, reader, timeline_file, {"tl": lambda: _decode_tl_l1(timeline_file, ending)},
+        {"ending": ending},
+    )["tl"]
+    return frames_to_processed(
+        filename_no_path, sci_frames, hk_frames, tl_frames, feature_mode, ending)
 
 
-def single_read03b(path, config):
-    return _data_readout(path, feature_mode=True, no_udp=False, ending="03b")
+def _read(path, ver, reader, feature_mode, no_udp, ending, overwrite_cache=False):
+    params = {"feature_mode": feature_mode, "no_udp": no_udp, "ending": ending}
+    return get_l2_processed(
+        ver, reader, path, params,
+        lambda: _process(path, ver, reader, feature_mode, no_udp, ending),
+        overwrite=overwrite_cache,
+    )
 
 
-def src_read03b(path, config):
-    return _data_readout(path, feature_mode=False, no_udp=False, ending="03b")
+def single_read05b_normal(path, config=None, **kwargs):
+    return _read(path, "05B", "normal", feature_mode=False, no_udp=True, ending="normal",
+                 overwrite_cache=kwargs.get("overwrite_cache", False))
+
+
+def single_read05b_xray(path, config=None, **kwargs):
+    return _read(path, "05B", "xray", feature_mode=False, no_udp=True, ending="x_ray",
+                 overwrite_cache=kwargs.get("overwrite_cache", False))
+
+
+def single_read03b(path, config=None, **kwargs):
+    return _read(path, "03B", "03b", feature_mode=True, no_udp=False, ending="03b",
+                 overwrite_cache=kwargs.get("overwrite_cache", False))
+
+
+def src_read03b(path, config=None, **kwargs):
+    return _read(path, "03B", "03b-src", feature_mode=False, no_udp=False, ending="03b",
+                 overwrite_cache=kwargs.get("overwrite_cache", False))
