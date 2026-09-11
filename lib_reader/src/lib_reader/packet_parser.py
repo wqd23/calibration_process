@@ -2,9 +2,7 @@ import numpy as np
 from crcmod import mkCrcFun
 import xml.etree.ElementTree as ET
 import re
-import h5py
 from .parity_check import crc16_xmodem_nd, bcc_nd
-import pandas as pd
 
 
 def find_pattern_in_buffer(buffer, pattern):
@@ -31,7 +29,6 @@ def parse_grid_data_new(file_name, xml_file=None, data_tag='wf_packet',
         cg_packet
         hk_grid1x_packet
     '''
-    print('========> parsing file ',file_name)
     packet_len = int(et_packet.attrib['packet_len']) if packet_len is None else packet_len
     head,tail = [],[]
     head = [int(v[2:],base=16) for v in et_packet.attrib['head'].split(';')]
@@ -109,25 +106,22 @@ def parse_grid_data_single(file_name, evt_index, xml_file='grid_packet.xml', dat
 
     data_byte = {}
     data = {}
-    # print(data_index.shape)
-    tag_info = pd.DataFrame({'name':[], 'start':[], 'size':[], 'len':[]})
+    tag_meta = {}
     for et in et_packet.findall('./'):
         name = et.tag
-        # print(name)
         if name in skip_et:
             continue
         start = int(et.find('start').text)
         if 'vary_wf' in et.find('start').attrib:
-            start = (start + int(tag_info[tag_info['name']=='waveform_data'].iloc[0]['start']) + 
-                int(tag_info[tag_info['name']=='waveform_data'].iloc[0]['size']) * int(tag_info[tag_info['name']=='waveform_data'].iloc[0]['len']))
+            wf_start, wf_size, wf_len = tag_meta['waveform_data']
+            start = start + wf_start + wf_size * wf_len
         if 'vary_repeat' in et.find('start').attrib:
-            print(et.find('start').attrib)
             start = (start + int(et.find('start').attrib['base_start']) + multi_evt*multi_step)
         size = int(et.find('size').text)
         length = int(et.find('len').text)
         if name == 'waveform_data':
             length = data['sample_length'][0]
-        tag_info.loc[len(tag_info.index)] = [name, start, size, length]
+        tag_meta[name] = (start, size, length)
 
         endian_bak = endian
         if 'endian' in et.attrib:
@@ -140,7 +134,6 @@ def parse_grid_data_single(file_name, evt_index, xml_file='grid_packet.xml', dat
         else:
             index = np.arange(start,start+length*size)
             multi_dim = 1
-        print(name)
         data_byte[name] = data0[:,index].reshape(-1,multi_dim,length,size) 
 
         if 'multi' in et.attrib:
@@ -184,7 +177,6 @@ def parse_grid_data_single(file_name, evt_index, xml_file='grid_packet.xml', dat
                 data['bcc_check'][:,j] = (bcc_nd(data0[:,bcc_index]) == data_bcc[:,j])
             data['bcc_check'] = data['bcc_check'].flatten()
 
-    print(tag_info)
     return (data,data_byte)
 
 def byte2int(data,endian='MSB'):
@@ -198,17 +190,6 @@ def byte2int(data,endian='MSB'):
     else:
         return (data @ 2**(8*np.arange(sp[-1], dtype=object))).squezze()
     pass
-
-if __file__ == "__main__":
-    import tkinter as tk
-    import tkinter.filedialog as tkf
-    from addict import Dict
-    
-    root = tk.Tk()
-    root.withdraw()
-    root.wm_attributes('-topmost',1)
-    #data0, data1,_,_ = parse_grid_data(tkf.askopenfilename(),'grid_packet.xml')
-    p1,_ = [Dict(v) for v in parse_grid_data_new(tkf.askopenfilename(),data_tag='ft_packet',endian='MSB')]
 
 ## deprecated
 def find_event_index(buffer, featureEventNum=20, sampleLen=256):
@@ -246,21 +227,3 @@ def parse_grid_data(file_name, xml_file=None,multi_evt=20,multi_step=24,endian='
 def crc16_xmodem(s):
     crc16 = mkCrcFun(0x11021, rev=False, initCrc=0x0000, xorOut=0x0000)
     return crc16(s)
-
-def dict_to_hdf5(fh,data):
-    for key,value in data.items():
-        if key == 'Header':
-            pass
-        elif type(value) is dict:
-            dict_to_hdf5(fh,data=value)
-        else:
-            # TODO(liping): temporary treat
-            if key == 'DDR_crc':
-                dt = h5py.string_dtype(encoding='utf-8')
-                fh.create_dataset(key,dtype=dt,data=str(value))
-            else:
-                fh.create_dataset(key,data=value)
-
-def save_hdf5(path=None,data=None):
-    with h5py.File(path+'.hdf5','w') as fh:
-        dict_to_hdf5(fh,data)

@@ -5,7 +5,16 @@ description = "Reader for GRID 03B, 04, 05B, 07, 10B calibration data"
 authors = [
     { name = "wqd", email = "wqd.2019@tsinghua.org.cn" }
 ]
-dependencies = []
+dependencies = [
+    "numpy>=1.24.4",
+    "addict>=2.4.0",
+    "polars>=0.20.0",
+    "numba>=0.58.1",
+    "lmfit>=1.2.2",
+    "scipy>=1.10.1",
+    "crcmod>=1.7",
+    "matplotlib>=3.7.2",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 
