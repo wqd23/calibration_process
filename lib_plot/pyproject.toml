@@ -5,9 +5,17 @@ description = "Plot librarry for GRID calibration"
 authors = [
     { name = "wqd", email = "wqd.2019@tsinghua.org.cn" }
 ]
-dependencies = []
-readme = "README.md"
-requires-python = ">= 3.8"
+dependencies = [
+    "grid_common",
+    "lib_reader",
+    "numpy>=1.24.4",
+    "matplotlib>=3.7.2",
+    "nptyping>=2.5.0",
+]
+
+[tool.uv.sources]
+grid_common = { workspace = true }
+lib_reader = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

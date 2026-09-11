@@ -9,6 +9,7 @@ authors = [
 dependencies = [
     "lib_reader",
     "lib_plot",
+    "grid_common",
     "numpy>=1.24.4",
     "matplotlib>=3.7.2",
     "scipy>=1.10.1",
@@ -50,9 +51,10 @@ allow-direct-references = true
 [tool.uv.sources]
 lib_reader = { workspace = true }
 lib_plot = { workspace = true }
+grid_common = { workspace = true }
 
 [tool.uv.workspace]
-members = ["lib_plot", "lib_reader"]
+members = ["lib_plot", "lib_reader", "grid_common"]
 
 
 [tool.pytest.ini_options]

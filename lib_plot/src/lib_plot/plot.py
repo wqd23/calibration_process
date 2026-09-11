@@ -16,11 +16,12 @@ Features:
 ---------------------------------
 """
 
-import lib_reader.reader05.fit_utils as basic
+import grid_common.fit_utils as basic
 from lib_reader.reader05.my_type import *
 import nptyping as npt
 
-from calibration_process.util_lib import resolutionFunction, headtime
+from grid_common.naming import headtime
+from grid_common.resolution import resolutionFunction
 
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec

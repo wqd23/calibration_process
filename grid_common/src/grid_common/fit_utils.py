@@ -1,8 +1,9 @@
 # -*- coding:utf-8 -*-
-"""Shared spectrum / response helpers used by ``calibration_process.util_lib``.
+"""Shared spectrum / response helpers.
 
-Extracted verbatim from the legacy ``reader05.gridBasicFunctions`` so that
-module can be removed.  Function bodies are unchanged.
+Extracted verbatim from the legacy ``reader05.gridBasicFunctions`` (via
+``lib_reader.reader05.fit_utils``) so the reader package no longer owns them.
+Function bodies are unchanged.
 """
 import numpy as np
 

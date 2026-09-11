@@ -6,7 +6,9 @@ GRID version independent Functions Library
 Basic functions for GRID data processing\n
 """
 
-import lib_reader.reader05.fit_utils as basic
+import grid_common.fit_utils as basic
+from grid_common.naming import headtime
+from grid_common.resolution import resolutionFunction
 from lib_reader.reader05.my_type import *
 
 import numpy as np
@@ -16,7 +18,6 @@ from scipy.optimize import curve_fit
 import dill as pickle
 import json
 import os
-import datetime
 import re
 from pathlib import Path
 
@@ -283,12 +284,6 @@ def tempbias2DFunction(temp, bias, G0, k, V0, b, c):
     return G0 * Vov**2 * (-(temp**2) + b * temp + c)
 
 
-def resolutionFunction(x, a, b, c):
-    y = np.sqrt(a * x * x + b * x + c) / x
-    y[a * x * x + b * x + c < 0] = 0.0
-    return y
-
-
 def temp_bias_lmfit(
     center: Float1D,
     center_err: Float1D,
@@ -426,10 +421,6 @@ def json_save(data, path: str):
         f.write(json.dumps(data, ensure_ascii=False))
 
 
-def timestamp(format="%Y%m%d%H%M%S"):
-    return datetime.datetime.now().strftime(format)
-
-
 def json_time_save(data, path: str, forward=False):
     """save data with a time appended file name, wrapper for json_save
 
@@ -448,15 +439,6 @@ def json_time_save(data, path: str, forward=False):
 
 def json_headtime_save(data, path: str):
     json_time_save(data, path, forward=True)
-
-
-def headtime(path, forward=True):
-    path = Path(path)
-    if forward:
-        new = path.parent / f"{timestamp()}_{path.stem}{path.suffix}"
-    else:
-        new = path.parent / f"{path.stem}_{timestamp()}{path.suffix}"
-    return new
 
 
 def json_load(path: str):

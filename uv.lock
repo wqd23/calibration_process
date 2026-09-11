@@ -12,6 +12,7 @@ resolution-markers = [
 [manifest]
 members = [
     "calibration-process",
+    "grid-common",
     "lib-plot",
     "lib-reader",
 ]
@@ -322,6 +323,7 @@ dependencies = [
     { name = "crcmod" },
     { name = "dill" },
     { name = "fire" },
+    { name = "grid-common" },
     { name = "h5py", version = "3.11.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "h5py", version = "3.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "lib-plot" },
@@ -372,6 +374,7 @@ requires-dist = [
     { name = "crcmod", specifier = ">=1.7" },
     { name = "dill", specifier = ">=0.3.7" },
     { name = "fire", specifier = ">=0.5.0" },
+    { name = "grid-common", editable = "grid_common" },
     { name = "h5py", specifier = ">=3.10.0" },
     { name = "lib-plot", editable = "lib_plot" },
     { name = "lib-reader", editable = "lib_reader" },
@@ -1231,6 +1234,18 @@ sdist = { url = "https://files.pythonhosted.org/packages/30/3e/a80a8c077fd798951
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cf/58/8acf1b3e91c58313ce5cb67df61001fc9dcd21be4fadb76c1a2d540e09ed/fqdn-1.5.1-py3-none-any.whl", hash = "sha256:3a179af3761e4df6eb2e026ff9e1a3033d3587bf980a0b1b2e1e5d08d7358014", size = 9121 },
 ]
+
+[[package]]
+name = "grid-common"
+version = "0.1.0"
+source = { editable = "grid_common" }
+dependencies = [
+    { name = "numpy", version = "1.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "numpy", specifier = ">=1.24.4" }]
 
 [[package]]
 name = "h11"
@@ -2282,6 +2297,25 @@ wheels = [
 name = "lib-plot"
 version = "0.1.0"
 source = { editable = "lib_plot" }
+dependencies = [
+    { name = "grid-common" },
+    { name = "lib-reader" },
+    { name = "matplotlib", version = "3.7.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "matplotlib", version = "3.9.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "matplotlib", version = "3.10.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "nptyping" },
+    { name = "numpy", version = "1.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "grid-common", editable = "grid_common" },
+    { name = "lib-reader", editable = "lib_reader" },
+    { name = "matplotlib", specifier = ">=3.7.2" },
+    { name = "nptyping", specifier = ">=2.5.0" },
+    { name = "numpy", specifier = ">=1.24.4" },
+]
 
 [[package]]
 name = "lib-reader"
