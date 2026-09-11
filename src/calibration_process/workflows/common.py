@@ -7,6 +7,7 @@ lib_plot).  They never re-implement the fit / plot / serialization logic.
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 from typing import List, Optional
@@ -17,6 +18,44 @@ from .. import file_lib, util_lib as util
 from ..config_schema import ManifestEntry
 from ..products import FileRunSpec, SingleFitResult, TBPoint, ECPoint
 from ..runtime import RuntimeConfig
+
+
+def _jsonable(obj):
+    """Recursively convert numpy scalars/arrays so ``json.dumps`` works."""
+    if isinstance(obj, dict):
+        return {k: _jsonable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_jsonable(v) for v in obj]
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, np.generic):
+        return obj.item()
+    if callable(obj):
+        return getattr(obj, "__name__", repr(obj))
+    if isinstance(obj, (str, int, float, bool)) or obj is None:
+        return obj
+    return str(obj)
+
+
+def _save_spectrum(fp, path) -> None:
+    """Write the 4-channel spectrum as a portable long-format parquet table."""
+    import polars as pl
+
+    channel, bin_idx, x, spectrum, spectrum_err = [], [], [], [], []
+    for i in range(4):
+        xi = np.asarray(fp.x[i])
+        channel.append(np.full(len(xi), i, dtype=np.int8))
+        bin_idx.append(np.arange(len(xi), dtype=np.int32))
+        x.append(xi)
+        spectrum.append(np.asarray(fp.spectrum[i]))
+        spectrum_err.append(np.asarray(fp.spectrum_err[i]))
+    pl.DataFrame({
+        "channel": np.concatenate(channel),
+        "bin": np.concatenate(bin_idx),
+        "x": np.concatenate(x),
+        "spectrum": np.concatenate(spectrum),
+        "spectrum_err": np.concatenate(spectrum_err),
+    }).write_parquet(path, compression="zstd")
 
 
 # --------------------------------------------------------------------------- #
@@ -264,24 +303,49 @@ def run_single_fit(
         fit_range=fc.fit_config.fit_range,
         save_path=str(fig_dir / f"{stem}.png"),
     )
+    # L3: portable fit parameters + spectrum (the pickle stays for compatibility
+    # with legacy consumers and for the frozen-oracle regression).
+    util.json_save(
+        {"file": str(fp.path), "fit_result": _jsonable(fp.fit_result)},
+        str(save_dir / f"{stem}.fit.json"),
+    )
+    _save_spectrum(fp, save_dir / f"{stem}.spectrum.parquet")
     fp.save(str(save_dir / f"{stem}.pickle"))
     return fp
 
 
 class _LoadedFit:
-    """Minimal accessor over a persisted single-fit pickle."""
+    """Minimal accessor over a persisted single-fit result."""
 
-    def __init__(self, pickle_dict):
-        self.fit_result = pickle_dict["fit_result"]
-        self.tel = pickle_dict["tel"]
+    def __init__(self, fit_result, tel):
+        self.fit_result = fit_result
+        self.tel = tel
 
 
 def load_single_fp_from_store(rt, branch, m, output_root) -> _LoadedFit:
-    """Load a single-fit pickle produced by the single-fit stage."""
+    """Load a single-fit result: L3 ``fit.json`` + L2 telemetry.
+
+    ``fit_result`` comes from the portable L3 ``fit.json``.  TB telemetry is
+    rebuilt from the reader's L2 ``processed.parquet`` cache by re-resolving
+    the exact read spec (the reader returns the cached processing); this keeps
+    L4 independent of the dill pickle's ``tel``.  Both fall back to the pickle
+    when the newer artefacts are absent.
+    """
     stem = os.path.splitext(m.id)[0]
     sub = "TB_fit_result" if branch == "tb" else "EC_fit_result"
-    path = output_root / "single_process" / sub / f"{stem}.pickle"
-    return _LoadedFit(util.pickle_load(str(path)))
+    base = output_root / "single_process" / sub / stem
+    fit_json = base.with_suffix(".fit.json")
+    if fit_json.exists():
+        fit_result = json.loads(fit_json.read_text())["fit_result"]
+    else:
+        fit_result = util.pickle_load(str(base.with_suffix(".pickle")))["fit_result"]
+
+    tel = None
+    if branch == "tb":
+        tel = build_fit_operation(rt, "tb", single_run_spec(rt, "tb", m)).tel
+        if tel is None:
+            tel = util.pickle_load(str(base.with_suffix(".pickle")))["tel"]
+    return _LoadedFit(fit_result, tel)
 
 
 # --------------------------------------------------------------------------- #
