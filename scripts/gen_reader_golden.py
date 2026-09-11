@@ -3,10 +3,17 @@
 
 For each sample it commits a small truncated real raw sample under
 ``tests/golden/reader/<sample>/raw/`` plus the frozen ``(sci, tel)`` output
-(``expected.npz`` + ``structure.json``) produced by the *legacy* reader.  At test
-time ``tests/test_reader_golden.py`` runs the *new* unified reader on the
-committed sample and asserts the output equals the frozen legacy output, with no
-``raw_data`` / ``.oracle`` dependency.
+(``expected.npz`` + ``structure.json``).  At test time
+``tests/test_reader_golden.py`` runs the *new* unified reader on the committed
+sample and asserts the output equals the frozen output, with no ``raw_data`` /
+``.oracle`` dependency.
+
+The committed expected output is the legacy-validated ``(sci, tel)`` (the same
+values the frozen oracle produces, byte-for-byte).  Re-running this script
+re-freezes the *current* reader output: only do it intentionally, after the
+oracle regression (``tests/test_pipeline_run.py``) has confirmed the reader is
+still legacy-identical, otherwise the legacy baseline would be overwritten by
+current code.
 
 For 03B/05B the HK / timeline / config sibling files (derived from the rundata
 name) are committed alongside the truncated rundata.  The 03B feature sample is

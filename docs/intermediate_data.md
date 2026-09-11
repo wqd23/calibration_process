@@ -10,7 +10,10 @@
 
 | 数据 | 位置 | 格式 | 怎么读 |
 |------|------|------|--------|
-| L1 解析缓存（全版本） | `data/{ver}/l1_cache/` | polars parquet（zstd）+ `meta.json` + `index.json` | 见本文「5. L1 parquet 缓存」；亦可脱离本项目用纯 polars 读 parquet |
+| L1 忠实帧缓存（全版本） | `data/{ver}/l1/<key>/<kind>.parquet` + `<kind>.meta.json` + `index.json` | polars parquet（zstd） | 见本文「5. L1/L2 缓存」；亦可脱离本项目用纯 polars 读 parquet |
+| L2 处理结果缓存（全版本） | `data/{ver}/l2/<key>/`（若干 parquet）+ `meta.json` + `index.json` | polars parquet（zstd，四通道叠加） | 见本文「5. L1/L2 缓存」 |
+| 单谱拟合参数（可移植） | `single_process/{TB,EC}_fit_result/*.fit.json` | JSON（`fit_result` 4 通道参数） | `json.load` |
+| 单谱能谱（可移植） | `single_process/{TB,EC}_fit_result/*.spectrum.parquet` | polars parquet（长表：channel/bin/x/spectrum/spectrum_err） | `polars.read_parquet` |
 | 单谱拟合 pickle | `single_process/{TB,EC}_fit_result/*.pickle` | **dill** pickle 的 dict | `dill.load(path)` 或 `util_lib.pickle_load(path)` |
 | 单谱拟合图 | `single_process/single_fit_fig/*.png` | PNG | `matplotlib.image.imread` |
 | TB 二维面拟合 | `tb_logs/*_temp_bias_fit.json` | JSON（每通道 G0/k/V0/b/c+err+redchi+ndf） | `json.load` |
@@ -117,74 +120,86 @@ stages.global_tb(rt, custom, pipeline.output_root("09") / "tb_logs_custom")
   pickle 后把需要字段另存为 npy/json；本项目若要加这类"可移植中间产物"，可再加
   一个 `calib export` 子命令（目前未做）。
 
-## 5. L1 parquet 缓存（全版本）
+## 5. L1/L2 缓存（全版本）
 
-修订日期：2026-09-10
+修订日期：2026-09-12
 
-为了替代 dill，本仓库给 reader 结果加了一层 L1 parquet 缓存，统一放在
-`data/{ver}/l1_cache/`。按缓存边界分两种：
+读取分成两层，各写一层 parquet 缓存，都放在 `data/{ver}/` 下：
 
-- **帧缓存**（`schema_ver=1`，10B/11B/12B）：缓存 `readSci`/`readHK` 的**原始解析
-  结果**（每事件一行），命中后**重跑** `single_readXX` 的既有后处理（amp、遥测换算、
-  稳定段截取、按通道分组），对科学结果透明。
-- **最终输出缓存**（`schema_ver=2`，03B/04/05B/07/09）：缓存整个 `(sci, tel)` 的
-  **最终输出**，命中即返回（不重跑）。参差的四通道量按"四通道叠加"压成规整 parquet：
-  每个通道键把 4 个通道数组**首尾相连**成一列、并记录各通道长度（`sublens`），读回时
-  再按边界切回 4 个通道；共享数组与空条目分别存表/存 `meta.json`。
+- **L1 忠实帧**（`data/{ver}/l1/<key>/<kind>.parquet`，`schema_ver=4`）：把原始帧里
+  每个字段原样落成"天然单元"的一行——科学数据一个粒子一行，HK/时间线一次采样
+  一行。包含帧头元数据、数据字段（如 `data_sum`）、CRC 数值，以及解析时算出的
+  `crc_check`。处理（CRC 过滤、run 切分、单位换算、按通道分组）不属于 L1。
+- **L2 处理结果**（`data/{ver}/l2/<key>/`，`schema_ver=5`）：各版本 reader 的
+  `(sci, tel)` 最终输出。参差的四通道量按"四通道叠加"压成规整 parquet：每个键把
+  4 个通道数组首尾相连成一列并记录各通道长度（`sublens`），读回时按边界切回；
+  共享的 1-D/2-D 数组与空条目分别存表/存 `meta.json`。每个键还记录**逐通道
+  dtype**（空通道默认 float64，不能与整型通道混成一个 dtype）。
+
+读取入口：`single_readXX`（`lib_reader`）内部就是"取 L1 → 处理成 L2"；命中 L2 时
+直接返回、不再碰 L1。`lib_reader.read_frames(path, ver, kind)` 只做 L1 解码，供只
+想拿原始帧的项目使用。
 
 一次性灌满全部版本用 `python scripts/warm_l1_cache.py [ver ...]`（只做读出、不拟合）。
 
 ### 布局与缓存键
 
 ```
-data/{ver}/l1_cache/
-  index.json                  # 原始文件 -> 缓存映射（每条记录一个原始文件）
-  cache/{key}/
-    events.parquet            # readSci 的 raw 解析结果（每事件一行）
-    tel.parquet               # readHK  的 raw 解析结果（每 HK 记录一行）
-    meta.json                 # schema_ver / reader / ver / kind / dtypes / rows
+data/{ver}/l1/<key>/
+  sci.parquet  hk.parquet  tl.parquet     # 按 kind 各一张（存在哪些由载荷决定）
+  <kind>.meta.json                         # schema_ver/reader/ver/kind/dtypes/shapes/rows
+  （sci.meta.json 里 03B UDP 文件另有 legacy_drop_frame_idx）
+data/{ver}/l1/index.json                   # 原始文件 -> key 映射
+data/{ver}/l2/<key>/
+  sci__chan__0.parquet  sci__flat__0.parquet  tel__chan__0.parquet ...
+  meta.json                                # sections{files(sublens/shape/keys/dtypes),empties}
+data/{ver}/l2/index.json
 ```
 
-缓存键为 `sha256(f"{ver}|{reader}|{kind}|{raw_path}|{parse_kwargs 的排序 json}")[:16]`，
-`parse_kwargs` 只含影响解析的参数（如 `readSci` 的 `mode`；`readHK` 为空），
+缓存键为 `sha256(f"{ver}|{reader}|{raw_path}|{parse_kwargs 的排序 json}")[:16]`，
+`parse_kwargs` 只含影响解析的参数（如 `readSci` 的 `mode`、B 的 `feature_mode`），
 **不含** `bin_width`/`adc_max`/`fit_range` 等后续拟合参数。`overwrite_cache=True`
-会强制重解析并覆盖缓存。kind 为 `sci`/`tel`，二者键不同、各占一个 `cache/{key}/`
-目录。
+会强制重算并覆盖缓存。
 
-### 为什么不建议直接读缓存文件
+### 为什么不建议直接读 L1 文件
 
-- parquet 里存的是**原始整数/bool 数组**（`amp` 不缓存，由后处理重算），所以要读
-  出能用于分析的"峰"仍要走 `single_readXX`。
-- `index.json` 只是"哪个原始文件对应哪个 parquet"的发现表；`meta.json` 里记录各列
-  的 numpy dtype，用于读取时若有宽度提升则按原 dtype 回退。
+- L1 parquet 里是**逐字段的原始整数/bool 数组**（`amp` 由 L2 用 `data_max-data_base`
+  重算），要拿能用于分析的"峰"仍要走 L2（`single_readXX`）。
+- `meta.json` 记录各列 numpy dtype 与 2-D 形状，读回时按原值还原；`index.json` 只是
+  "哪个原始文件对应哪个 key"的发现表。
 
 ### 跨项目读取（纯 polars，无本包 import）
 
 ```python
 import json, polars as pl
-idx = json.load(open("data/12B/l1_cache/index.json"))
+idx = json.load(open("data/12B/l1/index.json"))
 rec = next(r for r in idx if r["kind"] == "sci")
-df = pl.read_parquet(rec["events"])          # 每事件一行
+df = pl.read_parquet("data/12B/l1/" + rec["key"] + "/sci.parquet")   # 每粒子一行
 amp = df["data_max"] - df["data_base"].to_numpy() / 4.0
 ```
 
-### 「四通道叠加」缓存布局（03B/04/05B/07/09）
+`index.json` 的每条记录带相对路径字段 `file`，可直接使用。
 
-```
-data/{ver}/l1_cache/cache/{key}/
-  meta.json               # schema_ver=2, reader/ver/kind, sections{sci,tel}
-  sci__chan__0.parquet    # 通道键（同 sublens 的合一张表）：每键一列=concat(4通道) + __channel__
-  sci__flat__0.parquet    # 共享 1-D 数组（如 effectiveCount/missingCount）
-  tel__chan__0.parquet
-  tel__flat__0.parquet
-```
+### 03B 的 legacy 丢帧
 
-`meta.json` 的 `sections.<name>.files` 记录每张表是 `channel`（含 `sublens`/`keys`）还是
-`flat`（含 `shape`/`keys`），`empties` 记录空条目（空 list / None）。读回外部工具时按
-`sublens` 用 `np.split` 切回四通道即可；`__channel__` 列给出每行归属的通道号。
+旧实现用 `maxUdpReadout=10000` 分批读 UDP，跨批边界的科学帧会被丢弃。新实现 L1 按
+完整格式解码全部帧，并把旧实现会丢的帧号写进 `sci.meta.json` 的
+`legacy_drop_frame_idx`；L2 据此丢帧，保证输出与 legacy 逐字节一致。
 
-> 缓存键与 `schema_ver` 详见 `lib_reader/src/lib_reader/l1_cache.py`；命中校验同时检查
-> `schema_ver` 与 `kind`，任何格式/语义变化都必须 bump 常量以作废旧缓存。
+> 缓存键与 `schema_ver` 详见 `lib_reader/src/lib_reader/l1_cache.py`；任何格式/语义
+> 变化都必须 bump 常量以作废旧缓存。
+
+## 5b. L3 拟合参数 / L4 输入
+
+修订日期：2026-09-12
+
+- **L3**：`run_single_fit` 除原有 dill pickle 外，新增可移植的
+  `<stem>.fit.json`（4 通道拟合参数）与 `<stem>.spectrum.parquet`（长表
+  `channel/bin/x/spectrum/spectrum_err`）。pickle 保留给旧消费方与冻结 oracle。
+- **L4**：`load_single_fp_from_store` 从 `fit.json` 读 `fit_result`，TB 遥测
+  （`tempSipm`/`bias`）改从 reader 的 **L2 处理结果**取（按同一 read spec 重解析，
+  命中 L2 即返回），不再依赖 pickle 里的 `tel`。
+
 
 ## 6. 读取层统一（packet_parser / frame_io）
 
@@ -206,19 +221,20 @@ data/{ver}/l1_cache/cache/{key}/
 
 | 载荷族 | 帧 XML | 适配层（帧表→`(sci, tel)`） | 说明 |
 |--------|--------|------------------------------|------|
-| 10B/11B/12B | 各 `reader{10,11,12}/grid_packet.xml` | `readerXX/read.py` 的后处理 | 原始帧缓存（schema_ver=1） |
+| 10B/11B/12B | 各 `reader{10,11,12}/grid_packet.xml` | `readerXX/read.py` | L1 帧缓存 + L2 处理输出 |
 | 04/07/09 | `reader07/grid_packet.xml` | `reader07/frame_adapter.py` | 三版合并为一个参数化 reader；`hex_sci_packet`（主事件 + 43 子事件，步进 11B）、`hex_tel_packet`（7×70B） |
 | 03B/05B | `reader05/grid_packet.xml` | `reader05/frame_adapter.py` + `reader05/readout.py` | `sci_wf_packet`（waveform）/`sci_ft_packet`（feature 20×24B）；HK/timeline 解码与 UTC 拟合在自包含的 `readout.py` |
 
 要点与坑：
 
 - **04 与 07 的差异是两个科学常量**：`internal_resistance`（04=2.1、07=1.1）与 iMon
-  除数（04 除以 2.0、07 除以 1.0）。合并时做成版本参数 `_PARAMS`，不"顺手统一"。
+  除数（04 除以 2.0、07 除以 1.0）。这些常量放在 `configs/{ver}/reader.yaml`，由
+  `file_lib` 读出后传给 reader（直接调用 reader 时用内建默认值），不"顺手统一"。
 - **C 组科学包不是纯 XML 直出**：主事件在包头，43 个子事件在 repeat 区（步进 11B），
   适配层用 stable-argsort 按通道分组以复现 legacy 的"逐包、先主事件后子事件"顺序。
 - **B 组 UDP 分块读取会造成帧丢失**：legacy 以 `maxUdpReadout=10000` 个 UDP 包为一批
-  读取，跨批边界的科学帧被丢弃。适配层复用 `readout.extractSciRawData` 按同样的批次
-  切分，**忠实复现**这一行为（否则 03B 输出会与 legacy/oracle 不一致）。
+  读取，跨批边界的科学帧被丢弃。新实现 L1 解码全部帧、把丢失帧号记进
+  `legacy_drop_frame_idx`，由 L2 丢弃以复现 legacy 行为（见第 5 节）。
 - **`cutFileRef` 逐文件时间截断**：部分 03B X 光机文件带按文件名指定的 time cut，
   适配层在末尾复现该截断。
 - HK/timeline 解码（`extractHKData*`/`extractTimelineData*`/`getUTC`）与 `findPackPos`/
@@ -234,7 +250,12 @@ data/{ver}/l1_cache/cache/{key}/
 `gridBasicFunctions.py`/`gridParametersCommon.py`/`gridProcessFunctions*/`、
 `extractSciEvents`/`dataReadout`/`fitBaseline` 等编排函数、`*_legacy` 包装与全部
 `@cachier`（含依赖）。B 族现在只依赖 `reader05/readout.py` 的小函数；`util_lib` 用到的
-`getSpectrum`/`gehrelsErr`/`residualTempbias2D` 迁到 `reader05/fit_utils.py`。
+`getSpectrum`/`gehrelsErr`/`residualTempbias2D` 及 `resolutionFunction`/`headtime` 已迁到
+中立包 `grid_common`（见第 8 节）。
+
+版本级读取参数（`engine` + handler 注册表 + 常量）放在
+`configs/{ver}/reader.yaml`，由 `calib check` 做 strict 校验；`file_lib.__read` 经
+`lib_reader.READERS` 注册表统一分发，不再有 `if ending == ...` 的硬编码。
 
 ## 7. Reader golden（自包含回归）
 
@@ -245,6 +266,29 @@ data/{ver}/l1_cache/cache/{key}/
 解码（07/04）、B 组 waveform noUdp（05B normal）、大小端 HK（05B xray）、waveform UDP
 （03B src）、feature UDP 与逐文件 time cut（03B xray）。重新生成：
 `python scripts/gen_reader_golden.py`。
+
+## 8. 分层流水线与共享包
+
+修订日期：2026-09-12
+
+流水线现在是**声明式步骤**，可用 `--until` 停在任意层：
+
+```
+L1 忠实帧（reader 解码）        data/{ver}/l1/
+L2 处理输出（reader 处理）      data/{ver}/l2/
+L3 单谱拟合                    single_process/*/*.{fit.json,spectrum.parquet,pickle}
+L4 构造点（TB/EC）             内存中（由 L3+L2 得到）
+L5 全局拟合                    tb_logs/、ec_logs/
+```
+
+- `calib all {ver} --until L2` 只跑读出（建 L1/L2 缓存），不拟合；
+  `--until L3` 跑完单谱拟合即停；`--until L4` 构造点后停；默认 `L5` 跑完整流程。
+- L1/L2 由同一次 reader 调用一起产生；L4 的 TB 遥测来自 L2，`fit_result` 来自 L3。
+
+共享数值（谱直方图 `getSpectrum`、`gehrelsErr`、residual/response 函数、
+`resolutionFunction`、`headtime`）集中在中立包 **`grid_common`**，供
+`calibration_process` 与 `lib_plot` 共用。这样 `lib_plot` 不再反向 import
+`calibration_process`，workspace 内没有包循环；`lib_reader` 也不再持有拟合工具。
 
 ## 相关
 - 结构：`README.md` 仓库结构

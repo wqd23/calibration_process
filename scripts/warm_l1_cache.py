@@ -1,9 +1,10 @@
 # -*- coding:utf-8 -*-
-"""Populate the L1 parquet cache for every measurement (read step only).
+"""Populate the L1/L2 parquet caches for every measurement (read step only).
 
 For each version/branch it resolves the run spec and builds the
 ``File_operation_05b`` (whose constructor performs the data readout via
-``read_out``), which populates ``data/{ver}/l1_cache/`` without running any fit.
+``read_out``), which populates ``data/{ver}/l1/`` (faithful frames) and
+``data/{ver}/l2/`` (processed ``(sci, tel)``) without running any fit.
 Errors on individual measurements are reported and skipped.
 
 Usage:

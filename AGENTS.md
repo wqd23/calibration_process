@@ -41,16 +41,20 @@ just cover                                          # coverage run + report（.c
 - CLI 入口统一为 **`calib`**（`src/calibration_process/cli.py`，也可
   `python -m calibration_process.cli` 或 `pyproject` 里的 `calib` console script）。
 - **配置集中在 `src/calibration_process/configs/{ver}/`**：
-  `payload.yaml`（版本级科学/reader 参数）、`analysis.yaml`（背景/峰型默认与 override）、
+  `payload.yaml`（版本级科学/reader 参数）、`reader.yaml`（读取 engine + handler
+  注册表 + 版本常量）、`analysis.yaml`（背景/峰型默认与 override）、
   `fit_range_{tb,ec_source,ec_xray}.yaml`（逐 measurement 每通道区间）、
   `*_manifest.yaml`（**人工确认**的 measurement 列表）。全部走 strict schema。
+- **分层缓存与流水线**：reader 读取产出 `data/{ver}/l1/`（忠实帧）+ `data/{ver}/l2/`
+  （处理结果）；`calib all {ver} --until L1|L2|L3|L4|L5` 可在任意层停下（L2=只读出、
+  L3=单拟合、L4=构造点、L5=全局）。L3 另写可移植的 `*.fit.json` / `*.spectrum.parquet`。
 - **每版本一个显式 workflow**：`workflows/versions/v{ver}.py`（`enumerate_measurements`
   复现历史选点规则）；共享 stage 在 `workflows/common.py`；版本选择只发生一次
   （`workflows/registry.py`，之后不再 `if version == ...`）。
 - **Protected scientific kernel**：`file_lib.py` / `util_lib.py` / `lib_reader/` /
   `lib_plot/`。单谱拟合、TB/EC 数学模型、reader 数据结构都归它们——读取层已统一
-  （见 [docs/intermediate_data.md](docs/intermediate_data.md) 第 6 节），但**科学数学
-  未改**。
+  （见 [docs/intermediate_data.md](docs/intermediate_data.md) 第 5/6 节），但**科学数学
+  未改**。共享数值在 `grid_common/`（中立包，避免 lib_plot↔calibration_process 循环）。
 - 数据软链到 `data/{ver}/raw_data`（不复制），产物输出到 `data/{ver}/single_process/`、
   `tb_logs/`、`ec_logs/`。
 - 中间产物的格式与可移植性见 [docs/intermediate_data.md](docs/intermediate_data.md)：
@@ -76,7 +80,7 @@ just check {ver}            # 全 OK -> [ver] READY；缺失时加 --fix 建输�
 
 `just check`（`calib check`）校验：
 - `raw_data` 软链（真实目录也算可接受）；
-- `configs/{ver}/payload.yaml` / `analysis.yaml` 是否 strict-valid；
+- `configs/{ver}/payload.yaml` / `reader.yaml` / `analysis.yaml` 是否 strict-valid；
 - 三个 `*_manifest.yaml` 是否 strict-valid、id 是否唯一、引用的文件在 `data/{ver}/` 下是否存在；
 - 输出目录（`single_process/{TB,EC}_fit_result`、`single_fit_fig`、`tb_logs`、`ec_logs`）。
 
@@ -86,6 +90,7 @@ just check {ver}            # 全 OK -> [ver] READY；缺失时加 --fix 建输�
 ```bash
 calib scaffold {ver} --data-dir /path/to/data   # 生成 configs/{ver}/*.yaml + 目录 + 软链
 # 编辑 configs/{ver}/payload.yaml（reader/bin_width/adc_max/分支路径/channel_count）
+# 如 reader 常量不同，改 configs/{ver}/reader.yaml（engine + handler + params）
 # 若包格式不同：新增 lib_reader/.../reader{ver}/，并在 lib_reader/__init__.py 注册
 calib discover {ver} tb      # 扫描 -> manifest 草稿（tb / ec_source / ec_xray 各一次）
 # 人工确认 manifest（去重、剔除坏点、设 use / channels.use）
