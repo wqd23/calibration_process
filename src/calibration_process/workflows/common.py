@@ -167,6 +167,23 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
         fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
         return FileRunSpec(reads, bkg_reads, spec, fit)
 
+    if branch == "neutron":
+        # standalone peak-fit profile: no TB/EC global, identity correction
+        pb = rt.payload.neutron
+        if pb is None:
+            raise ValueError("neutron branch configured but payload.neutron is missing")
+        kwarg: dict = {}
+        if m.hk_files:
+            kwarg["hk_path"] = abspath(m.hk_files[-1])
+        for key in ("sci_half", "hk_bias", "mode"):
+            if m.metadata.get(key) is not None:
+                kwarg[key] = m.metadata[key]
+        read = rc(abspath(m.science_files[-1]), pb.reader, kwarg=kwarg)
+        bkg = rc("", pb.reader, select=None)
+        spec = file_lib.Spectrum_config(bin_width=pb.bin_width, adc_max=pb.adc_max)
+        fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), None)
+        return FileRunSpec(read, bkg, spec, fit)
+
     raise ValueError(f"unknown branch {branch!r}")
 
 
@@ -282,7 +299,20 @@ def build_fit_operation(rt, branch, fc: FileRunSpec, nocache=False) -> object:
 
 
 def qa_category(output_dir: str, branch: str) -> str:
-    return "tb" if branch == "tb" else "ec"
+    if branch == "tb":
+        return "tb"
+    if branch == "neutron":
+        return "neutron"
+    return "ec"
+
+
+def _fit_subdir(branch: str) -> str:
+    return {
+        "tb": "TB_fit_result",
+        "ec_source": "EC_fit_result",
+        "ec_xray": "EC_fit_result",
+        "neutron": "NEUTRON_fit_result",
+    }.get(branch, "EC_fit_result")
 
 
 def run_single_fit(
@@ -314,7 +344,7 @@ def run_single_fit(
         f"{stem}: {np.mean(fp.tel['bias'][0]):.2f}V, "
         f"{np.mean(fp.tel['tempSipm'][0]):.2f}C"
     )
-    sub = "TB_fit_result" if branch == "tb" else "EC_fit_result"
+    sub = _fit_subdir(branch)
     fig_dir = output_root / "single_process" / "single_fit_fig"
     save_dir = output_root / "single_process" / sub
     fig_dir.mkdir(parents=True, exist_ok=True)
@@ -330,10 +360,14 @@ def run_single_fit(
     )
     # L3: portable fit parameters + spectrum (the pickle stays for compatibility
     # with legacy consumers and for the frozen-oracle regression).
-    util.json_save(
-        {"file": str(fp.path), "fit_result": _jsonable(fp.fit_result)},
-        str(save_dir / f"{stem}.fit.json"),
-    )
+    fit_payload = {"file": str(fp.path), "fit_result": _jsonable(fp.fit_result)}
+    if branch == "neutron":
+        # the standalone profile does no TB/EC correction, so record the
+        # measured temperature alongside the fit for later reference
+        fit_payload["temperature"] = [
+            float(np.mean(t)) for t in fp.tel.get("tempSipm", [])
+        ]
+    util.json_save(fit_payload, str(save_dir / f"{stem}.fit.json"))
     _save_spectrum(fp, save_dir / f"{stem}.spectrum.parquet")
     fp.save(str(save_dir / f"{stem}.pickle"))
     return fp
@@ -357,7 +391,7 @@ def load_single_fp_from_store(rt, branch, m, output_root) -> _LoadedFit:
     when the newer artefacts are absent.
     """
     stem = os.path.splitext(m.id)[0]
-    sub = "TB_fit_result" if branch == "tb" else "EC_fit_result"
+    sub = _fit_subdir(branch)
     base = output_root / "single_process" / sub / stem
     fit_json = base.with_suffix(".fit.json")
     if fit_json.exists():

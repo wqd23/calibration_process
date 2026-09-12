@@ -29,7 +29,7 @@ def _manifest_path(ver: str, branch: str) -> Path:
     return _config_root(ver) / f"{branch}_manifest.yaml"
 
 
-_BRANCHES = ("tb", "ec_source", "ec_xray")
+_BRANCHES = ("tb", "ec_source", "ec_xray", "neutron")
 
 
 def present_branches(ver: str) -> list:
@@ -172,6 +172,7 @@ def all_version(ver: str, nocache: bool = False, out: Path | None = None,
         return
     for manifest_branch, cli_branch in (
         ("tb", "tb"), ("ec_source", "ec-src"), ("ec_xray", "ec-xray"),
+        ("neutron", "neutron"),
     ):
         if manifest_branch in branches:
             fit_branch(ver, cli_branch, nocache, out)

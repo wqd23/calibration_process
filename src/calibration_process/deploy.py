@@ -21,6 +21,7 @@ DATA = Path("data")
 _OUTPUT_SUBDIRS = (
     "single_process/TB_fit_result",
     "single_process/EC_fit_result",
+    "single_process/NEUTRON_fit_result",
     "single_process/single_fit_fig",
     "tb_logs",
     "ec_logs",
@@ -93,7 +94,7 @@ def check_version(ver: str, fix: bool = False,
         ok = False
 
     present = []
-    for branch in ("tb", "ec_source", "ec_xray"):
+    for branch in ("tb", "ec_source", "ec_xray", "neutron"):
         mp = root / f"{branch}_manifest.yaml"
         if not mp.exists():
             print(f"  SKIP     configs/{ver}/{branch}_manifest.yaml (branch absent)")
@@ -131,6 +132,8 @@ def check_version(ver: str, fix: bool = False,
         required |= {"single_process/TB_fit_result", "tb_logs"}
     if "ec_source" in present or "ec_xray" in present:
         required |= {"single_process/EC_fit_result", "ec_logs"}
+    if "neutron" in present:
+        required.add("single_process/NEUTRON_fit_result")
     for sub in _OUTPUT_SUBDIRS:
         if sub not in required:
             continue

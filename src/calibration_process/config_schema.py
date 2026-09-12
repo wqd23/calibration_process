@@ -17,6 +17,17 @@ class _StrictBase(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+def _check_channel_list(v: List[int]) -> List[int]:
+    if not v:
+        raise ValueError("channels must not be empty")
+    if len(set(v)) != len(v):
+        raise ValueError(f"channels has duplicates: {v}")
+    for ch in v:
+        if ch not in (0, 1, 2, 3):
+            raise ValueError(f"channels entry {ch} out of range 0..3")
+    return sorted(v)
+
+
 class FitRangeSet(_StrictBase):
     """One fit-range file: measurement_id -> [ range x4 channels ].
 
@@ -84,14 +95,7 @@ class TBParams(_StrictBase):
     @field_validator("channels")
     @classmethod
     def _check_channels(cls, v: List[int]) -> List[int]:
-        if not v:
-            raise ValueError("tb.channels must not be empty")
-        if len(set(v)) != len(v):
-            raise ValueError(f"tb.channels has duplicates: {v}")
-        for ch in v:
-            if ch not in (0, 1, 2, 3):
-                raise ValueError(f"tb.channels entry {ch} out of range 0..3")
-        return sorted(v)
+        return _check_channel_list(v)
 
 
 class ECParams(_StrictBase):
@@ -150,12 +154,31 @@ class ECParams(_StrictBase):
     src_reader: Optional[str] = None
 
 
+class SingleParams(_StrictBase):
+    """A standalone peak-fit profile (e.g. neutron): no TB/EC global fit."""
+
+    reader: str
+    bin_width: int
+    adc_max: float
+    fit_range_file: str = "fit_range_neutron.yaml"
+    science_dir: str = "raw_data"
+    # which channels the profile fits; unlisted channels stay null
+    channels: List[int] = [0, 1, 2, 3]
+
+    @field_validator("channels")
+    @classmethod
+    def _check_channels(cls, v: List[int]) -> List[int]:
+        return _check_channel_list(v)
+
+
 class PayloadSchema(_StrictBase):
     """The payload.yaml file: version-level scientific / reader parameters."""
 
     version: str
     tb: TBParams
     ec: ECParams
+    # optional standalone (neutron/PSD) profile
+    neutron: Optional[SingleParams] = None
 
 
 class ReaderSpec(_StrictBase):

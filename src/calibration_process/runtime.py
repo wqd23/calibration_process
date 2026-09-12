@@ -64,8 +64,8 @@ class RuntimeConfig:
             "tb": self.analysis.tb,
             "ec_source": self.analysis.ec_source,
             "ec_xray": self.analysis.ec_xray,
-        }[branch]
-        return b.default_bkg
+        }.get(branch)
+        return b.default_bkg if b is not None else None
 
     def reader_handler(self, ending: str) -> Optional[str]:
         """Registry name of the reader handler for ``ending`` (or None)."""
@@ -85,8 +85,8 @@ def _resolve_bkg(branch: str, analysis: AnalysisSchema) -> Dict[str, Optional[st
         "tb": analysis.tb,
         "ec_source": analysis.ec_source,
         "ec_xray": analysis.ec_xray,
-    }[branch]
-    return dict(b.background_overrides)
+    }.get(branch)
+    return dict(b.background_overrides) if b is not None else {}
 
 
 def load_runtime(version: str, config_root: Path, data_dir: Path,
@@ -116,6 +116,7 @@ def load_runtime(version: str, config_root: Path, data_dir: Path,
         "tb": "fit_range_tb.yaml",
         "ec_source": "fit_range_ec_source.yaml",
         "ec_xray": "fit_range_ec_xray.yaml",
+        "neutron": "fit_range_neutron.yaml",
     }
     for branch, fname in fit_files.items():
         p = config_root / fname
@@ -124,7 +125,7 @@ def load_runtime(version: str, config_root: Path, data_dir: Path,
         rt.fit_ranges[branch] = FitRangeSet.model_validate(
             _load_yaml(p)
         ).measurements
-    for branch in ("tb", "ec_source", "ec_xray"):
+    for branch in ("tb", "ec_source", "ec_xray", "neutron"):
         rt.bkg_forms[branch] = _resolve_bkg(branch, analysis)
     # ``rt.corr`` is built lazily on first access (EC branches only), so a
     # TB-only / neutron payload does not need its TB reference to exist yet.

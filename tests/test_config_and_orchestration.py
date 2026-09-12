@@ -133,6 +133,15 @@ def test_ec_form_schema():
         ECParams(**base, ec_form={"a": "linear"})
 
 
+def test_payload_neutron_section_optional():
+    from calibration_process.config_schema import SingleParams
+    p = PayloadSchema.model_validate(yaml.safe_load(open(CONFIG_ROOT / "payload.yaml")))
+    assert p.neutron is None
+    assert SingleParams(reader="n1", bin_width=4, adc_max=16384.0).channels == [0, 1, 2, 3]
+    with pytest.raises(Exception):
+        SingleParams(reader="n1", bin_width=4, adc_max=16384.0, channels=[5])
+
+
 def test_check_version_ready():
     from calibration_process import deploy
     assert deploy.check_version("09") is True

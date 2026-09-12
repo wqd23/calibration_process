@@ -272,3 +272,33 @@ def test_single_run_spec_threads_selection(monkeypatch):
     spec = stages.single_run_spec(rt, "tb", m)
     assert spec.read_config.select == hook
     assert spec.bkg_read_config.select is None
+
+
+def test_fit_subdir_and_qa_category():
+    assert stages._fit_subdir("tb") == "TB_fit_result"
+    assert stages._fit_subdir("ec_source") == "EC_fit_result"
+    assert stages._fit_subdir("neutron") == "NEUTRON_fit_result"
+    assert stages.qa_category("x", "neutron") == "neutron"
+
+
+def test_single_run_spec_neutron(monkeypatch):
+    from types import SimpleNamespace
+    from calibration_process.config_schema import ManifestEntry
+    hook = ("n1@1", lambda f: f["amp"] > 0)
+    monkeypatch.setattr(stages, "_selection", lambda version, branch: hook)
+    rt = SimpleNamespace(
+        version="N1-Neutron", data_dir=Path("data/N1-Neutron"),
+        payload=SimpleNamespace(neutron=SimpleNamespace(reader="n1", bin_width=4, adc_max=16384.0)),
+        reader_params=lambda e: {},
+        fit_ranges={"neutron": {"m": [[0, 1], None, [0, 1], None]}},
+        bkg_forms={"neutron": {}},
+        fit_range=lambda branch, key: {"m": [[0, 1], None, [0, 1], None]}[key],
+        bkg_form=lambda branch, key: None,
+    )
+    m = ManifestEntry(id="m", branch="neutron", science_files=["raw_data/a.dat"])
+    spec = stages.single_run_spec(rt, "neutron", m)
+    assert spec.read_config.ending == "n1"
+    assert spec.read_config.select == hook
+    assert spec.bkg_read_config.select is None
+    assert spec.fit_config.bkg_form is None
+    assert len(spec.spectrum_config.corr) == 4
