@@ -159,10 +159,23 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
             fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
             return FileRunSpec(read, bkg, spec, fit)
 
-        reads = [
-            rc(abspath(f), pb.reader, config_file=pb.xray_config_file or "")
-            for f in m.science_files
-        ]
+        low_prefix = f"{pb.x_path_low}/" if pb.x_path_low else None
+        reads = []
+        for f in m.science_files:
+            if f:
+                reader = pb.reader
+                if low_prefix and f.startswith(low_prefix) and pb.xray_reader_low:
+                    reader = pb.xray_reader_low
+                reads.append(rc(abspath(f), reader, config_file=pb.xray_config_file or ""))
+            else:
+                reads.append(None)
+        # An empty slot marks a channel with no file (GRIDN1 low-energy X-ray has
+        # no ch0).  Fill it from the first available channel only to keep the
+        # positional 4-slot structure; its fit_range is null so it is not fitted.
+        fallback = next((r for r in reads if r is not None), None)
+        if fallback is None:
+            raise ValueError(f"ec_xray measurement {m.id!r} has no science files")
+        reads = [r if r is not None else fallback for r in reads]
         n = pb.channel_count
         rotation = pb.xray_bkg_rotation
         bkg_reads = _rotate_bkg(reads, rotation, n)
@@ -739,6 +752,12 @@ def _pad_group_4ch(groups: List[list]) -> List[list]:
 
 
 def _center_fit(energy, center, center_err, deg: int = 2):
+    # an exactly-determined segment cannot scale a covariance matrix; fall back
+    # to the plain interpolating polynomial (errors reported as zero).  This
+    # never triggers for the legacy versions, whose split segments are larger.
+    if len(center) <= deg + 1:
+        popt = np.polyfit(center, energy, deg=deg)
+        return list(popt), [0.0] * len(popt)
     popt, pcov = np.polyfit(center, energy, deg=deg, full=False, cov=True, w=1.0 / center_err)
     perr = np.sqrt(np.diag(pcov))
     return list(popt), list(perr)

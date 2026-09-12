@@ -109,6 +109,12 @@ class ECParams(_StrictBase):
     adc_max: float
     x_path: str
     src_path: str
+    # optional second X-ray root holding the low-energy part of a split X-ray
+    # dataset (e.g. GRIDN1 260129 alongside 260202); defaults to disabled
+    x_path_low: Optional[str] = None
+    # reader for the low-energy root when its packet format differs from the
+    # main root (GRIDN1: 260129 is ft, 260202 is wf); defaults to ec.reader
+    xray_reader_low: Optional[str] = None
     energy_split_low: float = 49.0
     energy_split_high: float = 55.0
     ref_temp: float = 25.0

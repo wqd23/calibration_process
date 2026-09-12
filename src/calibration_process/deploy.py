@@ -95,6 +95,8 @@ def check_version(ver: str, fix: bool = False,
         try:
             p = PayloadSchema.model_validate(yaml.safe_load(open(root / "payload.yaml")))
             ec_roots = [data_dir / p.ec.src_path, data_dir / p.ec.x_path]
+            if p.ec.x_path_low:
+                ec_roots.append(data_dir / p.ec.x_path_low)
         except Exception:
             ec_roots = []
         present = [str(r.relative_to(data_dir)) for r in ec_roots if r.exists()]

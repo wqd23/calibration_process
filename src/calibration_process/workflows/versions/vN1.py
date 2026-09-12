@@ -90,26 +90,41 @@ def _enumerate_n1_ec_source(rt: RuntimeConfig, data_dir: Path) -> list:
 
 
 def _enumerate_n1_ec_xray(rt: RuntimeConfig, data_dir: Path) -> list:
-    """N1 EC X-ray points: one per energy, four per-channel collimated files."""
+    """N1 EC X-ray points: one per energy, per-channel collimated files.
+
+    Scans both the high-energy root (``ec.x_path``) and the optional
+    low-energy root (``ec.x_path_low``); the two energy sets are disjoint and
+    the low-energy root has no ch0 file, so that slot stays empty (its
+    fit_range entry is null and it is not fitted).
+    """
     pb = rt.payload.ec
-    xdir = Path(data_dir) / pb.x_path
-    files = [f for f in os.listdir(xdir)
-             if f.endswith(".event.dat") and "-ch" in f]
-    energies = sorted({f.split("-")[0] for f in files if f.split("-")[0].isdigit()},
-                      key=int)
+    roots = [pb.x_path]
+    if pb.x_path_low:
+        roots.append(pb.x_path_low)
+    files_by_energy: dict[str, list[str]] = {}
+    for root in roots:
+        xdir = Path(data_dir) / root
+        if not xdir.is_dir():
+            continue
+        for f in sorted(os.listdir(xdir)):
+            if not f.endswith(".event.dat") or "-ch" not in f:
+                continue
+            if "start" in f or "cut" in f or "CI" in f:
+                continue
+            e = f.split("-")[0]
+            if not e.isdigit():
+                continue
+            files_by_energy.setdefault(e, []).append(f"{root}/{f}")
+
     out = []
-    for e in energies:
+    for e in sorted(files_by_energy, key=int):
         if e not in rt.energies:
             continue
+        files = files_by_energy[e]
         ch_files = []
         for i in range(4):
-            cands = [f for f in files if f.startswith(f"{e}-ch{i}-")]
-            if not cands:
-                ch_files = None
-                break
-            ch_files.append(f"{pb.x_path}/{cands[0]}")
-        if ch_files is None:
-            continue
+            cands = [f for f in files if Path(f).name.startswith(f"{e}-ch{i}-")]
+            ch_files.append(cands[0] if cands else "")
         out.append({
             "id": e, "branch": "ec_xray", "science_files": ch_files,
             "hk_files": [], "aux_files": [],
