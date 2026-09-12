@@ -1,0 +1,69 @@
+version: N1-Neutron
+branch: tb
+measurements:
+- id: 0-75C-28.5-193
+  branch: tb
+  science_files:
+  - raw_data/0-75C-28.5-193.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    temp: 0-75C
+    bias: 28.5
+  use: true
+  channels: null
+- id: 0degC-28.5-191
+  branch: tb
+  science_files:
+  - raw_data/0degC-28.5-191.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    temp: 0degC
+    bias: 28.5
+  use: false
+  channels: null
+- id: 0degC-28.5-192
+  branch: tb
+  science_files:
+  - raw_data/0degC-28.5-192.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    temp: 0degC
+    bias: 28.5
+  use: true
+  channels: null
+- id: 90-165C-28.5-194
+  branch: tb
+  science_files:
+  - raw_data/90-165C-28.5-194.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    temp: 90-165C
+    bias: 28.5
+  use: true
+  channels: null
+- id: m15-m75C-28.5-195
+  branch: tb
+  science_files:
+  - raw_data/m15-m75C-28.5-195.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    temp: m15-m75C
+    bias: 28.5
+  use: true
+  channels: null
+- id: m90-m180C-28.5-196
+  branch: tb
+  science_files:
+  - raw_data/m90-m180C-28.5-196.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    temp: m90-m180C
+    bias: 28.5
+  use: true
+  channels: null

@@ -47,6 +47,11 @@ def _readSci_impl(path, mode="ft"):
         return Dict(parse_grid_data_new(
             path, xml_file=_SCI_XML, data_tag="grid1x_ft_packet", endian="MSB",
             multi_evt=38, multi_step=14)[0])
+    if mode == "wf256":
+        # the standard 568-byte 256-sample waveform packet (grid_packet.xml);
+        # used by the neutron-beam runs
+        return Dict(parse_grid_data_new(
+            path, xml_file=_SCI_XML, data_tag="grid1x_wf_packet", endian="MSB")[0])
     if mode == "wf":
         parts = []
         for chunk in parse_grid_data_iter(

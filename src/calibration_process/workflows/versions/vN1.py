@@ -52,14 +52,41 @@ NEUTRON_AMP_MIN = 0.0
 
 _SINGLE = re.compile(r"^(m?\d+C)-(\d{3})-\d+\.event\.dat$")
 _SCAN = re.compile(r"^(m?\d+C)-265-290-\d+\.event\.dat$")
+# neutron-beam runs: {temperature}-{bias V}-{idx}.event.dat (a single bias)
+_NEUTRON = re.compile(r"^(?P<temp>.+?)-(?P<bias>\d+\.\d+)-(?P<idx>\d+)\.event\.dat$")
 
 
 def enumerate_measurements(version: str, branch: str, rt: RuntimeConfig,
                            data_dir: Path) -> list:
     assert version in VERSIONS, f"vN1 workflow used for non-N1 version {version!r}"
+    if version == "N1-Neutron" and branch == "tb":
+        return _enumerate_neutron_tb(rt, data_dir)
     if branch == "tb" and version in DATASET:
         return _enumerate_tb(rt, data_dir, DATASET[version])
     return []
+
+
+def _enumerate_neutron_tb(rt: RuntimeConfig, data_dir: Path) -> list:
+    """The neutron-beam temperature scans (fixed bias) used for a TB snapshot."""
+    sci_dir = rt.payload.tb.science_dir
+    full = Path(data_dir) / sci_dir
+    out = []
+    for f in sorted(os.listdir(full)):
+        if not f.endswith(".event.dat") or "To" in f or "CI" in f or "test" in f:
+            continue
+        m = _NEUTRON.match(f)
+        if not m:
+            continue
+        out.append({
+            "id": f[: -len(".event.dat")],
+            "branch": "tb",
+            "science_files": [f"{sci_dir}/{f}"],
+            "hk_files": [],
+            "aux_files": [],
+            "metadata": {"temp": m.group("temp"), "bias": float(m.group("bias"))},
+            "use": True,
+        })
+    return out
 
 
 def _enumerate_tb(rt: RuntimeConfig, data_dir: Path, dataset: str) -> list:

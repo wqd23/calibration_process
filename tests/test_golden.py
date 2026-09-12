@@ -174,6 +174,21 @@ def test_global_tb_golden(tmp_path, ver):
     assert_json_equivalent(produced, golden, f"tb.{ver}")
 
 
+def test_global_tb_neutron_selfconsistent(tmp_path):
+    """N1 neutron runs: fixed bias, so the 5-parameter TB fit is degenerate.
+
+    This is a *self-consistent* anchor (not a legacy/physics baseline): it locks
+    the current fit output so later refactors are compared bit-for-bit.  The
+    frozen points come from the 260322 neutron temperature scans at 28.5 V.
+    """
+    rt = _rt("N1-Neutron")
+    per_channel = _load_points_tb("N1-Neutron")
+    stages.global_tb(rt, per_channel, tmp_path / "tb_logs")
+    produced = json.load(open(_latest(tmp_path / "tb_logs", "temp_bias_fit.json")))
+    golden = json.load(open(GOLDEN / "N1-Neutron" / "tb_coeff.json"))
+    assert_json_equivalent(produced, golden, "tb.N1-Neutron")
+
+
 @pytest.mark.parametrize("ver", EC_GOLDEN)
 def test_global_ec_golden(tmp_path, ver):
     rt = _rt(ver)
