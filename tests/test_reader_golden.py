@@ -84,17 +84,20 @@ def test_reader_golden(sample, reader, rundata, args):
     _assert_pair_equal(produced, expected, f"reader.{sample}")
 
 
-N1_EVENT = "0degC-28.5-191.event.dat"
-N1_HK = "0degC-28.5-ecu_113.hk"
+N1_CASES = [
+    ("n1_gagg_ft", "m20C-265-125.event.dat", "m20C-265-ecu_027.hk", "ft"),
+    ("n1_clyc_wf", "0C-265-290-164.event.dat", "0C-265-290-ecu_073.hk", "wf"),
+]
 
 
-def test_reader_n1_golden():
-    # GRID-N1 has no legacy implementation; this golden is self-consistent
-    raw_dir = OUT / "n1_wf" / "raw"
-    if not (raw_dir / N1_EVENT).exists():
-        pytest.skip(f"golden raw sample missing: {raw_dir / N1_EVENT}")
-    structure = json.loads((OUT / "n1_wf" / "structure.json").read_text())
-    with np.load(OUT / "n1_wf" / "expected.npz") as npz:
+@pytest.mark.parametrize("sample,event,hk,mode", N1_CASES)
+def test_reader_n1_golden(sample, event, hk, mode):
+    # GRID-N1 has no legacy implementation; these goldens are self-consistent
+    raw_dir = OUT / sample / "raw"
+    if not (raw_dir / event).exists():
+        pytest.skip(f"golden raw sample missing: {raw_dir / event}")
+    structure = json.loads((OUT / sample / "structure.json").read_text())
+    with np.load(OUT / sample / "expected.npz") as npz:
         expected = _reconstruct({k: npz[k] for k in npz.files}, structure)
-    produced = single_readN1(str(raw_dir / N1_EVENT), hk_path=str(raw_dir / N1_HK), mode="wf")
-    _assert_pair_equal(produced, expected, "reader.n1_wf")
+    produced = single_readN1(str(raw_dir / event), hk_path=str(raw_dir / hk), mode=mode)
+    _assert_pair_equal(produced, expected, f"reader.{sample}")

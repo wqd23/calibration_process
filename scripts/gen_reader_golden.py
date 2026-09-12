@@ -40,11 +40,15 @@ from lib_reader.reader05.frame_adapter import (  # noqa: E402
 )
 from lib_reader.readerN1.read import single_readN1  # noqa: E402
 
-# GRID-N1 has no legacy implementation, so this sample freezes the current
-# reader output (a self-consistent golden) rather than a legacy-validated one.
-N1_SRC = Path("/home/wqd/cali_data/GRIDN1/data/260322中子束流")
-N1_EVENT = "0degC-28.5-191.event.dat"
-N1_HK = "0degC-28.5-ecu_113.hk"
+# GRID-N1 has no legacy implementation, so these samples freeze the current
+# reader output (self-consistent goldens) rather than legacy-validated ones.
+# GAGG uses the 584-byte ft packets; CLYC the 1080-byte 512-sample wf packets.
+N1_GAGG = Path("data/N1-Gamma-Am241/raw_data")
+N1_CLYC = Path("data/N1-Gamma-Na22/raw_data")
+N1_FT = ("n1_gagg_ft", "m20C-265-125.event.dat", "m20C-265-ecu_027.hk",
+         "ft", 40000, 30000)
+N1_WF = ("n1_clyc_wf", "0C-265-290-164.event.dat", "0C-265-290-ecu_073.hk",
+         "wf", 108000, 50000)
 
 D05B = "data/05B/raw_data/test"
 D05X = "data/05B/raw_data/X光机实验-天格"
@@ -142,21 +146,27 @@ def flatten(sci, tel):
     return flat, structure
 
 
-def gen_n1():
-    """Freeze a small GRID-N1 waveform sample (self-consistent, no legacy)."""
-    sample = "n1_wf"
+def _gen_n1(spec, src_root):
+    """Freeze one GRID-N1 reader sample (self-consistent, no legacy)."""
+    sample, event, hk, mode, ev_size, hk_size = spec
     raw_dir = OUT / sample / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
-    (raw_dir / N1_EVENT).write_bytes((N1_SRC / N1_EVENT).read_bytes()[:56800])
-    (raw_dir / N1_HK).write_bytes((N1_SRC / N1_HK).read_bytes()[:71200])
+    (raw_dir / event).write_bytes((src_root / event).read_bytes()[:ev_size])
+    (raw_dir / hk).write_bytes((src_root / hk).read_bytes()[:hk_size])
 
-    sci, tel = single_readN1(str(raw_dir / N1_EVENT), hk_path=str(raw_dir / N1_HK), mode="wf")
+    sci, tel = single_readN1(str(raw_dir / event), hk_path=str(raw_dir / hk), mode=mode,
+                             overwrite_cache=True)
     flat, structure = flatten(sci, tel)
     np.savez(OUT / sample / "expected.npz", **flat)
     (OUT / sample / "structure.json").write_text(json.dumps(structure, indent=2))
 
     n_sci = sum(len(np.asarray(v)) for v in sci["amp"])
-    print(f"{sample}: sci events={n_sci}, tel records={len(np.asarray(tel['utc_time']))}")
+    print(f"{sample}: mode={mode} sci events={n_sci}, tel records={len(np.asarray(tel['utc_time']))}")
+
+
+def gen_n1():
+    _gen_n1(N1_FT, N1_GAGG)
+    _gen_n1(N1_WF, N1_CLYC)
 
 
 def main():

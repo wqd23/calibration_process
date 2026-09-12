@@ -15,9 +15,6 @@ import lib_reader
 
 OUT = Path(__file__).resolve().parent / "golden" / "reader"
 
-N1_EVENT = "0degC-28.5-191.event.dat"
-N1_HK = "0degC-28.5-ecu_113.hk"
-
 # sample -> (ver, kind, raw file name, read_frames kwargs)
 CASES = [
     ("04_hex", "04", "sci", "210501124621_COM7_tb_-20C_27p0V_4m_5cm-Data.txt", {}),
@@ -32,8 +29,10 @@ CASES = [
     ("03B_src", "03B", "tl", "src_Cs137_12m_10cm_TimeLine2021-05-05-12-12-27.dat", {}),
     ("03B_xray", "03B", "sci", "jly_18p0_ch0_30s_rundata2021-04-29-15-21-50.dat",
      {"feature_mode": True}),
-    ("n1_wf", "N1-Neutron", "sci", N1_EVENT, {"mode": "wf"}),
-    ("n1_wf", "N1-Neutron", "hk", N1_HK, {}),
+    ("n1_gagg_ft", "N1-Gamma-Am241", "sci", "m20C-265-125.event.dat", {"mode": "ft"}),
+    ("n1_gagg_ft", "N1-Gamma-Am241", "hk", "m20C-265-ecu_027.hk", {}),
+    ("n1_clyc_wf", "N1-Gamma-Na22", "sci", "0C-265-290-164.event.dat", {"mode": "wf"}),
+    ("n1_clyc_wf", "N1-Gamma-Na22", "hk", "0C-265-290-ecu_073.hk", {}),
 ]
 
 
