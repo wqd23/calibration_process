@@ -51,6 +51,11 @@ just cover                                          # coverage run + report（.c
 - **每版本一个显式 workflow**：`workflows/versions/v{ver}.py`（`enumerate_measurements`
   复现历史选点规则）；共享 stage 在 `workflows/common.py`；版本选择只发生一次
   （`workflows/registry.py`，之后不再 `if version == ...`）。
+- **GRIDN1 特殊**：`GRIDN1/{GAGG,CLYC,EC,Neutron}` 是**路径式版本名**（配置在
+  `configs/GRIDN1/<part>`、数据在 `data/GRIDN1/<part>`），四个名字共享
+  `workflows/versions/vN1.py`。TB/EC 新增能力（`tb.channels`、`tb_fit_p0_by_channel`、
+  `skip_qa_fail`、`ec.ec_form`、`ec.rate_span`、`payload.neutron`、`Read_config.select`）
+  **默认关闭**，旧 8 版本逐字节不变。数据组织与坑见 [docs/N1/data.md](docs/N1/data.md)。
 - **reader 分发统一**：`file_lib.__read` 不再有 `if ending == ...`，改为查
   `lib_reader.READERS` 注册表，逐版本常量由 `configs/{ver}/reader.yaml` 提供；
   `single_readXX` 内部完成 L1→L2 并缓存。

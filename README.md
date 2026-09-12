@@ -48,7 +48,7 @@ GRID 载荷标定分成 **TB**（温度-偏压）与 **EC**（能量-道址）�
         │       data/{ver}/l2/<key>/*.parquet
         ▼
 [L3 单谱拟合]   peak / center / sigma / resolution / redchi / qa_flag（file_lib + util_lib 内核）
-        │       single_process/{TB,EC}_fit_result/<stem>.{fit.json,spectrum.parquet,pickle}
+        │       single_process/{TB,EC,NEUTRON}_fit_result/<stem>.{fit.json,spectrum.parquet,pickle}
         ▼
 [L4 构造点]     TBPoint / ECPoint（含通道过滤、能量映射；由 fit.json + L2 遥测重建）
         ▼
@@ -138,8 +138,10 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 │   ├── results.md                  # 结果产物与 QA 指标
 │   ├── payloads_data.md            # 其它 7 个载荷的数据说明（简化版）
 │   ├── intermediate_data.md        # 分层中间数据（L1/L2 缓存、L3 可移植产物）/ 跨项目 / 定制 pipeline
-│   └── 12B_13B/                    # 12B/13B 类载荷的数据说明（详细版）
-│       └── data.md                 # 点位对照表、各数据文件的特殊情况
+│   ├── 12B_13B/                    # 12B/13B 类载荷的数据说明（详细版）
+│   │   └── data.md                 # 点位对照表、各数据文件的特殊情况
+│   └── N1/                         # GRIDN1 载荷的数据说明
+│       └── data.md                 # GAGG/CLYC 双数据集、中子、EC、坏点
 ├── data/{ver}/                     # 各版本数据目录
 │   ├── raw_data -> /path/to/data   # 原始数据软链（L0）
 │   ├── l1/                         # L1 忠实帧 parquet 缓存（可删可重算）
@@ -157,7 +159,7 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 │   ├── manifest.py                 # manifest 发现与加载（运行时不再扫目录）
 │   ├── runtime.py                  # 解析后的运行时配置（resolved context）
 │   ├── deploy.py                   # 部署校验 + 新载荷脚手架（calib check/scaffold）
-│   ├── products.py                 # typed 中间产物（FileRunSpec/SingleFitResult/TBPoint/ECPoint）
+│   ├── products.py                 # typed 中间产物（FileRunSpec/TBPoint/ECPoint）
 │   ├── file_lib.py                 # 单文件读取与拟合（protected kernel）
 │   ├── util_lib.py                 # 工具函数（拟合、阈值，protected kernel）
 │   ├── configs/{ver}/              # 每版本 YAML 配置 + manifest
@@ -174,6 +176,7 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 
 - [x] 12B 简易结果
 - [x] 12B 完整结果（TB: 备份目录全 54 点位温偏面拟合，适用偏压 ≥27.5V 内残差 <3.5%；EC: 与其他载荷相同的 K 边拆段二次拟合（EC_low/EC_high 输出 schema 一致），锚点为 Am241/Na22/Cs137/Co60（双高斯拟合 1332 keV）+ X光机 20-100 kV（低管压点的能量按管压赋值、有已知系统偏差，仅作参考；见 docs/12B_13B/data.md））
+- [x] N1 温偏 + EC（TB: GAGG/CLYC 分数据集二维面，合并后 GAGG ch1/2 与参考逐位一致、CLYC ch0/3 在 ±1.6%；EC: 放射源 + X 光机单条二次；中子束流为自洽快照；见 docs/N1/data.md）
 - [ ] 13B 完整结果
 - [ ] 10B, 11B 塑闪结果
 

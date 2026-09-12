@@ -64,8 +64,7 @@ d = dill.load("single_process/EC_fit_result/15keV.pickle")
   `TBPoint`/`ECPoint`（L4→L5 的点），见 `products.py`；L3→L4 目前传的是
   `load_single_fp_from_store` 读出的 `fit_result` dict（来自 `*.fit.json`）。
   所以你可以在"第一步单拟合 → 第二步造点"之间**插入任何加工**，再把结果传给下游
-  的全局拟合。（`SingleFitResult`/`to_single_fit_result` 是早期预留的类型，当前
-  主流程未使用。）
+  的全局拟合。
 
 例如：`只做前两步，中间加一道加工，再走后面的步骤`：
 
@@ -267,7 +266,11 @@ amp = df["data_max"] - df["data_base"].to_numpy() / 4.0
 的 `(sci, tel)` 输出冻结成 `expected.npz` + `structure.json`。测试用**当前统一 reader**
 在样本上重跑并逐字段对齐冻结值，零 `raw_data` 依赖、全新 clone 可跑。覆盖：C 组 hex
 解码（07/04）、B 组 waveform noUdp（05B normal）、大小端 HK（05B xray）、waveform UDP
-（03B src）、feature UDP 与逐文件 time cut（03B xray）。重新生成：
+（03B src）、feature UDP 与逐文件 time cut（03B xray）。
+
+GRIDN1 无 legacy 实现，其样本（`n1_gagg_ft` ft 包、`n1_clyc_wf` 512 点 wf 包）冻结的是
+**当前 reader 的自洽输出**（非 legacy 基准），由 `tests/test_reader_golden.py::test_reader_n1_golden`
+覆盖；`tests/golden/GRIDN1/Neutron/` 另有中子 TB 自洽快照。重新生成：
 `python scripts/gen_reader_golden.py`。
 
 ## 8. 分层流水线与共享包

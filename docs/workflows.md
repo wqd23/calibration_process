@@ -1,6 +1,6 @@
 # 各载荷的显式 workflow
 
-修订日期：2026-09-08
+修订日期：2026-09-12
 
 本文描述当前代码里**每个载荷版本**实际执行的 workflow。它们都由
 `src/calibration_process/workflows/versions/v{ver}.py` 显式定义（文件选择规则、
@@ -20,7 +20,7 @@ reader、背景轮转、分辨率拟合方法、等等），并复用同一个�
   参考温压（默认 25°C / 28.5V），拟合全能峰，得到 能量↔道址 点。
 - **EC-xray**：X 光机能量-道址标定。同上，对每个管压点拟合。
 - **EC 全局**：把 E-C 点按 Gd K 吸收边（~50 keV）拆成低/高两段，各做二次拟合，
-  同时做分辨率拟合。
+  同时做分辨率拟合。（例外：GRIDN1 用**单条二次**，见下。）
 - **TV 校正位置**：温度/偏压校正都发生在**单谱生成阶段**（`get_spectrum` 里对
   amp 乘因子），不发生在点/全局层。
 
@@ -108,6 +108,27 @@ reader、背景轮转、分辨率拟合方法、等等），并复用同一个�
   **4 通道 fit_range 都完整** 才保留；**fixed** 背景轮转；resolution polyfit；
   拆分 49/55 keV。
 - 逐通道 **None** fit range 表示该通道在该点不拟合（历史行为，保留）。
+
+## GRIDN1（中子/伽马双探测器）
+
+GRIDN1 按组成部分拆成 4 个路径式版本（`GRIDN1/<part>`），共享
+`workflows/versions/vN1.py`；数据与坏点见 [N1/data.md](N1/data.md)。
+
+- `GRIDN1/GAGG`（TB，Am241，ft 包，ch1/2）与 `GRIDN1/CLYC`（TB，Na22，wf 512 包，
+  ch0–3）：两轮源不同、峰位 ADC 差约 9–10 倍，**按数据集分别做二维面**；逐通道
+  初值用 `tb_fit_p0_by_channel`；`skip_qa_fail: true` 丢弃 fail 单点。跨数据集由
+  `scripts/merge_tb.py` 按通道（ch1/2 取 GAGG、ch0/3 取 CLYC）合并成 EC 用的参考。
+- `GRIDN1/EC`（`ec_source`/`ec_xray`）：EC 用**单条二次**（`ec_form: quadratic`，
+  不拆 Gd K 边）；源 = 放射源 ft 锚点（不减本底）、X 光 = 逐通道准直 wf 文件，
+  背景旋转 `[1,2,0,0]`（`fixed`）；X 光各通道来自不同文件，速率用
+  `rate_span: channel`（逐通道时间跨度）。
+- `GRIDN1/Neutron`（`tb`/`neutron`）：中子束流固定 28.5V 温度扫描（256 点 wf，
+  reader 模式 `wf256`）；TB 面因无偏压自由度而简并，仅冻结为**自洽回归基准**
+  （非物理标定）；PSD 走 `vN1.selection` 的 `data_ccm`/`amp` 阈值钩子（占位）。
+- Reader：`n1`（ft，GAGG/源）与 `n1wf`（wf512，CLYC/X 光）；`wf256`（中子）。HK 是
+  `yingtian_packet.xml` 的 178B `hk_packet`；sci 带真实 utc，扫描文件按 utc 间隙
+  切成偏压段、`seg_bias` 选段（0.1V 容差）。<!-- keep -->
+
 
 ---
 

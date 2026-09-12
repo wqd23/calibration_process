@@ -16,6 +16,7 @@
 | TB 单谱能谱 | `data/{ver}/single_process/TB_fit_result/*.spectrum.parquet` | parquet | 长表 `channel/bin/x/spectrum/spectrum_err` |
 | TB 单谱拟合 | `data/{ver}/single_process/TB_fit_result/*.pickle` | dill pickle | 每个数据文件一个，含 4 通道拟合结果（兼容旧消费方） |
 | EC 单谱拟合参数/能谱/ pickle | `data/{ver}/single_process/EC_fit_result/*.{fit.json,spectrum.parquet,pickle}` | 同上 | 同上 |
+| 单谱（neutron 剖面） | `data/{ver}/single_process/NEUTRON_fit_result/*.{fit.json,spectrum.parquet,pickle}` | 同上 | GRIDN1/Neutron 用；`fit.json` 额外带 `temperature` |
 | TB 面拟合 | `data/{ver}/tb_logs/*_temp_bias_fit.json` | JSON | 4 通道的温度-偏压二维面拟合参数 |
 | E-C 系数 | `data/{ver}/ec_logs/*_ec_coef_*.json` | JSON | 每通道一组能量-道址关系系数 |
 | E-C 数据 | `data/{ver}/ec_logs/*_ec_data_*.npy` | numpy | 拟合用的原始数据点 |
