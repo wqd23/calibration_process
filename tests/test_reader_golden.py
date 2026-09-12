@@ -22,6 +22,7 @@ from lib_reader.reader05.frame_adapter import (
     single_read03b,
     src_read03b,
 )
+from lib_reader.readerN1.read import single_readN1
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "tests" / "golden" / "reader"
@@ -81,3 +82,19 @@ def test_reader_golden(sample, reader, rundata, args):
 
     produced = reader(str(raw_dir / rundata), *args)
     _assert_pair_equal(produced, expected, f"reader.{sample}")
+
+
+N1_EVENT = "0degC-28.5-191.event.dat"
+N1_HK = "0degC-28.5-ecu_113.hk"
+
+
+def test_reader_n1_golden():
+    # GRID-N1 has no legacy implementation; this golden is self-consistent
+    raw_dir = OUT / "n1_wf" / "raw"
+    if not (raw_dir / N1_EVENT).exists():
+        pytest.skip(f"golden raw sample missing: {raw_dir / N1_EVENT}")
+    structure = json.loads((OUT / "n1_wf" / "structure.json").read_text())
+    with np.load(OUT / "n1_wf" / "expected.npz") as npz:
+        expected = _reconstruct({k: npz[k] for k in npz.files}, structure)
+    produced = single_readN1(str(raw_dir / N1_EVENT), hk_path=str(raw_dir / N1_HK), mode="wf")
+    _assert_pair_equal(produced, expected, "reader.n1_wf")

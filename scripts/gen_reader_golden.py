@@ -38,6 +38,13 @@ from lib_reader.reader05.frame_adapter import (  # noqa: E402
     single_read03b,
     src_read03b,
 )
+from lib_reader.readerN1.read import single_readN1  # noqa: E402
+
+# GRID-N1 has no legacy implementation, so this sample freezes the current
+# reader output (a self-consistent golden) rather than a legacy-validated one.
+N1_SRC = Path("/home/wqd/cali_data/GRIDN1/data/260322中子束流")
+N1_EVENT = "0degC-28.5-191.event.dat"
+N1_HK = "0degC-28.5-ecu_113.hk"
 
 D05B = "data/05B/raw_data/test"
 D05X = "data/05B/raw_data/X光机实验-天格"
@@ -135,6 +142,23 @@ def flatten(sci, tel):
     return flat, structure
 
 
+def gen_n1():
+    """Freeze a small GRID-N1 waveform sample (self-consistent, no legacy)."""
+    sample = "n1_wf"
+    raw_dir = OUT / sample / "raw"
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    (raw_dir / N1_EVENT).write_bytes((N1_SRC / N1_EVENT).read_bytes()[:56800])
+    (raw_dir / N1_HK).write_bytes((N1_SRC / N1_HK).read_bytes()[:71200])
+
+    sci, tel = single_readN1(str(raw_dir / N1_EVENT), hk_path=str(raw_dir / N1_HK), mode="wf")
+    flat, structure = flatten(sci, tel)
+    np.savez(OUT / sample / "expected.npz", **flat)
+    (OUT / sample / "structure.json").write_text(json.dumps(structure, indent=2))
+
+    n_sci = sum(len(np.asarray(v)) for v in sci["amp"])
+    print(f"{sample}: sci events={n_sci}, tel records={len(np.asarray(tel['utc_time']))}")
+
+
 def main():
     for sample, (reader, rundata_name, files, args) in SAMPLES.items():
         raw_dir = OUT / sample / "raw"
@@ -153,6 +177,8 @@ def main():
         n_sci = sum(len(np.asarray(v)) for v in sci["amp"])
         n_tel = len(np.asarray(tel["timestamp"]))
         print(f"{sample}: sci events={n_sci}, tel records={n_tel}")
+
+    gen_n1()
 
 
 if __name__ == "__main__":
