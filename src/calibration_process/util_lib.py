@@ -7,7 +7,7 @@ Basic functions for GRID data processing\n
 """
 
 import grid_common.fit_utils as basic
-from grid_common.naming import headtime
+from grid_common.naming import headtime  # noqa: F401  (re-exported for callers)
 from grid_common.resolution import resolutionFunction
 from lib_reader.reader05.my_type import *
 
@@ -18,8 +18,6 @@ from scipy.optimize import curve_fit
 import dill as pickle
 import json
 import os
-import re
-from pathlib import Path
 
 
 # QA thresholds: per-version file at data/{ver}/single_process/qa_thresholds.json
@@ -45,51 +43,6 @@ def load_qa_thresholds(ver: str, category: str) -> dict:
     base = _DEFAULT_QA_THRESHOLDS.get(category, _DEFAULT_QA_THRESHOLDS["tb"])
     merged = {**base, **overrides.get(category, {})}
     return merged
-
-
-def _deep_merge(base: dict, override: dict) -> dict:
-    """Recursively merge override into base (non-destructive)."""
-    result = base.copy()
-    for key, val in override.items():
-        if key in result and isinstance(result[key], dict) and isinstance(val, dict):
-            result[key] = _deep_merge(result[key], val)
-        else:
-            result[key] = val
-    return result
-
-
-def load_config(path: str) -> dict:
-    """Load config.json and expand _defaults template for each version.
-
-    Each version's tb/ec sections are merged with the corresponding
-    _defaults section, with {ver} replaced by the version key.
-    Version-specific keys override defaults; extra keys are preserved.
-    """
-    raw = json_load(path)
-    defaults = raw.pop("_defaults", {})
-    cfg = {}
-    for ver, sections in raw.items():
-        cfg[ver] = {}
-        for section in ("tb", "ec"):
-            template = defaults.get(section, {})
-            # replace {ver} placeholder in template values
-            expanded = {
-                k: v.replace("{ver}", ver) if isinstance(v, str) else v
-                for k, v in template.items()
-            }
-            override = sections.get(section, {})
-            cfg[ver][section] = _deep_merge(expanded, override)
-    return cfg
-
-
-def count_spectrum(amp, nbins, spec_range, bin_width, adc_max):
-    spectrum, x = basic.getSpectrum(
-        amp, nbins=nbins, specRange=spec_range, binWidth=bin_width, adcMax=adc_max
-    )
-    spectrum_err: Float_array_4channel = [
-        basic.gehrelsErr(spectrum_ich) for spectrum_ich in spectrum
-    ]  # type: ignore
-    return spectrum, spectrum_err, x
 
 
 def count(
@@ -421,26 +374,6 @@ def json_save(data, path: str):
         f.write(json.dumps(data, ensure_ascii=False))
 
 
-def json_time_save(data, path: str, forward=False):
-    """save data with a time appended file name, wrapper for json_save
-
-    Parameters
-    ----------
-    data : Any
-        data object
-    path : str
-        full path, time info will be appended to it
-    forward : bool
-        add time stamp before
-    """
-    new = headtime(path, forward)
-    json_save(data, new)
-
-
-def json_headtime_save(data, path: str):
-    json_time_save(data, path, forward=True)
-
-
 def json_load(path: str):
     with open(path, "r") as f:
         return json.loads(f.read())
@@ -461,9 +394,6 @@ def resolution_polyfit(energy: Float1D, resolution: Float1D, resolution_err: Flo
     data = (resolution * energy) ** 2
     error = 2 * energy**2 * resolution_err
     p0, pcov = np.polyfit(energy, data, deg=2, w=1.0 / error, cov=True)
-    perr = np.sqrt(np.diag(pcov))
-    popt = list(p0)
-    perr = list(perr)
     return p0, pcov
 
 
@@ -504,139 +434,3 @@ def resolution_lmfit(energy: Float1D, resolution: Float1D, resolution_err: Float
     perr = [param["a"].stderr, param["b"].stderr, param["c"].stderr]
     return popt, perr
 
-
-def get_key(file_name: str):
-    assert os.path.exists(file_name), f"{file_name} does not exist!"
-    return os.path.basename(file_name)
-
-
-def get_hpge_data(path):
-    data = np.loadtxt(path)
-    counts = data
-    # unit: keV
-    energy = np.arange(0, len(counts), 1)
-    return energy, counts
-
-
-def get_fit_dict(path: str, ec_energy, suffix="dat"):
-    """get energy and fit result of both x and src files, return result dicts
-
-    Parameters
-    ----------
-    path : str
-        path of EC_fit_result
-    ec_energy : Any
-        ec_energy through load_json
-    suffix : str
-        [Default: 'dat'] suffix of data files, 'txt' for 07 and 'dat' for 03 & 05
-    """
-    # key -> energy, value -> fit-result
-    x_result = {}
-    src_result = {}
-    f_list = os.listdir(path)
-    # X: for 03 & 07, [?p?.pickle] alike gauge
-    regex_x_energy = r"^(\d+)p(\d+)(.pickle)$"
-    # X: for 05, [X/x M/m···observe.pickle] alike gauge
-    regex_xm = r"[xX][mM]\S+(observe.pickle)$"
-    # SRC: [src···.pickle] alike gauge
-    regex_src = r"src\S+(.pickle)$"
-    for f in f_list:
-        match_x_energy = re.search(regex_x_energy, f)
-        match_xm = re.search(regex_xm, f)
-        match_src = re.search(regex_src, f)
-        if match_x_energy != None:
-            integer, fraction, _ = match_x_energy.groups()
-            # ec_energy x key: [?p?] alike gauge
-            f_name = integer + "p" + fraction
-            energy = ec_energy[f_name]
-            data = pickle_load(os.path.join(path, f))
-            x_result[energy] = data["fit_result"]
-            continue
-        elif match_xm != None:
-            # ec_energy x key: [filename] alike gauge
-            f_name = re.sub("pickle", suffix, f)
-            energy = ec_energy[f_name]
-            data = pickle_load(os.path.join(path, f))
-            x_result[energy] = data["fit_result"]
-            continue
-        elif match_src != None:
-            # ec_energy src key: [filename] alike gauge
-            f_name = re.sub("pickle", suffix, f)
-            energy = ec_energy[f_name]
-            data = pickle_load(os.path.join(path, f))
-            src_result[energy] = data["fit_result"]
-        else:
-            # fallback: try multiple keys to map pickle name -> ec_energy key
-            f_base = re.sub("\\.pickle$", f".{suffix}", f)
-            f_stem = Path(f).stem
-            candidates = [f_base, f_stem, f]
-            key = next((c for c in candidates if c in ec_energy), None)
-            if key is None:
-                continue
-            energy = ec_energy[key]
-            data = pickle_load(os.path.join(path, f))
-            # heuristic: src if name contains src or energy very high; otherwise x
-            if "src" in key.lower() or energy > 200:
-                src_result[energy] = data["fit_result"]
-            else:
-                x_result[energy] = data["fit_result"]
-    return x_result, src_result
-
-
-def print_temp(tel):
-    temp = tel["tempSipm"]
-    avg = [np.mean(temp[i]) for i in range(4)]
-    std = [np.std(temp[i]) for i in range(4)]
-    print(
-        f"CH0: {avg[0]:.2f}+/-{std[0]:.2f} CH1: {avg[1]:.2f}+/-{std[1]:.2f} CH2: {avg[2]:.2f}+/-{std[2]:.2f} CH3: {avg[3]:.2f}+/-{std[3]:.2f}"
-    )
-
-
-def data_save(sci, tel, path, name):
-    dir = os.path.join(path, name)
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    keys = [
-        "amp",
-        "bias",
-        "eventID",
-        "iMon",
-        "iSys",
-        "sciNum",
-        "telNum",
-        "tempSipm",
-        "timestamp",
-        "timestampEvt",
-        "utc",
-    ]
-    for key in keys:
-        if key in sci.keys():
-            np.save(os.path.join(dir, f"{key}_{name}.npy"), sci[key])
-        elif key in tel.keys():
-            np.save(os.path.join(dir, f"{key}_{name}.npy"), tel[key])
-        else:
-            print(f"key {key} not found")
-
-
-def data_load(path):
-    sci = {}.fromkeys(["amp", "timestampEvt", "eventID", "sciNum"])
-    tel = {}.fromkeys(
-        ["bias", "iMon", "iSys", "telNum", "tempSipm", "timestamp", "utc"]
-    )
-    files = os.listdir(path)
-    for file in files:
-        header = file.split("_")[0]
-        if header in sci.keys():
-            sci[header] = np.load(os.path.join(path, file))
-        elif header in tel.keys():
-            tel[header] = np.load(os.path.join(path, file))
-        elif header == "tempSiPM":
-            tel["tempSipm"] = np.load(os.path.join(path, file))
-        else:
-            print(f"key {header} not found")
-    return sci, tel
-
-
-def not_contain(path, *keyword):
-    """检查路径是否不包含指定的关键字"""
-    return not any(k in str(path) for k in keyword)

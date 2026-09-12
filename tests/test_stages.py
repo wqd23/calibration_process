@@ -22,21 +22,6 @@ def _fake_fp(fit_results):
     return fp
 
 
-def test_to_single_fit_result_with_none_channel():
-    m = ManifestEntry(id="x", branch="tb")
-    fr = [{
-        "a": 1.0, "a_err": 0.1, "b": 100.0, "b_err": 0.5, "c": 2.0, "c_err": 0.2,
-        "resolution": 0.05, "resolution_err": 0.005, "rate": 10.0, "rate_err": 1.0,
-        "redchi": 1.2, "ndf": 50, "success": True, "qa_flag": "ok",
-        "boundary_hit": [],
-    }, None]
-    fp = _fake_fp(fr)
-    out = stages.to_single_fit_result(m, fp)
-    assert out[0].peak_center == 100.0
-    assert out[0].channel == 0
-    assert out[1] is None
-
-
 def test_rotate_bkg_fixed_and_unknown():
     reads = list(range(4))
     assert stages._rotate_bkg(reads, "circle", 4) == [1, 2, 3, 0]

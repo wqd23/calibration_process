@@ -16,7 +16,7 @@ import numpy as np
 
 from .. import file_lib, util_lib as util
 from ..config_schema import ManifestEntry
-from ..products import FileRunSpec, SingleFitResult, TBPoint, ECPoint
+from ..products import FileRunSpec, TBPoint, ECPoint
 from ..runtime import RuntimeConfig
 
 
@@ -414,41 +414,6 @@ def load_single_fp_from_store(rt, branch, m, output_root) -> _LoadedFit:
         if tel is None:
             tel = util.pickle_load(str(pickle_path))["tel"]
     return _LoadedFit(fit_result, tel)
-
-
-# --------------------------------------------------------------------------- #
-# Typed intermediate conversion
-# --------------------------------------------------------------------------- #
-def to_single_fit_result(m: ManifestEntry, fp) -> List[Optional[SingleFitResult]]:
-    """Wrap the kernel's per-channel fit_result into typed SingleFitResult."""
-    out: List[Optional[SingleFitResult]] = []
-    fit_result = getattr(fp, "fit_result", None) or []
-    for ch, fr in enumerate(fit_result):
-        if fr is None:
-            out.append(None)
-            continue
-        out.append(
-            SingleFitResult(
-                measurement_id=m.id,
-                channel=ch,
-                peak_amplitude=fr["a"],
-                peak_amplitude_err=fr["a_err"],
-                peak_center=fr["b"],
-                peak_center_err=fr["b_err"],
-                peak_sigma=fr["c"],
-                peak_sigma_err=fr["c_err"],
-                resolution=fr["resolution"],
-                resolution_err=fr["resolution_err"],
-                rate=fr["rate"],
-                rate_err=fr["rate_err"],
-                redchi=fr["redchi"],
-                ndf=fr["ndf"],
-                success=fr["success"],
-                qa_flag=fr["qa_flag"],
-                boundary_hit=list(fr.get("boundary_hit", [])),
-            )
-        )
-    return out
 
 
 # --------------------------------------------------------------------------- #

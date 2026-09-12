@@ -1,7 +1,7 @@
 [project]
 name = "lib-reader"
 version = "0.1.0"
-description = "Reader for GRID 03B, 04, 05B, 07, 10B calibration data"
+description = "Reader for GRID payloads (03B/04/05B/07/09/10B/11B/12B and GRIDN1)"
 authors = [
     { name = "wqd", email = "wqd.2019@tsinghua.org.cn" }
 ]
