@@ -1,6 +1,6 @@
 # N1（GRIDN1）数据说明
 
-修订日期：2026-09-12
+修订日期：2026-09-13
 
 本文记录 GRIDN1 载荷标定数据的来源、文件组织与各文件特殊情况。GRIDN1 是
 中子/伽马双探测器载荷（GAGG 晶体通道测伽马、CLYC 晶体通道测中子），与 GRID B
@@ -49,11 +49,13 @@ GRIDN1 统一收在 `configs/GRIDN1/` 与 `data/GRIDN1/` 下，按组成部分�
 
 - 源：`260326放射源/src`（Cs137/Co60/Th228 等 ft 文件，每个含四通道）。
 - X 光机（分两部分，方向不同）：
-  - `260202计 量 院标定`：40/45/47/49/51/53/55/60/65/70/75/80/90 keV，ch0–3 齐全；
-    当前 `GRIDN1/EC` 的 `ec_xray` 已接入。
-  - `260129计 量 院标定`：15/20/25/30/35 keV，**只有 ch1/ch2/ch3（无 ch0）**；
-    **尚未接入**（见待办）。
-  - 文件命名为 `{E}-ch{N}-{idx}.event.dat`（E = 管压 keV）。
+  - `260202计量院标定`：40/45/47/49/51/53/55/60/65/70/75/80/90 keV，ch0–3 齐全，
+    是 `{E}-ch{N}-{idx}.event.dat` 的 **wf 512** 包；接在 `ec.x_path`。
+  - `260129计量院标定`：15/20/25/30/35 keV，**只有 ch1/ch2/ch3（无 ch0）**，
+    而且同名前缀是 **ft** 包（`grid1x_ft_packet`，与 260202 的 wf 不同）；接在
+    `ec.x_path_low`，并用 `ec.xray_reader_low: n1` 指定 ft reader。
+  - 文件命名为 `{E}-ch{N}-{idx}.event.dat`（E = 管压 keV）。`_start`、`.cut`、
+    `CI`、无能量前缀（如 `087.event.dat`）的文件都排除。
 
 ## 数据格式（与 12B 的关键差别）
 
@@ -89,13 +91,28 @@ Na22 的 1274 keV 峰评估过、放弃：这批数据采集幅度在 ~8700 ADC 
 溢出尖峰），1274 峰位（511×2.494）在 28.3V 以上全部越界；ch0/ch3 谱被噪声主导
 也看不到 1274 峰。
 
-## EC：单条二次
+## EC：GAGG 分段二次，CLYC 单条二次
 
-N1 的 E-C 不做 Gd K 边拆段，用**单条二次**（`ec_form: "quadratic"`）：ch1/ch2
-（GAGG）由放射源高能线与 X 光机低中能点共同拟合；ch0/ch3（CLYC）没有 Gd K 边，
-不套用 B 方案的 K 边假设。X 光逐通道准直，背景用旋转 `[1,2,0,0]`
-（`xray_bkg_rotation: fixed`）；源文件不减本底。X 光各通道来自不同文件，速率按
-**逐通道时间跨度**计算（`rate_span: channel`），否则本底扣减会出负值。
+N1 的 E-C 按通道形式不同（`ec.ec_form`）：
+
+- **ch1/ch2（GAGG）**：按 Gd K 边（50.2 keV）把能量轴拆成两段，各做一条二次，
+  拆分点为 `energy_split_low=49.0`、`energy_split_high=55.0`；落在死区
+  `[49,55)` 的 X 光点（49/51/53）不参与拟合，但仍做单谱拟合留档。
+- **ch0/ch3（CLYC）**：没有 Gd K 边，用**单条二次**（`ec_form: "quadratic"`）。
+
+X 光逐通道准直，背景用旋转 `[1,2,0,0]`（`xray_bkg_rotation: fixed`）；源文件不减
+本底。X 光各通道来自不同文件，速率按**逐通道时间跨度**计算（`rate_span: channel`），
+否则本底扣减会出负值。
+
+低能 X 光（260129，15–35 keV，ft 包）已接入 manifest 与 `energy_map`，但**本轮不
+参与 E-C 拟合**：它的峰落在阈值附近，跨通道本底扣减在阈值处留下一个很大的负凹陷，
+ch2/ch3 的谱被噪声主导，单谱拟合中心不稳定（redchi 常在 10 以上、σ 撞边界）。
+按"宁缺毋滥"，这些点在 `fit_range_ec_xray.yaml` 里置 null，低段只保留 40/45/47 三个
+锚点（三点正好定死一条二次）。
+
+放射源区间这次重开了窗：`fit_range_ec_source.yaml` 里 ch1/ch2 的旧窗口是按更高的
+增益设的，与实际峰位不符（662 keV 峰落在窗口下沿、拟合中心撞边界）；现按实测谱
+重开 Cs137（662）、Co60（1173/1332）、Th228（583）的 ch1/ch2 窗口，ch0/ch3 不变。
 
 ## 中子：TB 简并，仅作自洽基准
 
@@ -109,7 +126,8 @@ N1 的 E-C 不做 Gd K 边拆段，用**单条二次**（`ec_form: "quadratic"`�
 `GRIDN1/{GAGG,CLYC}/fit_range_tb.yaml` 由 `gridN_cali/data/TB_{GAGG,CLYC}/L1_cfg/*_fit_cfg.yaml`
 转出（人工区间，`can_fit: false` 的通道置 null），共 107 个点位（48 GAGG + 59 CLYC，
 含 11 个 CLYC 补测段）。`GRIDN1/EC` 的区间来自 `ec_fit_range.json`，源/X 光分别
-存于 `fit_range_ec_source.yaml` / `fit_range_ec_xray.yaml`。
+存于 `fit_range_ec_source.yaml` / `fit_range_ec_xray.yaml`（X 光含新增的 49/51/53
+和 15–35；后者置 null，见上）。
 
 已知坏点（数据本身问题）：
 
@@ -117,12 +135,19 @@ N1 的 E-C 不做 Gd K 边拆段，用**单条二次**（`ec_form: "quadratic"`�
   （ch0 峰位非单调），已在 `fit_range_tb.yaml` 置 null。
 - GAGG 轮（Am241）只针对 ch1/ch2，ch0/ch3 区间多为 null，二维面也只做 ch1/ch2。
 
-## 处理结果（2026-09-12，新架构）
+## 处理结果（2026-09-13，新架构）
 
-- TB：两数据集共 107 点位；`merge_tb.py` 合并后与 `gridN_cali` 参考
-  `20260826185532_temp_bias_fit.json` 对比，**GAGG ch1/ch2 系数逐位一致（0.00%）**，
-  **CLYC ch0/ch3 在 ±1.6% 内**（k/V0≈0；二维面在标定范围内差异 0.0000%，属简并
-  参数化差异）。点数与 `gridN_cali` 表一致（GAGG 41/43，CLYC 53/58/58/55）。
-- EC：源 6 点 + X 光 10 点，四通道单二次系数有限；`gridN_cali`/`feat/gridN1` 未提交
-  N1 EC 系数，按物理合理性验收（ch1 662 keV 处约 737 keV）。
+- TB：两数据集共 107 点位。2026-09-13 关闭 `skip_qa_fail`（原先会默认丢掉
+  `qa_flag=fail` 的点），改为全部点先做单谱拟合、QA 报告出来后再逐通道人工排除。
+  本次排除（写在 manifest 的 `channels.{ch}.use:false`）：GAGG `0C/10C/20C_265` 的
+  ch1/ch2、CLYC `10C_265` 的 ch1/ch2、`0C_270` 的 ch0、`m10C_265` 的 ch0。
+  排除后二维面相对残差 max < 5%：GAGG ch1/ch2 为 4.1%/2.8%，CLYC ch0–3 为
+  4.6%/4.3%/4.0%/3.6%。
+- EC：源 6 点 + X 光 13 个能量（40/45/47/49/51/53/55/60/65/70/75/80/90）进入单谱
+  拟合，其中 49/51/53 落在死区、不参与 E-C 拟合。ch1/ch2 分段二次、ch0/ch3 单条
+  二次。四通道 E-C 相对偏差 max < 5%（ch0 2.9%、ch1 2.6%、ch2 4.4%、ch3 3.8%）。
+  ch1/ch2 的低段只有 40/45/47 三个点，正好定死一条二次；`_center_fit` 对这种
+  "点数 = 阶数+1" 的情形退化为不带协方差的插值拟合（误差棒记 0，系数不受影响）。
+  N1 没有 legacy EC 系数可对，按物理合理性验收，并作为自洽 golden
+  （`tests/golden/GRIDN1/EC/`）。
 - 中子：20 点自洽 TB 快照（见上）。
