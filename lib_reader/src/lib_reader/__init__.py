@@ -98,7 +98,7 @@ def read_frames(path, ver, kind="sci", **kwargs):
         from .readerN1 import read as n1
 
         if kind == "sci":
-            return n1._readSci_impl(path, kwargs.get("mode", "wf"))
+            return n1._readSci_impl(path, kwargs.get("mode", "ft"))
         if kind == "hk":
             return n1._readHK_impl(path)
         raise ValueError(f"{ver}: unknown L1 kind {kind!r}")
