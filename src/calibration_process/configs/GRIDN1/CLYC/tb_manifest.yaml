@@ -26,7 +26,9 @@ measurements:
     bias: 270
     seg_bias: 270
   use: true
-  channels: null
+  channels:
+    '0':
+      use: false
 - id: CLYC_0C_275
   branch: tb
   science_files:
@@ -130,7 +132,11 @@ measurements:
     bias: 265
     seg_bias: 265
   use: true
-  channels: null
+  channels:
+    '1':
+      use: false
+    '2':
+      use: false
 - id: CLYC_10C_270
   branch: tb
   science_files:
@@ -507,7 +513,9 @@ measurements:
     bias: 265
     seg_bias: 265
   use: true
-  channels: null
+  channels:
+    '0':
+      use: false
 - id: CLYC_m10C_270
   branch: tb
   science_files:

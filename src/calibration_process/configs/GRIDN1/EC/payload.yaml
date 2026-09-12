@@ -15,7 +15,12 @@ ec:
   bin_width: 4
   adc_max: 16384.0
   x_path: ec_xray
+  x_path_low: ec_xray_low
+  xray_reader_low: n1
   src_path: ec_src
+  # Gd K edge dead zone for the GAGG channels (piecewise form)
+  energy_split_low: 49.0
+  energy_split_high: 55.0
   tb_ref_path: single_process/merged_tb.json
   fit_range_file: fit_range_ec_xray.yaml
   energy_map:
@@ -24,22 +29,30 @@ ec:
     Co60C-70m-209.event.dat: 1332.0
     Co60C-40m-209.event.dat: 1173.0
     Th228C-20m-210.event.dat: 583.2
+    '15': 15.0
+    '20': 20.0
+    '25': 25.0
+    '30': 30.0
+    '35': 35.0
     '40': 40.0
     '45': 45.0
     '47': 47.0
+    '49': 49.0
+    '51': 51.0
+    '53': 53.0
+    '55': 55.0
+    '60': 60.0
     '65': 65.0
     '70': 70.0
     '75': 75.0
     '80': 80.0
     '90': 90.0
-    '55': 55.0
-    '60': 60.0
     Th228C-2m-210.event.dat: 2614.5
   channel_count: 4
   ec_form:
     '0': quadratic
-    '1': quadratic
-    '2': quadratic
+    '1': piecewise_quadratic
+    '2': piecewise_quadratic
     '3': quadratic
   src_reader: n1
   rate_span: channel

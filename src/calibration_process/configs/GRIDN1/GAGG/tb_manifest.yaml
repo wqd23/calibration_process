@@ -13,7 +13,11 @@ measurements:
     bias: 265
     seg_bias: 265
   use: true
-  channels: null
+  channels:
+    '1':
+      use: false
+    '2':
+      use: false
 - id: GAGG_0C_270
   branch: tb
   science_files:
@@ -117,7 +121,11 @@ measurements:
     bias: 265
     seg_bias: 265
   use: true
-  channels: null
+  channels:
+    '1':
+      use: false
+    '2':
+      use: false
 - id: GAGG_10C_270
   branch: tb
   science_files:
@@ -221,7 +229,11 @@ measurements:
     bias: 265
     seg_bias: 265
   use: true
-  channels: null
+  channels:
+    '1':
+      use: false
+    '2':
+      use: false
 - id: GAGG_20C_270
   branch: tb
   science_files:

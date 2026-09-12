@@ -12,7 +12,7 @@ tb:
   - -35.0
   - -1000.0
   tb_fit_maxfev: 100000
-  bias_min_filter: 27.25
+  bias_min_filter: null
   tb_file_map: single_process/tb_file_map.json
 ec:
   reader: 12b

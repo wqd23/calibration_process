@@ -13,6 +13,7 @@ wheels/
 raw_data
 data/**/ec_src
 data/**/ec_xray
+data/**/ec_xray_low
 
 # binary data
 *.npy
@@ -40,6 +41,7 @@ data/**/single_process/merged_tb.json
 # result
 tb_logs/
 ec_logs/
+data/**/qa/
 *.zip
 
 # differential regression scratch dirs

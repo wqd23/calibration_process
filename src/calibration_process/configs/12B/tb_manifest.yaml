@@ -394,7 +394,9 @@ measurements:
   aux_files: []
   metadata: {}
   use: true
-  channels: null
+  channels:
+    '2':
+      use: false
 - id: 20C_270
   branch: tb
   science_files:
@@ -474,7 +476,15 @@ measurements:
   aux_files: []
   metadata: {}
   use: true
-  channels: null
+  channels:
+    '0':
+      use: false
+    '1':
+      use: false
+    '2':
+      use: false
+    '3':
+      use: false
 - id: 30C_270
   branch: tb
   science_files:

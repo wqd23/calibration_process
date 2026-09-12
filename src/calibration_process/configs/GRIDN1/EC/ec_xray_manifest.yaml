@@ -1,6 +1,71 @@
 version: GRIDN1/EC
 branch: ec_xray
 measurements:
+- id: '15'
+  branch: ec_xray
+  science_files:
+  - ''
+  - ec_xray_low/15-ch1-084.event.dat
+  - ec_xray_low/15-ch2-084.event.dat
+  - ec_xray_low/15-ch3-084.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 15.0
+  use: true
+  channels: null
+- id: '20'
+  branch: ec_xray
+  science_files:
+  - ''
+  - ec_xray_low/20-ch1-084.event.dat
+  - ec_xray_low/20-ch2-084.event.dat
+  - ec_xray_low/20-ch3-084.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 20.0
+  use: true
+  channels: null
+- id: '25'
+  branch: ec_xray
+  science_files:
+  - ''
+  - ec_xray_low/25-ch1-084.event.dat
+  - ec_xray_low/25-ch2-084.event.dat
+  - ec_xray_low/25-ch3-084.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 25.0
+  use: true
+  channels: null
+- id: '30'
+  branch: ec_xray
+  science_files:
+  - ''
+  - ec_xray_low/30-ch1-084.event.dat
+  - ec_xray_low/30-ch2-084.event.dat
+  - ec_xray_low/30-ch3-084.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 30.0
+  use: true
+  channels: null
+- id: '35'
+  branch: ec_xray
+  science_files:
+  - ''
+  - ec_xray_low/35-ch1-084.event.dat
+  - ec_xray_low/35-ch2-084.event.dat
+  - ec_xray_low/35-ch3-084.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 35.0
+  use: true
+  channels: null
 - id: '40'
   branch: ec_xray
   science_files:
@@ -38,6 +103,45 @@ measurements:
   aux_files: []
   metadata:
     energy: 47.0
+  use: true
+  channels: null
+- id: '49'
+  branch: ec_xray
+  science_files:
+  - ec_xray/49-ch0-092.event.dat
+  - ec_xray/49-ch1-092.event.dat
+  - ec_xray/49-ch2-092.event.dat
+  - ec_xray/49-ch3-092.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 49.0
+  use: true
+  channels: null
+- id: '51'
+  branch: ec_xray
+  science_files:
+  - ec_xray/51-ch0-093.event.dat
+  - ec_xray/51-ch1-093.event.dat
+  - ec_xray/51-ch2-093.event.dat
+  - ec_xray/51-ch3-093.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 51.0
+  use: true
+  channels: null
+- id: '53'
+  branch: ec_xray
+  science_files:
+  - ec_xray/53-ch0-094.event.dat
+  - ec_xray/53-ch1-094.event.dat
+  - ec_xray/53-ch2-094.event.dat
+  - ec_xray/53-ch3-094.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 53.0
   use: true
   channels: null
 - id: '55'

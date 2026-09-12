@@ -9,7 +9,7 @@ tb:
   - 1
   - 2
   tb_fit_maxfev: 100000
-  skip_qa_fail: true
+  skip_qa_fail: false
   tb_fit_p0_by_channel:
     '1':
     - 0.0003296
