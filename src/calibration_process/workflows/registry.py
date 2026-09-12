@@ -18,6 +18,10 @@ _MODULE = {
     "11B": "calibration_process.workflows.versions.v11B",
     "09": "calibration_process.workflows.versions.v09",
     "12B": "calibration_process.workflows.versions.v12B",
+    "N1-Gamma-Am241": "calibration_process.workflows.versions.vN1",
+    "N1-Gamma-Na22": "calibration_process.workflows.versions.vN1",
+    "N1-Gamma-EC": "calibration_process.workflows.versions.vN1",
+    "N1-Neutron": "calibration_process.workflows.versions.vN1",
 }
 
 
