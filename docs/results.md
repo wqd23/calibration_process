@@ -1,21 +1,28 @@
 # 结果产物与 QA 指标
 
-修订日期：2026-09-08
+修订日期：2026-09-12
 
 > 下文所有产物由 `calib all {ver}`（或 `calib fit`/`calib global`）产生，
 > 路径与历史实现保持一致。处理流程见 [README 标定基础流程](../README.md) 与
-> [workflows.md](workflows.md)。
+> [workflows.md](workflows.md)；各层缓存的格式见 [intermediate_data.md](intermediate_data.md)。
 
 ## 产物清单
 
 | 产物 | 路径 | 格式 | 说明 |
 |------|------|------|------|
-| TB 单谱拟合 | `data/{ver}/single_process/TB_fit_result/*.pickle` | pickle | 每个数据文件一个，含 4 通道拟合结果 |
-| EC 单谱拟合 | `data/{ver}/single_process/EC_fit_result/*.pickle` | pickle | 每个数据文件一个，含 4 通道拟合结果 |
+| L1 忠实帧缓存 | `data/{ver}/l1/<key>/{sci,hk,tl}.parquet` | parquet | 一个粒子/一次采样一行（含 `crc_check`），可删可重算 |
+| L2 处理输出缓存 | `data/{ver}/l2/<key>/*.parquet` | parquet | `(sci, tel)` 物理量，可删可重算 |
+| TB 单谱拟合参数 | `data/{ver}/single_process/TB_fit_result/*.fit.json` | JSON | 4 通道拟合参数（可移植） |
+| TB 单谱能谱 | `data/{ver}/single_process/TB_fit_result/*.spectrum.parquet` | parquet | 长表 `channel/bin/x/spectrum/spectrum_err` |
+| TB 单谱拟合 | `data/{ver}/single_process/TB_fit_result/*.pickle` | dill pickle | 每个数据文件一个，含 4 通道拟合结果（兼容旧消费方） |
+| EC 单谱拟合参数/能谱/ pickle | `data/{ver}/single_process/EC_fit_result/*.{fit.json,spectrum.parquet,pickle}` | 同上 | 同上 |
 | TB 面拟合 | `data/{ver}/tb_logs/*_temp_bias_fit.json` | JSON | 4 通道的温度-偏压二维面拟合参数 |
 | E-C 系数 | `data/{ver}/ec_logs/*_ec_coef_*.json` | JSON | 每通道一组能量-道址关系系数 |
 | E-C 数据 | `data/{ver}/ec_logs/*_ec_data_*.npy` | numpy | 拟合用的原始数据点 |
 | 拟合图 | `data/{ver}/single_process/single_fit_fig/*.png` | PNG | 每个数据文件每个通道一张 |
+
+> `--until L1|L2|L3|L4|L5` 可让 `calib all` 停在任意一层：L2 只产出 L1/L2 缓存、
+> L3 产出单拟合、L4 构造点（当前为内存）、L5 跑全局拟合。
 
 ## pickle 内容
 

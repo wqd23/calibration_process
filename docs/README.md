@@ -10,13 +10,13 @@
 
 | 编号 | 文档 | 内容 |
 |------|------|------|
-| D2 | [data.md](data.md) | 数据准备与目录约定：新配置（`configs/{ver}/*.yaml` + manifest）的格式、新载荷接入流程、以及方法论经验（找峰、HK 截取、质量筛查、拟合技巧） |
-| D3 | [results.md](results.md) | 结果产物清单与质量判定指标（pickle 字段、redchi、qa_flag）的含义 |
+| D2 | [data.md](data.md) | 数据准备与目录约定：新配置（`configs/{ver}/*.yaml`（含 `reader.yaml`）+ manifest）的格式、新载荷接入流程、以及方法论经验（找峰、HK 截取、质量筛查、拟合技巧） |
+| D3 | [results.md](results.md) | 结果产物清单与质量判定指标（pickle 字段、`fit.json`/`spectrum.parquet`、redchi、qa_flag）的含义 |
 | D4 | [workflows.md](workflows.md) | 每个载荷各自的显式 workflow：文件选择、reader、背景轮转、分辨率方法、特殊处理，一步可从 `v{ver}.py` 读出 |
 | D5 | [workflow_matrix.md](workflow_matrix.md) | 历史 workflow 完整审计矩阵（重构前每个版本实际做了什么，逐版本表格） |
 | D6 | [12B_13B/data.md](12B_13B/data.md) | 12B/13B 类载荷的数据说明：温度偏压点位与文件对照表、X 光机/放射源各数据文件的状态与特殊情况 |
 | D7 | [payloads_data.md](payloads_data.md) | 其它 7 个载荷的数据说明（简化版）：通用结构 + 每个版本的目录/reader/命名/选择与排除/已知坑 |
-| D8 | [intermediate_data.md](intermediate_data.md) | 中间数据格式（pickle/json/npy/cache）、怎么读、能否跨项目分析、如何定制 pipeline、pickle 对环境的依赖；第 5 节为全版本 L1 parquet 缓存，第 6/7 节为读取层统一与 reader golden |
+| D8 | [intermediate_data.md](intermediate_data.md) | 中间数据分层（L1 忠实帧 / L2 处理输出 / L3 `fit.json`+`spectrum.parquet`、pickle）、怎么读、能否跨项目分析、如何定制 pipeline；第 5/5b 节为 L1/L2 缓存与 L3/L4，第 6/7 节为读取层统一与 reader golden，第 8 节为分层流水线与 `grid_common` |
 
 **数据说明的约定**：数据特殊的载荷（如 12B/13B）单独放一个子目录详述
 （数据从哪来、每个文件对应什么条件、哪些文件有坑：截断/复制/补测等）。

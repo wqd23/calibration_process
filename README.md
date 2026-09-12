@@ -22,38 +22,46 @@ just check {ver} [--fix]             # 校验新配置/manifest 层与数据链�
 **跑数据（显式 workflow）：**
 ```bash
 just all {ver}                       # 处理该版本全部 TB + EC 数据（单拟合 + 全局拟合）
+just all {ver} --until L3            # 只跑到单拟合（L2=只读出、L4=构造点、L5=全局）
 just fit-one {ver} tb {id}           # 单 measurement 单拟合
 just global {ver} tb                 # TB 二维面拟合
 just global {ver} ec                 # E-C 关系拟合
 just discover {ver} {branch}         # 扫描目录 -> manifest 草稿
+just oracle {ver}                    # 把本版产物冻结到 .oracle/{ver}/ 供回归比对
 ```
 
 新版本由**显式 workflow** 驱动：配置在 `src/calibration_process/configs/{ver}/`（YAML + strict schema），每一步都调用同一个未改动的科学内核，因此结果与历史实现一致。
 
 ## 标定的基础流程
 
-GRID 载荷标定分成 **TB**（温度-偏压）与 **EC**（能量-道址）两条线，处理链路都是：
+GRID 载荷标定分成 **TB**（温度-偏压）与 **EC**（能量-道址）两条线。处理是**分层**的，
+每一层都可以选择落盘，`just all {ver} --until L1|L2|L3|L4|L5` 可停在任意一层：
 
 ```text
-[Raw Measurement Bundle]        # 一个 measurement = science + hk + aux + metadata（manifest 记录）
+[L0 原始数据]   data/{ver}/raw_data（软链到外部）
         │  discover → 人工确认 manifest
         ▼
-[单文件处理]  read → TV/temp-bias 校正 → 能谱 → 峰拟合   # file_lib / util_lib（科学内核）
+[L1 忠实帧]     一个粒子 / 一次采样一行（含解析出的 crc_check）
+        │       data/{ver}/l1/<key>/{sci,hk,tl}.parquet
         ▼
-[SingleFitResult]  peak / center / sigma / resolution / errors
+[L2 处理输出]   (sci, tel) 物理量：amp、遥测换算、CRC/run 过滤、按通道分组
+        │       data/{ver}/l2/<key>/*.parquet
         ▼
-[TBPoint / ECPoint]  build_tb_points / build_ec_points（含 channel 过滤、能量映射）
+[L3 单谱拟合]   peak / center / sigma / resolution / redchi / qa_flag（file_lib + util_lib 内核）
+        │       single_process/{TB,EC}_fit_result/<stem>.{fit.json,spectrum.parquet,pickle}
         ▼
-[版本特有 correction（若有）]   例如 12B 的 bias≥27.5V、11B 的 lmfit
+[L4 构造点]     TBPoint / ECPoint（含通道过滤、能量映射；由 fit.json + L2 遥测重建）
         ▼
-[全局拟合]  TB：峰位~（温度,偏压）二维面；EC：按 K 边拆两段二次拟合 + 分辨率拟合
-        ▼
-[最终产物]  JSON / NumPy / 图   # 与历史格式兼容
+[L5 全局拟合]   TB：峰位~(温度,偏压) 二维面；EC：按 K 边拆段二次 + 分辨率拟合
+                tb_logs/、ec_logs/（JSON / npy / 图，与历史格式兼容）
 ```
 
-- **TB** 单谱峰拟合**不做**校正（corr = 1），温压依赖交给二维面建模。
-- **EC** 单谱在生成阶段做**TV 校正**：以 TB 二维面为参考（默认 25°C/28.5V），
+- L1 / L2 是**透明加速缓存**（`.gitignore`，删掉可从 L0 重算）；L3 的 `*.fit.json` /
+  `*.spectrum.parquet` 是跨项目可移植产物，dill `*.pickle` 保留给旧消费方与冻结 oracle。
+- **TB** 单谱峰拟合**不做**温度偏压校正（corr = 1），温压依赖交给 L5 的二维面建模。
+- **EC** 单谱在 L3 生成阶段做 **TV 校正**：以 TB 二维面为参考（默认 25°C/28.5V），
   把每个 EC 文件修正到该参考点（`get_spectrum` 里对 amp 乘因子）。
+- 各层的落盘格式、缓存键与跨项目读取见 [docs/intermediate_data.md](docs/intermediate_data.md)。
 - EC 再分成**放射源**与**X 光机**两条分支（背景/选点不同，见 [workflows.md](docs/workflows.md)）。
 - 每个版本的实际选择规则与特殊处理见 [docs/workflows.md](docs/workflows.md)。
 
@@ -64,10 +72,11 @@ GRID 载荷标定分成 **TB**（温度-偏压）与 **EC**（能量-道址）�
 ```bash
 calib scaffold {ver} --data-dir /path/to/data   # 生成 configs/{ver}/*.yaml + 目录 + 软链 raw_data
 # 1) 编辑 configs/{ver}/payload.yaml：reader / bin_width / adc_max / 分支路径 / channel_count
-# 2) 新增 reader（若包格式不同）：lib_reader/src/lib_reader/reader{ver}/，在 lib_reader/__init__.py 注册
+# 2) 若 reader 常量不同，改 configs/{ver}/reader.yaml（engine + handler + params）
+# 3) 若包格式不同：新增 lib_reader/src/lib_reader/reader{ver}/，并在 lib_reader/__init__.py 注册
 calib discover {ver} tb                        # 扫描 -> manifest 草稿（tb / ec_source / ec_xray 各一次）
-# 3) 人工确认 manifest（去重、剔除坏点、设 use / channels.use）
-# 4) 填 configs/{ver}/fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml
+# 4) 人工确认 manifest（去重、剔除坏点、设 use / channels.use）
+# 5) 填 configs/{ver}/fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml
 calib check {ver}                               # 校验配置/manifest 层与数据链接
 calib all {ver}                                 # 全流程：单拟合 + TB/EC 全局拟合
 ```
@@ -93,7 +102,7 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 | [docs/results.md](docs/results.md) | 结果产物与 QA 指标说明 |
 | [docs/12B_13B/data.md](docs/12B_13B/data.md) | 12B/13B 类载荷的数据说明（点位对照表、各文件的特殊情况） |
 | [docs/payloads_data.md](docs/payloads_data.md) | 其它 7 个载荷的数据说明（简化版：通用结构 + 各版本选点/排除） |
-| [docs/intermediate_data.md](docs/intermediate_data.md) | 中间数据格式与读取、跨项目分析、定制 pipeline、pickle 环境依赖 |
+| [docs/intermediate_data.md](docs/intermediate_data.md) | 分层中间数据（L1/L2 缓存、L3 可移植产物、pickle）、怎么读、跨项目分析、定制 pipeline |
 
 每类载荷的数据说明单独放一个目录（如 `docs/12B_13B/`），新增载荷时仿照添加。
 
@@ -104,7 +113,7 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 | `just` | 查看所有命令 |
 | `just init {ver} {path}` | 初始化版本：软链数据 + 建目录 |
 | `just check {ver}` | 校验新配置/manifest 层与数据链接（`--fix` 建缺失目录） |
-| `just all {ver}` | 处理该版本全部数据（单拟合 + TB/EC 全局拟合） |
+| `just all {ver} [--until LN]` | 处理该版本全部数据；`--until` 停在 L1/L2/L3/L4/L5 |
 | `just fit-one {ver} {branch} {id}` | 处理单个 measurement 单拟合 |
 | `just fit {ver} {branch}` | 处理单个分支单拟合 |
 | `just global {ver} {branch}` | TB/EC 全局拟合 |
@@ -112,6 +121,7 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 | `just list {ver} {branch}` | 列出已确认 measurement |
 | `just config {ver} {branch} {id}` | 查看单个 measurement 的 resolved 配置 |
 | `just new-payload {ver}` | 为新载荷生成 YAML 配置/目录骨架 |
+| `just oracle {ver}` | 把本版产物冻结到 `.oracle/{ver}/`（回归基准） |
 | `just compare {ver}` | 新流程 vs 冻结 legacy oracle 差异对比 |
 
 ## 仓库结构
@@ -126,26 +136,29 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 │   ├── data.md                     # 数据准备与目录约定、接入方法论
 │   ├── results.md                  # 结果产物与 QA 指标
 │   ├── payloads_data.md            # 其它 7 个载荷的数据说明（简化版）
-│   ├── intermediate_data.md        # 中间数据格式 / 跨项目 / 定制 pipeline / pickle 依赖
+│   ├── intermediate_data.md        # 分层中间数据（L1/L2 缓存、L3 可移植产物）/ 跨项目 / 定制 pipeline
 │   └── 12B_13B/                    # 12B/13B 类载荷的数据说明（详细版）
 │       └── data.md                 # 点位对照表、各数据文件的特殊情况
 ├── data/{ver}/                     # 各版本数据目录
-│   ├── raw_data -> /path/to/data   # 原始数据软链
-│   ├── single_process/             # 拟合产物（+ 历史 JSON oracle）
+│   ├── raw_data -> /path/to/data   # 原始数据软链（L0）
+│   ├── l1/                         # L1 忠实帧 parquet 缓存（可删可重算）
+│   ├── l2/                         # L2 处理输出 parquet 缓存（可删可重算）
+│   ├── single_process/             # L3 单拟合产物（fit.json / spectrum.parquet / pickle / 图）
 │   ├── tb_logs/                    # TB 面拟合产物
 │   └── ec_logs/                    # E-C 拟合产物
 ├── lib_reader/                     # 各版本数据读取库（workspace 子包）
 ├── lib_plot/                       # 绘图库（workspace 子包）
+├── grid_common/                    # 共享数值（谱/分辨率/naming，中立包）
 ├── src/calibration_process/
 │   ├── cli.py                      # calib 命令入口
-│   ├── pipeline.py                 # 高层编排（discover/list/fit/global/all）
-│   ├── config_schema.py            # strict Pydantic schema（payload/analysis/fit_range/manifest）
+│   ├── pipeline.py                 # 高层编排（discover/list/fit/global/all/--until）
+│   ├── config_schema.py            # strict Pydantic schema（payload/reader/analysis/fit_range/manifest）
 │   ├── manifest.py                 # manifest 发现与加载（运行时不再扫目录）
 │   ├── runtime.py                  # 解析后的运行时配置（resolved context）
 │   ├── deploy.py                   # 部署校验 + 新载荷脚手架（calib check/scaffold）
-│   ├── products.py                 # typed 中间产物（SingleFitResult/TBPoint/ECPoint）
+│   ├── products.py                 # typed 中间产物（FileRunSpec/SingleFitResult/TBPoint/ECPoint）
 │   ├── file_lib.py                 # 单文件读取与拟合（protected kernel）
-│   ├── util_lib.py                 # 工具函数（拟合、缓存、阈值，protected kernel）
+│   ├── util_lib.py                 # 工具函数（拟合、阈值，protected kernel）
 │   ├── configs/{ver}/              # 每版本 YAML 配置 + manifest
 │   └── workflows/
 │       ├── common.py               # 复用内核的 stage（single fit/points/global）

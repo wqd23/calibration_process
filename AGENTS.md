@@ -14,7 +14,7 @@ just                # 列出所有命令
 uv sync             # 安装依赖到 .venv
 just init {ver} {path}    # 软链 data/{ver}/raw_data + 建输出目录
 just check {ver} [--fix]  # 校验配置/manifest 层与数据链接（= calib check；--fix 建缺失输出目录）
-just all {ver}            # 处理该版本全部 TB + EC（单拟合 + TB/EC 全局拟合）
+just all {ver} [--until LN]  # 处理该版本全部数据；停在 L1/L2/L3/L4/L5（L2=只读出、L3=单拟合）
 just fit-one {ver} {branch} {id}  # 单个 measurement 单拟合
 just fit {ver} {branch}    # 单个分支单拟合
 just global {ver} {branch} # TB / EC 全局拟合
@@ -36,8 +36,8 @@ just cover                                          # coverage run + report（.c
 ## 代码约定
 
 - 不加注释（除非必要且用英文）；docstring 简短。
-- `calibration_process` / `lib_reader` / `lib_plot` 是 uv workspace 子包
-  （见 `pyproject.toml` 的 `[tool.uv.workspace]`），包内部用相对导入。
+- `calibration_process` / `lib_reader` / `lib_plot` / `grid_common` 是 uv workspace
+  子包（见 `pyproject.toml` 的 `[tool.uv.workspace]`），包内部用相对导入。
 - CLI 入口统一为 **`calib`**（`src/calibration_process/cli.py`，也可
   `python -m calibration_process.cli` 或 `pyproject` 里的 `calib` console script）。
 - **配置集中在 `src/calibration_process/configs/{ver}/`**：
@@ -51,6 +51,9 @@ just cover                                          # coverage run + report（.c
 - **每版本一个显式 workflow**：`workflows/versions/v{ver}.py`（`enumerate_measurements`
   复现历史选点规则）；共享 stage 在 `workflows/common.py`；版本选择只发生一次
   （`workflows/registry.py`，之后不再 `if version == ...`）。
+- **reader 分发统一**：`file_lib.__read` 不再有 `if ending == ...`，改为查
+  `lib_reader.READERS` 注册表，逐版本常量由 `configs/{ver}/reader.yaml` 提供；
+  `single_readXX` 内部完成 L1→L2 并缓存。
 - **Protected scientific kernel**：`file_lib.py` / `util_lib.py` / `lib_reader/` /
   `lib_plot/`。单谱拟合、TB/EC 数学模型、reader 数据结构都归它们——读取层已统一
   （见 [docs/intermediate_data.md](docs/intermediate_data.md) 第 5/6 节），但**科学数学
@@ -243,6 +246,10 @@ calib all {ver}
      （`expected.npz` + `structure.json`）；测试用统一 reader 在样本上重跑并对齐冻结值，
      零 raw 依赖。覆盖 hex 解码、UDP 解包、waveform/feature、大小端 HK、逐文件 time cut。
      重新生成：`python scripts/gen_reader_golden.py`。
+   - **L1 冒烟**（`tests/test_l1_frames.py`）：对上面的 reader golden 样本调用
+     `lib_reader.read_frames`，锁定 L1 结构（bool `crc_check`、各列行数一致），
+     不需新增 fixture；L1/L2 缓存的序列化另有 `tests/test_l1_cache.py` /
+     `tests/test_l1_processed.py` 覆盖。
    - 重新生成：`python scripts/gen_golden.py`（需先跑一次 `calib fit` 填 store，
      再执行；脚本 docstring 写明步骤）。golden 的 `.npy` 靠 `.gitignore` 里
      `!tests/golden/**/*.npy` 例外被提交。

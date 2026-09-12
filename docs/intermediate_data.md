@@ -60,9 +60,12 @@ d = dill.load("single_process/EC_fit_result/15keV.pickle")
 - `calib` 的每个 stage 都在 `workflows/common.py`（`run_single_fit`、
   `build_tb_points`、`build_ec_points`、`global_tb`、`global_ec`）与
   `pipeline.py`（`fit_branch`/`global_*`/`all`）里，可被脚本直接 import。
-- 中间边界是 **typed 数据**（`SingleFitResult`/`TBPoint`/`ECPoint`，见
-  `products.py`），所以你可以在"第一步单拟合 → 第二步造点"之间**插入任何加工**，
-  再把结果传给下游的全局拟合。
+- 中间边界是 **typed 数据**：`FileRunSpec`（L2→L3 的读取/谱/拟合配置）与
+  `TBPoint`/`ECPoint`（L4→L5 的点），见 `products.py`；L3→L4 目前传的是
+  `load_single_fp_from_store` 读出的 `fit_result` dict（来自 `*.fit.json`）。
+  所以你可以在"第一步单拟合 → 第二步造点"之间**插入任何加工**，再把结果传给下游
+  的全局拟合。（`SingleFitResult`/`to_single_fit_result` 是早期预留的类型，当前
+  主流程未使用。）
 
 例如：`只做前两步，中间加一道加工，再走后面的步骤`：
 

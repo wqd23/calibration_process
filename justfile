@@ -7,9 +7,9 @@ default:
 calib *args:
   {{py}} -m calibration_process.cli {{args}}
 
-# full formal workflow for one version (no discover/preview)
-all ver:
-  {{py}} -m calibration_process.cli all {{ver}}
+# full formal workflow for one version (no discover/preview); pass --until L1..L5 to stop early
+all ver *flags:
+  {{py}} -m calibration_process.cli all {{ver}} {{flags}}
 
 # single-fit one measurement / whole branch
 fit-one ver branch id:

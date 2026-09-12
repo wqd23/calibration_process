@@ -1,6 +1,6 @@
 # 数据准备与目录约定
 
-修订日期：2026-08-25
+修订日期：2026-09-12
 
 术语约定：**TB** 指温度-偏压标定（temperature-bias，测探测器响应对温度和
 工作偏压的依赖）；**EC** 指能量-道址标定（energy-channel，建立 ADC 道址
@@ -18,17 +18,21 @@
 
 ```
 data/{ver}/                       # 数据目录（数据 + 产物）
-├── raw_data -> /path/to/data     # 软链，指向原始标定数据
-├── single_process/               # 单谱拟合产物 + 历史 JSON（oracle）
+├── raw_data -> /path/to/data     # 软链，指向原始标定数据（L0）
+├── l1/<key>/                     # L1 忠实帧 parquet 缓存（可删可重算）
+├── l2/<key>/                     # L2 处理输出 parquet 缓存（可删可重算）
+├── single_process/               # 单谱产物 + 历史 JSON（oracle）
 │   ├── fit_range.json ...        # （历史 oracle，新流程不再读）
-│   ├── TB_fit_result/            # TB 单谱拟合产物（pickle）
-│   ├── EC_fit_result/            # EC 单谱拟合产物（pickle）
+│   ├── qa_thresholds.json        # QA 阈值来源（新流程仍读）
+│   ├── TB_fit_result/            # L3：*.fit.json / *.spectrum.parquet / *.pickle
+│   ├── EC_fit_result/            # L3：同上
 │   └── single_fit_fig/           # 拟合图（png）
 ├── tb_logs/                      # TB 二维面拟合产物
 └── ec_logs/                      # E-C 关系拟合产物
 
 src/calibration_process/configs/{ver}/   # 新配置（唯一事实来源）
 ├── payload.yaml                 # 版本级科学/reader 参数
+├── reader.yaml                  # 读取 engine + handler 注册表 + 版本常量
 ├── analysis.yaml                # 人类可编辑：背景/峰型默认与逐点 override
 ├── fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml
 ├── tb_manifest.yaml / ec_source_manifest.yaml / ec_xray_manifest.yaml
@@ -100,12 +104,13 @@ measurements:
 ```bash
 calib scaffold {ver} --data-dir /path/to/data   # 生成 configs/{ver}/*.yaml + 目录 + 软链 raw_data
 # 1) 编辑 configs/{ver}/payload.yaml：reader / bin_width / adc_max / 分支路径 / channel_count
-# 2) 若包格式不同，新增 reader：lib_reader/src/lib_reader/reader{ver}/，并在 lib_reader/__init__.py 注册
+# 2) 若 reader 常量不同，改 configs/{ver}/reader.yaml（engine + handler + params）
+# 3) 若包格式不同，新增 reader：lib_reader/src/lib_reader/reader{ver}/，并在 lib_reader/__init__.py 注册
 calib discover {ver} tb                        # 扫描 -> manifest 草稿（tb / ec_source / ec_xray 各一次）
-# 3) 人工确认 manifest（去重、剔除坏点、设 use / channels.use）
-# 4) 填 configs/{ver}/fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml
+# 4) 人工确认 manifest（去重、剔除坏点、设 use / channels.use）
+# 5) 填 configs/{ver}/fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml
 calib check {ver}                               # 校验
-calib all {ver}                                 # 全流程：单拟合 + TB/EC 全局拟合
+calib all {ver}                                 # 全流程；加 --until L2/L3 可只跑读出/单拟合
 ```
 
 > 若该版本流程与已有版本完全相同，可复用对应 `workflows/versions/v{ver}.py` 的
@@ -128,10 +133,11 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
   `hk_grid1x_packet`，sipm 字段偏移不同（82 vs 111）
 
 最稳妥的做法是把**随数据附带的解析代码**（如数据目录里的
-`python_Grid11B解析代码/`）中的 `grid_packet.xml` 整体复制进新 reader，
-再从最近代的 reader（reader11）复制 `parse_grid_data.py` / `parity_check.py`
-（仓库版已把 import 改成相对导入，数据目录版是绝对导入），read 逻辑仿照
-`reader{ver}/read.py` 编写。
+`python_Grid11B解析代码/`）中的 `grid_packet.xml` 整体复制进新 reader，解析走仓库
+共享的 `lib_reader/packet_parser.py`（`parse_grid_data_new`，调用时显式传
+`xml_file=`），read 逻辑仿照 `reader{ver}/read.py` 编写。**不要再复制
+`parse_grid_data.py` / `parity_check.py`**——各版本已统一为一份共享实现
+（见 [intermediate_data.md](intermediate_data.md) 第 6 节）。
 
 **2. 新 reader 必查四件事。**
 
@@ -177,7 +183,8 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
   即可实现，无需改代码）；主峰初值取自数据右半，所以窗口要让最右边的
   峰占据右半
 - TB 文件先做 md5 查重：12B 有两个 dat 是前一点位的逐字节复制
-  （真实数据丢失），要在 operation 的文件列表里剔除
+  （真实数据丢失），要在 `workflows/versions/v{ver}.py` 的选点里剔除
+  （或把该点 `use: false`）
 
 **3b. TB 数据质量筛查：同一点位复测一致性。**
 

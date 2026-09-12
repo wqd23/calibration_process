@@ -9,6 +9,8 @@ reader、背景轮转、分辨率拟合方法、等等），并复用同一个�
 
 > 完整的历史审计矩阵见 [workflow_matrix.md](workflow_matrix.md)；
 > 科学内核（单谱拟合 / TB 二维面 / EC 分段拟合 / 绘图）见 [data.md](data.md) 与 [results.md](results.md)。
+> 分层（L1 忠实帧 / L2 处理输出 / L3 单拟合 / L5 全局）与 `--until` 见
+> [intermediate_data.md](intermediate_data.md)。
 
 概括几个跨版本的概念：
 
@@ -113,11 +115,13 @@ reader、背景轮转、分辨率拟合方法、等等），并复用同一个�
 
 1. `configs/{ver}/payload.yaml`：reader、bin_width、adc_max、channel_count、
    X 光机过滤/背景轮转、能量分界、温度参考、EC 的 TB 参考路径等**版本级**参数。
-2. `configs/{ver}/analysis.yaml`：背景/峰型默认与逐点 override。
-3. `configs/{ver}/fit_range_*.yaml`：逐 measurement 每通道拟合区间。
-4. `configs/{ver}/*_manifest.yaml`：**人工确认**的 measurement 列表（science/hk/aux/
+2. `configs/{ver}/reader.yaml`：读取 engine、handler 注册表与逐版本读取常量
+   （如 04/07 的 `internal_resistance`/`imon_div`）。
+3. `configs/{ver}/analysis.yaml`：背景/峰型默认与逐点 override。
+4. `configs/{ver}/fit_range_*.yaml`：逐 measurement 每通道拟合区间。
+5. `configs/{ver}/*_manifest.yaml`：**人工确认**的 measurement 列表（science/hk/aux/
    metadata/use/channels）。
-5. `workflows/versions/v{ver}.py`：**文件选择规则**（哪个文件进哪些分支）与版本特有
+6. `workflows/versions/v{ver}.py`：**文件选择规则**（哪个文件进哪些分支）与版本特有
    逻辑；`enumerate_measurements` 复现了历史选择。
-6. `workflows/common.py`：被所有版本共用的 stage（单拟合 / 点构建 / 全局拟合），
+7. `workflows/common.py`：被所有版本共用的 stage（单拟合 / 点构建 / 全局拟合），
    直接调用未改动的科学内核。
