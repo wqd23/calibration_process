@@ -11,6 +11,8 @@ wheels/
 
 # raw data 
 raw_data
+data/*/ec_src
+data/*/ec_xray
 
 # binary data
 *.npy

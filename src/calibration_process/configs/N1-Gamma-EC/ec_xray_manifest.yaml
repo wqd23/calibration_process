@@ -1,3 +1,133 @@
 version: N1-Gamma-EC
 branch: ec_xray
-measurements: []
+measurements:
+- id: '40'
+  branch: ec_xray
+  science_files:
+  - ec_xray/40-ch0-089.event.dat
+  - ec_xray/40-ch1-089.event.dat
+  - ec_xray/40-ch2-089.event.dat
+  - ec_xray/40-ch3-089.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 40.0
+  use: true
+  channels: null
+- id: '45'
+  branch: ec_xray
+  science_files:
+  - ec_xray/45-ch0-090.event.dat
+  - ec_xray/45-ch1-090.event.dat
+  - ec_xray/45-ch2-090.event.dat
+  - ec_xray/45-ch3-090.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 45.0
+  use: true
+  channels: null
+- id: '47'
+  branch: ec_xray
+  science_files:
+  - ec_xray/47-ch0-091.event.dat
+  - ec_xray/47-ch1-091.event.dat
+  - ec_xray/47-ch2-091.event.dat
+  - ec_xray/47-ch3-091.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 47.0
+  use: true
+  channels: null
+- id: '55'
+  branch: ec_xray
+  science_files:
+  - ec_xray/55-ch0-095.event.dat
+  - ec_xray/55-ch1-095.event.dat
+  - ec_xray/55-ch2-095.event.dat
+  - ec_xray/55-ch3-095.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 55.0
+  use: true
+  channels: null
+- id: '60'
+  branch: ec_xray
+  science_files:
+  - ec_xray/60-ch0-096.event.dat
+  - ec_xray/60-ch1-096.event.dat
+  - ec_xray/60-ch2-096.event.dat
+  - ec_xray/60-ch3-096.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 60.0
+  use: true
+  channels: null
+- id: '65'
+  branch: ec_xray
+  science_files:
+  - ec_xray/65-ch0-097.event.dat
+  - ec_xray/65-ch1-097.event.dat
+  - ec_xray/65-ch2-097.event.dat
+  - ec_xray/65-ch3-097.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 65.0
+  use: true
+  channels: null
+- id: '70'
+  branch: ec_xray
+  science_files:
+  - ec_xray/70-ch0-098.event.dat
+  - ec_xray/70-ch1-098.event.dat
+  - ec_xray/70-ch2-098.event.dat
+  - ec_xray/70-ch3-098.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 70.0
+  use: true
+  channels: null
+- id: '75'
+  branch: ec_xray
+  science_files:
+  - ec_xray/75-ch0-099.event.dat
+  - ec_xray/75-ch1-099.event.dat
+  - ec_xray/75-ch2-099.event.dat
+  - ec_xray/75-ch3-100.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 75.0
+  use: true
+  channels: null
+- id: '80'
+  branch: ec_xray
+  science_files:
+  - ec_xray/80-ch0-101.event.dat
+  - ec_xray/80-ch1-101.event.dat
+  - ec_xray/80-ch2-101.event.dat
+  - ec_xray/80-ch3-101.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 80.0
+  use: true
+  channels: null
+- id: '90'
+  branch: ec_xray
+  science_files:
+  - ec_xray/90-ch0-102.event.dat
+  - ec_xray/90-ch1-102.event.dat
+  - ec_xray/90-ch2-102.event.dat
+  - ec_xray/90-ch3-102.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    energy: 90.0
+  use: true
+  channels: null

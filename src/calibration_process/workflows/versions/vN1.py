@@ -61,9 +61,60 @@ def enumerate_measurements(version: str, branch: str, rt: RuntimeConfig,
     assert version in VERSIONS, f"vN1 workflow used for non-N1 version {version!r}"
     if version == "N1-Neutron" and branch == "tb":
         return _enumerate_neutron_tb(rt, data_dir)
+    if version == "N1-Gamma-EC" and branch == "ec_source":
+        return _enumerate_n1_ec_source(rt, data_dir)
+    if version == "N1-Gamma-EC" and branch == "ec_xray":
+        return _enumerate_n1_ec_xray(rt, data_dir)
     if branch == "tb" and version in DATASET:
         return _enumerate_tb(rt, data_dir, DATASET[version])
     return []
+
+
+def _enumerate_n1_ec_source(rt: RuntimeConfig, data_dir: Path) -> list:
+    """N1 EC radioisotope anchors (single ft files carrying all four channels)."""
+    pb = rt.payload.ec
+    src = Path(data_dir) / pb.src_path
+    out = []
+    for f in sorted(os.listdir(src)):
+        if not f.endswith(".event.dat"):
+            continue
+        if "AmBe" in f or "bkg" in f or "_CI" in f or f not in rt.energies:
+            continue
+        out.append({
+            "id": f, "branch": "ec_source",
+            "science_files": [f"{pb.src_path}/{f}"],
+            "hk_files": [], "aux_files": [], "metadata": {}, "use": True,
+        })
+    return out
+
+
+def _enumerate_n1_ec_xray(rt: RuntimeConfig, data_dir: Path) -> list:
+    """N1 EC X-ray points: one per energy, four per-channel collimated files."""
+    pb = rt.payload.ec
+    xdir = Path(data_dir) / pb.x_path
+    files = [f for f in os.listdir(xdir)
+             if f.endswith(".event.dat") and "-ch" in f]
+    energies = sorted({f.split("-")[0] for f in files if f.split("-")[0].isdigit()},
+                      key=int)
+    out = []
+    for e in energies:
+        if e not in rt.energies:
+            continue
+        ch_files = []
+        for i in range(4):
+            cands = [f for f in files if f.startswith(f"{e}-ch{i}-")]
+            if not cands:
+                ch_files = None
+                break
+            ch_files.append(f"{pb.x_path}/{cands[0]}")
+        if ch_files is None:
+            continue
+        out.append({
+            "id": e, "branch": "ec_xray", "science_files": ch_files,
+            "hk_files": [], "aux_files": [],
+            "metadata": {"energy": rt.energies[e]}, "use": True,
+        })
+    return out
 
 
 def _enumerate_neutron_tb(rt: RuntimeConfig, data_dir: Path) -> list:

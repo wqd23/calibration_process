@@ -74,3 +74,36 @@ def test_enumerate_matches_committed_fit_range():
             (Path("src/calibration_process/configs") / ver / "fit_range_tb.yaml").read_text()
         )["measurements"]
         assert ids == set(fr), f"{ver}: {sorted(ids ^ set(fr))[:6]}"
+
+
+def test_enumerate_n1_ec(tmp_path):
+    (tmp_path / "ec_src").mkdir()
+    (tmp_path / "ec_xray").mkdir()
+    for n in ("Cs137C-30m-208.event.dat", "bkg0326C-30m-212.event.dat",
+              "AmBeC-2m-211.event.dat"):
+        (tmp_path / "ec_src" / n).write_bytes(b"")
+    for i in range(4):
+        (tmp_path / "ec_xray" / f"40-ch{i}-089.event.dat").write_bytes(b"")
+    ec = SimpleNamespace(src_path="ec_src", x_path="ec_xray",
+                         energy_map={"Cs137C-30m-208.event.dat": 662.0, "40": 40.0})
+    rt = SimpleNamespace(payload=SimpleNamespace(ec=ec), energies=ec.energy_map)
+
+    src = vN1.enumerate_measurements("N1-Gamma-EC", "ec_source", rt, tmp_path)
+    assert [r["id"] for r in src] == ["Cs137C-30m-208.event.dat"]  # AmBe/bkg dropped
+    xr = vN1.enumerate_measurements("N1-Gamma-EC", "ec_xray", rt, tmp_path)
+    assert [r["id"] for r in xr] == ["40"]
+    assert xr[0]["science_files"] == [f"ec_xray/40-ch{i}-089.event.dat" for i in range(4)]
+
+
+def test_enumerate_n1_ec_matches_committed():
+    ver = "N1-Gamma-EC"
+    if not (Path("data") / ver / "ec_src").exists():
+        pytest.skip("N1 EC data not linked")
+    rt = pipeline.load_rt(ver)
+    cfg = Path("src/calibration_process/configs") / ver
+    sids = {r["id"] for r in vN1.enumerate_measurements(ver, "ec_source", rt, Path("data") / ver)}
+    sfr = set(yaml.safe_load((cfg / "fit_range_ec_source.yaml").read_text())["measurements"])
+    assert sids == sfr
+    xids = {r["id"] for r in vN1.enumerate_measurements(ver, "ec_xray", rt, Path("data") / ver)}
+    xfr = set(yaml.safe_load((cfg / "fit_range_ec_xray.yaml").read_text())["measurements"])
+    assert xids == xfr

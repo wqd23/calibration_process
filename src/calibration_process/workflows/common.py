@@ -397,18 +397,21 @@ def load_single_fp_from_store(rt, branch, m, output_root) -> _LoadedFit:
     """
     stem = os.path.splitext(m.id)[0]
     sub = _fit_subdir(branch)
-    base = output_root / "single_process" / sub / stem
-    fit_json = base.with_suffix(".fit.json")
+    base = output_root / "single_process" / sub
+    # build names by string concat: ids such as "x.event.dat" have an interior
+    # dot, so Path.with_suffix would drop ".event"
+    fit_json = base / f"{stem}.fit.json"
+    pickle_path = base / f"{stem}.pickle"
     if fit_json.exists():
         fit_result = json.loads(fit_json.read_text())["fit_result"]
     else:
-        fit_result = util.pickle_load(str(base.with_suffix(".pickle")))["fit_result"]
+        fit_result = util.pickle_load(str(pickle_path))["fit_result"]
 
     tel = None
     if branch == "tb":
         tel = build_fit_operation(rt, "tb", single_run_spec(rt, "tb", m)).tel
         if tel is None:
-            tel = util.pickle_load(str(base.with_suffix(".pickle")))["tel"]
+            tel = util.pickle_load(str(pickle_path))["tel"]
     return _LoadedFit(fit_result, tel)
 
 
@@ -620,26 +623,35 @@ def global_ec(rt: RuntimeConfig, src_pts: List[List[ECPoint]], x_pts: List[List[
     all_pts = src + xr
     all_pts.sort(key=lambda p: p.energy)
 
-    # per-channel arrays aligned to energy (every point on 09 EC has all 4 ch)
+    # per-channel arrays: channels may cover different point sets (N1 CLYC gets
+    # source anchors only, GAGG gets source + X-ray), unlike the legacy versions
     center, center_err, resolution, resolution_err = [], [], [], []
+    en_by_ch = []
     energies_all = None
     for ch in range(n):
         pts = [p for p in all_pts if p.channel == ch]
         en = np.array([p.energy for p in pts])
+        en_by_ch.append(en)
         center.append(np.array([p.peak_center for p in pts]))
         center_err.append(np.array([p.peak_center_err for p in pts]))
         resolution.append(np.array([p.resolution for p in pts]))
         resolution_err.append(np.array([p.resolution_err for p in pts]))
-        if energies_all is None:
+        if energies_all is None and en.size:
             energies_all = en
 
     result = [{} for _ in range(n)]
     for ch in range(n):
-        en, c, ce, r, re = energies_all, center[ch], center_err[ch], resolution[ch], resolution_err[ch]
+        en, c, ce, r, re = en_by_ch[ch], center[ch], center_err[ch], resolution[ch], resolution_err[ch]
         q_low = en < pb.energy_split_low
         q_high = en >= pb.energy_split_high
-        res_low, res_low_err = _resolution_fit(pb.resolution_method, en[q_low], r[q_low], re[q_low])
-        res_high, res_high_err = _resolution_fit(pb.resolution_method, en[q_high], r[q_high], re[q_high])
+        try:
+            res_low, res_low_err = _resolution_fit(pb.resolution_method, en[q_low], r[q_low], re[q_low])
+        except Exception:
+            res_low, res_low_err = None, None
+        try:
+            res_high, res_high_err = _resolution_fit(pb.resolution_method, en[q_high], r[q_high], re[q_high])
+        except Exception:
+            res_high, res_high_err = None, None
         if _ec_form(pb, ch) == "linear":
             # single unsplit line; mirrored into low/high so the plotting layer
             # (which always reads EC_low/EC_high) keeps working
@@ -697,11 +709,16 @@ def global_ec(rt: RuntimeConfig, src_pts: List[List[ECPoint]], x_pts: List[List[
     result4 = _pad_to4(result)
     src_result = _pad_group_4ch(_group_4ch(src))
     x_result = _pad_group_4ch(_group_4ch(xr))
-    plot.ec_plot(
-        energies_all, center4, result4,
-        src_energy, x_energy, src_result, x_result,
-        str(result_path), pb.energy_split_low, pb.energy_split_high,
-    )
+    try:
+        plot.ec_plot(
+            energies_all, center4, result4,
+            src_energy, x_energy, src_result, x_result,
+            str(result_path), pb.energy_split_low, pb.energy_split_high,
+        )
+    except Exception as e:
+        # a channel with too few points has no resolution model; the fit
+        # coefficients are still valid, so do not fail the whole run on the plot
+        print(f"WARNING: ec_plot skipped ({e})")
     return result
 
 

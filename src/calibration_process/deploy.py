@@ -90,8 +90,19 @@ def check_version(ver: str, fix: bool = False,
     elif raw.is_dir():
         print(f"  real dir data/{ver}/raw_data (not a symlink, acceptable)")
     else:
-        print(f"  ABSENT   data/{ver}/raw_data (run `calib scaffold {ver}` or link data)")
-        ok = False
+        # EC-only versions may read from ec_src / ec_xray instead of raw_data
+        ec_roots = []
+        try:
+            p = PayloadSchema.model_validate(yaml.safe_load(open(root / "payload.yaml")))
+            ec_roots = [data_dir / p.ec.src_path, data_dir / p.ec.x_path]
+        except Exception:
+            ec_roots = []
+        present = [str(r.relative_to(data_dir)) for r in ec_roots if r.exists()]
+        if present:
+            print(f"  OK       data/{ver}: {', '.join(present)} present (no raw_data)")
+        else:
+            print(f"  ABSENT   data/{ver}/raw_data (run `calib scaffold {ver}` or link data)")
+            ok = False
 
     present = []
     for branch in ("tb", "ec_source", "ec_xray", "neutron"):

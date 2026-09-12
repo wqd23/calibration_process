@@ -44,6 +44,7 @@ READERS = {
     "11b": single_read11,
     "12b": single_read12,
     "n1": single_readN1,
+    "n1wf": single_readN1,
 }
 
 

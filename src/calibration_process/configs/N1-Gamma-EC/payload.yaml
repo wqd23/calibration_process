@@ -11,15 +11,37 @@ tb:
   - 2
   - 3
 ec:
-  reader: n1
+  reader: n1wf
   bin_width: 4
   adc_max: 16384.0
-  x_path: raw_data
-  src_path: raw_data
+  x_path: ec_xray
+  src_path: ec_src
   tb_ref_path: single_process/merged_tb.json
   fit_range_file: fit_range_ec_xray.yaml
-  energy_map: {}
+  energy_map:
+    Cs137C-30m-208.event.dat: 662.0
+    Cs137C-90m-208.event.dat: 662.0
+    Co60C-70m-209.event.dat: 1332.0
+    Co60C-40m-209.event.dat: 1173.0
+    Th228C-20m-210.event.dat: 583.2
+    '40': 40.0
+    '45': 45.0
+    '47': 47.0
+    '65': 65.0
+    '70': 70.0
+    '75': 75.0
+    '80': 80.0
+    '90': 90.0
+    '55': 55.0
+    '60': 60.0
+    Th228C-2m-210.event.dat: 2614.5
   channel_count: 4
   ec_form:
-    '0': linear
-    '3': linear
+    '0': quadratic
+    '1': quadratic
+    '2': quadratic
+    '3': quadratic
+  src_reader: n1
+  rate_span: channel
+  xray_bkg_rotation: fixed
+  xray_require_fit_range: true
