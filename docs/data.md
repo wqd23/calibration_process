@@ -19,6 +19,7 @@
 ```
 data/{ver}/                       # 数据目录（数据 + 产物）
 ├── raw_data -> /path/to/data     # 软链，指向原始标定数据（L0）
+├── ec_src / ec_xray -> ...       # 可选：EC-only 版本的源/X光数据软链（如 GRIDN1/EC）
 ├── l1/<key>/                     # L1 忠实帧 parquet 缓存（可删可重算）
 ├── l2/<key>/                     # L2 处理输出 parquet 缓存（可删可重算）
 ├── single_process/               # 单谱产物 + 历史 JSON（oracle）
@@ -26,16 +27,17 @@ data/{ver}/                       # 数据目录（数据 + 产物）
 │   ├── qa_thresholds.json        # QA 阈值来源（新流程仍读）
 │   ├── TB_fit_result/            # L3：*.fit.json / *.spectrum.parquet / *.pickle
 │   ├── EC_fit_result/            # L3：同上
+│   ├── NEUTRON_fit_result/       # L3：单谱（neutron）剖面，同上（fit.json 带 temperature）
 │   └── single_fit_fig/           # 拟合图（png）
 ├── tb_logs/                      # TB 二维面拟合产物
 └── ec_logs/                      # E-C 关系拟合产物
 
-src/calibration_process/configs/{ver}/   # 新配置（唯一事实来源）
+src/calibration_process/configs/{ver}/   # 新配置（唯一事实来源；{ver} 可含 "/"，如 GRIDN1/GAGG）
 ├── payload.yaml                 # 版本级科学/reader 参数
 ├── reader.yaml                  # 读取 engine + handler 注册表 + 版本常量
 ├── analysis.yaml                # 人类可编辑：背景/峰型默认与逐点 override
-├── fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml
-├── tb_manifest.yaml / ec_source_manifest.yaml / ec_xray_manifest.yaml
+├── fit_range_tb.yaml / fit_range_ec_source.yaml / fit_range_ec_xray.yaml / fit_range_neutron.yaml
+├── tb_manifest.yaml / ec_source_manifest.yaml / ec_xray_manifest.yaml / neutron_manifest.yaml
 ```
 
 `just init {ver} {path}` 负责**软链 raw_data + 创建输出目录**；`just check {ver}`
@@ -51,6 +53,13 @@ EC 的各分支路径（`x_path`/`src_path`）、能量分界（`energy_split_lo
 温度参考（`ref_temp`/`ref_bias`）、EC 的温度偏压参考（`tb_ref_path`）、
 能量映射（`energy_map`）、X 光机的过滤/背景轮转（`xray_drop_*`、`xray_bkg_rotation`、
 `xray_name_index`）、以及 05B 的单文件 X 光机标志（`xray_single_file` + `time_cut`）。
+
+可选的新能力（**默认关闭，旧版本不写即行为不变**）：`tb.channels`（TB 只拟合部分
+通道，其余记 null）、`tb.tb_fit_p0_by_channel`（逐通道初值）、`tb.skip_qa_fail`
+（是否丢弃单谱 `qa_flag=="fail"` 的点，默认 false）、`ec.ec_form`（逐通道 E-C 形式：
+`piecewise_quadratic` 默认 / `quadratic` 单条二次 / `linear`）、`ec.rate_span`
+（速率时间基准 `union` 默认 / `channel` 逐通道）、`ec.src_reader`/`ec.xray_reader`
+（源/X 光各自 reader），以及独立的 `neutron` 剖面段（单谱拟合、无 TB/EC 全局）。
 
 示例（09）：
 ```yaml
@@ -235,6 +244,8 @@ Vov² 形式平缓，是模型形式本身的偏差，不是拟合错误。因�
   12B 最终用全温度段 TB 拟合结果做修正，修正因子 ~1.1
 
 **5. 跑完看 QA。**
-`single_process/{TB,EC}_fit_result/*.pickle` 里每个通道有 `qa_flag`
-（ok/warn/fail）和 `redchi`，汇总确认通过情况；拟合失败或跳过的点要在
-结果说明里如实记录原因。
+`single_process/{TB,EC,NEUTRON}_fit_result/*.fit.json`（可移植）与 `*.pickle`
+里每个通道有 `qa_flag`（ok/warn/fail）和 `redchi`，汇总确认通过情况；拟合失败
+或跳过的点要在结果说明里如实记录原因。QA 过滤默认不做：需要放弃某个点时，
+按人工检查结果**逐通道**设 `channels.{ch}.use:false`（或整点 `use:false`），
+不要依赖默认参数自动丢弃。
