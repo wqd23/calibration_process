@@ -1,0 +1,25 @@
+version: N1-Gamma-EC
+tb:
+  reader: n1
+  bin_width: 4
+  adc_max: 16384.0
+  science_dir: raw_data
+  fit_range_file: fit_range_tb.yaml
+  channels:
+  - 0
+  - 1
+  - 2
+  - 3
+ec:
+  reader: n1
+  bin_width: 4
+  adc_max: 16384.0
+  x_path: raw_data
+  src_path: raw_data
+  tb_ref_path: single_process/merged_tb.json
+  fit_range_file: fit_range_ec_xray.yaml
+  energy_map: {}
+  channel_count: 4
+  ec_form:
+    '0': linear
+    '3': linear

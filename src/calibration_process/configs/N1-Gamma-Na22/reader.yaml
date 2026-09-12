@@ -1,0 +1,6 @@
+version: N1-Gamma-Na22
+engine: grid1x
+readers:
+  n1:
+    handler: single_readN1
+    params: {}
