@@ -88,6 +88,11 @@ class TBParams(_StrictBase):
     tb_file_map: Optional[str] = None
     # 11B uses the lmfit temp-bias fit (which needs temp/bias errors); 11B stores "lmfit"
     tb_fit_method: str = "curvefit"
+    # per-channel initial guesses (keys are channel numbers as strings); a
+    # channel not listed falls back to tb_fit_p0
+    tb_fit_p0_by_channel: Optional[Dict[str, List[float]]] = None
+    # drop single fits whose qa_flag is "fail" when building the TB points
+    skip_qa_fail: bool = False
     # which channels the TB global fit runs; unlisted channels stay null in the
     # four-slot result (default keeps the historical all-four behaviour)
     channels: List[int] = [0, 1, 2, 3]

@@ -108,6 +108,9 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
             kwarg["sci_half"] = m.metadata["sci_half"]
         if m.metadata.get("hk_bias") is not None:
             kwarg["hk_bias"] = m.metadata["hk_bias"]
+        for key in ("mode", "seg_bias", "quantity"):
+            if m.metadata.get(key) is not None:
+                kwarg[key] = m.metadata[key]
         read = rc(abspath(m.science_files[-1]), pb.reader, kwarg=kwarg)
         bkg = rc("", "normal", select=None)
         spec = file_lib.Spectrum_config(bin_width=pb.bin_width, adc_max=pb.adc_max)
@@ -452,12 +455,16 @@ def build_tb_points(rt: RuntimeConfig, items: List) -> List[List[TBPoint]]:
     telemetry arrays for that channel; the center is the fitted peak center.
     """
     per_channel: List[List[TBPoint]] = [[] for _ in range(4)]
+    tb_cfg = getattr(getattr(rt, "payload", None), "tb", None)
+    skip_fail = bool(getattr(tb_cfg, "skip_qa_fail", False))
     for m, fp in items:
         tel_4ch = [
             {k: v[i] for k, v in fp.tel.items() if len(v) == 4} for i in range(4)
         ]
         for ch, fit in enumerate(fp.fit_result):
             if fit is None:
+                continue
+            if skip_fail and fit.get("qa_flag") == "fail":
                 continue
             tel = tel_4ch[ch]
             temp = float(np.average(tel["tempSipm"]))
@@ -514,9 +521,11 @@ def global_tb(rt: RuntimeConfig, per_channel: List[List[TBPoint]],
                     center, center_err, temp, temp_err, bias, bias_err
                 )
             else:
+                p0_by_ch = getattr(pb, "tb_fit_p0_by_channel", None) or {}
+                p0 = p0_by_ch.get(str(ch), pb.tb_fit_p0)
                 res = util.temp_bias_fit_curvefit(
                     center, center_err, temp, bias,
-                    p0=pb.tb_fit_p0, maxfev=pb.tb_fit_maxfev,
+                    p0=p0, maxfev=pb.tb_fit_maxfev,
                 )
         except util.FitError as e:
             raise util.FitError(f"failed to do temp bias fit: {e.args[-1]}")

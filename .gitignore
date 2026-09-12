@@ -30,6 +30,11 @@ data/*/l1_cache/
 data/*/l1/
 data/*/l2/
 
+# L3 portable artifacts are outputs
+data/*/single_process/**/*.fit.json
+data/*/single_process/**/*.spectrum.parquet
+data/*/single_process/merged_tb.json
+
 # result
 tb_logs/
 ec_logs/
