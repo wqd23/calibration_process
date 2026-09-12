@@ -33,7 +33,7 @@ _BRANCHES = ("tb", "ec_source", "ec_xray", "neutron")
 
 
 def present_branches(ver: str) -> list:
-    """The branches that have a manifest for ``ver`` (order: tb, ec_source, ec_xray).
+    """The branches that have a manifest for ``ver`` (order: tb, ec_source, ec_xray, neutron).
 
     Payload versions need not provide every branch: a gamma-only or neutron
     sub-version simply omits the manifests it does not use.

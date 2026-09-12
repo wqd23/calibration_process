@@ -172,6 +172,8 @@ def _template_payload(ver: str, import_from: str = "") -> dict:
             "adc_max": 16384.0,
             "science_dir": "raw_data",
             "fit_range_file": "fit_range_tb.yaml",
+            "channels": [0, 1, 2, 3],
+            "skip_qa_fail": False,
         },
         "ec": {
             "reader": "normal",
@@ -188,6 +190,8 @@ def _template_payload(ver: str, import_from: str = "") -> dict:
             "energy_map": {},
             "resolution_method": "polyfit",
             "channel_count": 4,
+            "ec_form": {},
+            "rate_span": "union",
         },
     }
 
@@ -208,8 +212,9 @@ def scaffold_version(ver: str, data_dir: str = None,
 
     for fname in ("analysis.yaml", "reader.yaml", "fit_range_tb.yaml",
                   "fit_range_ec_source.yaml", "fit_range_ec_xray.yaml",
-                  "tb_manifest.yaml", "ec_source_manifest.yaml",
-                  "ec_xray_manifest.yaml"):
+                  "fit_range_neutron.yaml", "tb_manifest.yaml",
+                  "ec_source_manifest.yaml", "ec_xray_manifest.yaml",
+                  "neutron_manifest.yaml"):
         p = root / fname
         if not p.exists():
             if fname == "analysis.yaml":
@@ -224,7 +229,8 @@ def scaffold_version(ver: str, data_dir: str = None,
                         "readers": {"normal": {"handler": "single_read05b_normal"}}}
             elif fname == "fit_range_tb.yaml":
                 data = {"measurements": {}}
-            elif fname in ("fit_range_ec_source.yaml", "fit_range_ec_xray.yaml"):
+            elif fname in ("fit_range_ec_source.yaml", "fit_range_ec_xray.yaml",
+                           "fit_range_neutron.yaml"):
                 data = {"measurements": {}}
             else:  # *_manifest.yaml
                 data = {"version": ver,

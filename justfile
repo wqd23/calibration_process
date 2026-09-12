@@ -55,6 +55,7 @@ init ver path:
   -ln -s {{path}} ./data/{{ver}}/raw_data
   mkdir -p ./data/{{ver}}/single_process/TB_fit_result
   mkdir -p ./data/{{ver}}/single_process/EC_fit_result
+  mkdir -p ./data/{{ver}}/single_process/NEUTRON_fit_result
   mkdir -p ./data/{{ver}}/single_process/single_fit_fig
   mkdir -p ./data/{{ver}}/tb_logs
   mkdir -p ./data/{{ver}}/ec_logs

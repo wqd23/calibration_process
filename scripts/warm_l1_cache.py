@@ -22,8 +22,9 @@ from calibration_process.pipeline import load_rt  # noqa: E402
 from calibration_process.workflows import common as stages  # noqa: E402
 
 CONFIG = ROOT / "src" / "calibration_process" / "configs"
-BRANCHES = ["tb", "ec_source", "ec_xray"]
-ALL_VERSIONS = ["03B", "04", "05B", "07", "09", "10B", "11B", "12B"]
+BRANCHES = ["tb", "ec_source", "ec_xray", "neutron"]
+ALL_VERSIONS = ["03B", "04", "05B", "07", "09", "10B", "11B", "12B",
+                "GRIDN1/GAGG", "GRIDN1/CLYC", "GRIDN1/EC", "GRIDN1/Neutron"]
 
 
 def warm_version(ver: str):

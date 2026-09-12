@@ -111,7 +111,7 @@ def load_runtime(version: str, config_root: Path, data_dir: Path,
         reader=reader,
         energies=dict(payload.ec.energy_map),
     )
-    # fit range files: order tb, ec_source, ec_xray
+    # fit range files: tb, ec_source, ec_xray, neutron
     fit_files = {
         "tb": "fit_range_tb.yaml",
         "ec_source": "fit_range_ec_source.yaml",

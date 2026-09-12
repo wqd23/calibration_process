@@ -122,7 +122,8 @@ class ECParams(_StrictBase):
     # rate time base: "union" (legacy) or "channel" (per-channel files)
     rate_span: str = "union"
     # per-channel E-C center form: "piecewise_quadratic" (default, split at the
-    # K edge) or "linear" (a single unsplit line); keys are channel numbers
+    # K edge), "quadratic" (a single unsplit quadratic) or "linear" (a single
+    # unsplit line); keys are channel numbers
     ec_form: Dict[str, str] = {}
 
     @field_validator("ec_form")
