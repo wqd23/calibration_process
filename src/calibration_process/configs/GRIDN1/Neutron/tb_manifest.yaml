@@ -1,4 +1,4 @@
-version: N1-Neutron
+version: GRIDN1/Neutron
 branch: tb
 measurements:
 - id: 0-75C-28.5-193

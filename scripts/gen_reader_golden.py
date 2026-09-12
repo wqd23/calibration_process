@@ -43,8 +43,8 @@ from lib_reader.readerN1.read import single_readN1  # noqa: E402
 # GRID-N1 has no legacy implementation, so these samples freeze the current
 # reader output (self-consistent goldens) rather than legacy-validated ones.
 # GAGG uses the 584-byte ft packets; CLYC the 1080-byte 512-sample wf packets.
-N1_GAGG = Path("data/N1-Gamma-Am241/raw_data")
-N1_CLYC = Path("data/N1-Gamma-Na22/raw_data")
+N1_GAGG = Path("data/GRIDN1/GAGG/raw_data")
+N1_CLYC = Path("data/GRIDN1/CLYC/raw_data")
 N1_FT = ("n1_gagg_ft", "m20C-265-125.event.dat", "m20C-265-ecu_027.hk",
          "ft", 40000, 30000)
 N1_WF = ("n1_clyc_wf", "0C-265-290-164.event.dat", "0C-265-290-ecu_073.hk",

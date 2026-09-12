@@ -33,12 +33,20 @@ _HK_XML = str(Path(__file__).with_name("yingtian_packet.xml"))
 
 
 def _cache_ver(path) -> str:
-    """Version component of ``.../data/<ver>/...`` (falls back to 'N1')."""
+    """Version component of ``.../data/<ver>/<root>/...`` (falls back to 'N1').
+
+    ``<ver>`` may itself contain slashes (e.g. ``GRIDN1/GAGG``), so take every
+    segment between ``data/`` and the data root (``raw_data``/``ec_src``/
+    ``ec_xray``).
+    """
     parts = Path(path).parts
     if "data" in parts:
         i = parts.index("data")
-        if i + 1 < len(parts):
-            return parts[i + 1]
+        roots = {"raw_data", "ec_src", "ec_xray"}
+        segs = parts[i + 1:]
+        for j, seg in enumerate(segs):
+            if seg in roots:
+                return "/".join(segs[:j]) or "N1"
     return "N1"
 
 
@@ -74,27 +82,26 @@ def _readHK_impl(path):
         path, xml_file=_HK_XML, data_tag="hk_packet", endian="MSB")[0])
 
 
-def _readSci(path, mode, overwrite):
-    ver = _cache_ver(path)
+def _readSci(path, mode, overwrite, ver):
     return get_l1_frames(
         ver, "n1", path, {"sci": lambda: _readSci_impl(path, mode)},
         {"mode": mode}, overwrite=overwrite)["sci"]
 
 
-def _readHK(path, overwrite):
-    ver = _cache_ver(path)
+def _readHK(path, overwrite, ver):
     return get_l1_frames(
         ver, "n1", path, {"hk": lambda: _readHK_impl(path)}, {},
         overwrite=overwrite)["hk"]
 
 
-def getHK(sciFile, mode="ft"):
+def getHK(sciFile, mode="ft", ver=None):
     """Pair ``{temp}-{bias...}-{idx}.event.dat`` with ``{temp}-{bias...}-ecu_*.hk``.
 
     When several candidates exist, pick the one whose utc range overlaps the
     science utc range the most.
     """
     sciFile = Path(sciFile)
+    ver = ver or _cache_ver(str(sciFile))
     parts = sciFile.stem.split("-")
     cands = []
     for n in (3, 2):
@@ -107,11 +114,11 @@ def getHK(sciFile, mode="ft"):
         raise FileNotFoundError(f"HK file for {sciFile} does not exist.")
     if len(cands) == 1:
         return cands[0]
-    sci = _readSci(str(sciFile), mode, overwrite=False)
+    sci = _readSci(str(sciFile), mode, False, ver)
     lo, hi = float(np.min(sci.utc)), float(np.max(sci.utc))
     best, best_overlap = None, -1.0
     for f in cands:
-        tel = _readHK(str(f), overwrite=False)
+        tel = _readHK(str(f), False, ver)
         u = np.asarray(tel.utc_time, dtype=float)
         overlap = max(0.0, min(hi, u.max()) - max(lo, u.min()))
         if overlap > best_overlap:
@@ -129,12 +136,14 @@ def _split_segments(utc):
     return np.digitize(np.asarray(utc, dtype=float), cuts)
 
 
-def _single_readN1_impl(path, mode, hk_name, seg_bias, quantity, overwrite, select=None):
-    sci = _readSci(path, mode, overwrite)
+def _single_readN1_impl(path, mode, hk_name, seg_bias, quantity, overwrite,
+                        select=None, ver=None):
+    ver = ver or _cache_ver(path)
+    sci = _readSci(path, mode, overwrite, ver)
     if select is not None:
-        sci = apply_selection(_cache_ver(path), "n1", path, {"mode": mode},
+        sci = apply_selection(ver, "n1", path, {"mode": mode},
                               select[0], select[1], sci)
-    tel = _readHK(str(hk_name), overwrite)
+    tel = _readHK(str(hk_name), overwrite, ver)
 
     utc = np.asarray(sci.utc, dtype=float)
     hk_utc = np.asarray(tel.utc_time, dtype=float)
@@ -199,9 +208,10 @@ def _single_readN1_impl(path, mode, hk_name, seg_bias, quantity, overwrite, sele
 
 
 def single_readN1(path: str, config=None, mode="ft", seg_bias=None,
-                  quantity="amp", hk_path=None, **kwargs):
+                  quantity="amp", hk_path=None, cache_ver=None, **kwargs):
     overwrite = kwargs.get("overwrite_cache", False)
     select = kwargs.get("select")
+    ver = cache_ver or _cache_ver(path)
     params = {
         "mode": mode,
         "seg_bias": seg_bias,
@@ -212,9 +222,9 @@ def single_readN1(path: str, config=None, mode="ft", seg_bias=None,
         params["select"] = select[0]
 
     def process():
-        hk_name = Path(hk_path) if hk_path else getHK(path, mode)
+        hk_name = Path(hk_path) if hk_path else getHK(path, mode, ver)
         return _single_readN1_impl(path, mode, hk_name, seg_bias, quantity,
-                                   overwrite, select=select)
+                                   overwrite, select=select, ver=ver)
 
-    return get_l2_processed(_cache_ver(path), "n1", path, params, process,
+    return get_l2_processed(ver, "n1", path, params, process,
                             overwrite=overwrite)

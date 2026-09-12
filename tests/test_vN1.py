@@ -19,11 +19,11 @@ def test_n1_registered_for_all_subversions():
 
 
 def test_selection_only_for_neutron(monkeypatch):
-    assert vN1.selection("N1-Gamma-Am241", "tb") is None
-    assert vN1.selection("N1-Neutron", "tb") is None
+    assert vN1.selection("GRIDN1/GAGG", "tb") is None
+    assert vN1.selection("GRIDN1/Neutron", "tb") is None
 
     monkeypatch.setattr(vN1, "NEUTRON_CCM_MIN", 0.5)
-    selkey, fn = vN1.selection("N1-Neutron", "neutron")
+    selkey, fn = vN1.selection("GRIDN1/Neutron", "neutron")
     assert selkey == vN1.NEUTRON_SELKEY
     frames = {"data_max": np.array([100, 200, 300]),
               "data_base": np.array([0, 0, 0]),
@@ -49,7 +49,7 @@ def _make_raw(tmp_path):
 
 def test_enumerate_tb(tmp_path):
     _make_raw(tmp_path)
-    gagg = vN1.enumerate_measurements("N1-Gamma-Am241", "tb", _rt(), tmp_path)
+    gagg = vN1.enumerate_measurements("GRIDN1/GAGG", "tb", _rt(), tmp_path)
     ids = [r["id"] for r in gagg]
     # 0C scan -> 8 standard biases, m20C single -> 1; CI/To excluded
     assert len(ids) == 9
@@ -58,14 +58,14 @@ def test_enumerate_tb(tmp_path):
     assert seg["GAGG_0C_265"] == 265
     assert seg["GAGG_m20C_265"] is None
 
-    clyc = vN1.enumerate_measurements("N1-Gamma-Na22", "tb", _rt(), tmp_path)
+    clyc = vN1.enumerate_measurements("GRIDN1/CLYC", "tb", _rt(), tmp_path)
     clyc_ids = [r["id"] for r in clyc]
     # 0C scan gains the extra 281 segment; m20C single stays
     assert "CLYC_0C_281" in clyc_ids and "CLYC_m20C_265" in clyc_ids
 
 
 def test_enumerate_matches_committed_fit_range():
-    for ver in ("N1-Gamma-Am241", "N1-Gamma-Na22"):
+    for ver in ("GRIDN1/GAGG", "GRIDN1/CLYC"):
         if not (Path("data") / ver / "raw_data").exists():
             pytest.skip("N1 raw_data not linked")
         rt = pipeline.load_rt(ver)
@@ -88,15 +88,15 @@ def test_enumerate_n1_ec(tmp_path):
                          energy_map={"Cs137C-30m-208.event.dat": 662.0, "40": 40.0})
     rt = SimpleNamespace(payload=SimpleNamespace(ec=ec), energies=ec.energy_map)
 
-    src = vN1.enumerate_measurements("N1-Gamma-EC", "ec_source", rt, tmp_path)
+    src = vN1.enumerate_measurements("GRIDN1/EC", "ec_source", rt, tmp_path)
     assert [r["id"] for r in src] == ["Cs137C-30m-208.event.dat"]  # AmBe/bkg dropped
-    xr = vN1.enumerate_measurements("N1-Gamma-EC", "ec_xray", rt, tmp_path)
+    xr = vN1.enumerate_measurements("GRIDN1/EC", "ec_xray", rt, tmp_path)
     assert [r["id"] for r in xr] == ["40"]
     assert xr[0]["science_files"] == [f"ec_xray/40-ch{i}-089.event.dat" for i in range(4)]
 
 
 def test_enumerate_n1_ec_matches_committed():
-    ver = "N1-Gamma-EC"
+    ver = "GRIDN1/EC"
     if not (Path("data") / ver / "ec_src").exists():
         pytest.skip("N1 EC data not linked")
     rt = pipeline.load_rt(ver)

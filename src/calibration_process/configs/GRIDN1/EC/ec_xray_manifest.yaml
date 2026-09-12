@@ -1,4 +1,4 @@
-version: N1-Gamma-EC
+version: GRIDN1/EC
 branch: ec_xray
 measurements:
 - id: '40'

@@ -1,4 +1,4 @@
-version: N1-Gamma-Am241
+version: GRIDN1/GAGG
 branch: tb
 measurements:
 - id: GAGG_0C_265

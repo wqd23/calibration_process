@@ -1,4 +1,4 @@
-version: N1-Gamma-EC
+version: GRIDN1/EC
 tb:
   reader: n1
   bin_width: 4

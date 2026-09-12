@@ -4,10 +4,11 @@
 GRID-N1 is split by acquisition dataset into separate sub-version namespaces
 that share this module:
 
-- ``N1-Gamma-Am241``: the GAGG runs (Am241 59.5 keV, ft packets, ch1/2).
-- ``N1-Gamma-Na22``: the CLYC runs (Na22 511 keV, wf 512-sample packets,
+- ``GRIDN1/GAGG``: the GAGG runs (Am241 59.5 keV, ft packets, ch1/2).
+- ``GRIDN1/CLYC``: the CLYC runs (Na22 511 keV, wf 512-sample packets,
   ch0-3).
-- ``N1-Gamma-EC`` / ``N1-Neutron``: placeholders for later phases.
+- ``GRIDN1/EC``: energy calibration (source anchors + X-ray).
+- ``GRIDN1/Neutron``: the neutron-beam runs (256-sample wf).
 
 TB measurement selection reproduces ``gridN_cali``'s curation (also used by the
 legacy ``TB_operation_N1``): per dataset, temperature-bias runs are either
@@ -28,10 +29,10 @@ import numpy as np
 
 from ...runtime import RuntimeConfig
 
-VERSIONS = ("N1-Gamma-Am241", "N1-Gamma-Na22", "N1-Gamma-EC", "N1-Neutron")
+VERSIONS = ("GRIDN1/GAGG", "GRIDN1/CLYC", "GRIDN1/EC", "GRIDN1/Neutron")
 
 # which dataset each gamma sub-version reads (TB)
-DATASET = {"N1-Gamma-Am241": "GAGG", "N1-Gamma-Na22": "CLYC"}
+DATASET = {"GRIDN1/GAGG": "GAGG", "GRIDN1/CLYC": "CLYC"}
 
 # standard bias-scan codes and the CLYC extra re-measured segments, taken from
 # the gridN_cali read_raw_CLYC.ipynb vol_sets
@@ -59,11 +60,11 @@ _NEUTRON = re.compile(r"^(?P<temp>.+?)-(?P<bias>\d+\.\d+)-(?P<idx>\d+)\.event\.d
 def enumerate_measurements(version: str, branch: str, rt: RuntimeConfig,
                            data_dir: Path) -> list:
     assert version in VERSIONS, f"vN1 workflow used for non-N1 version {version!r}"
-    if version == "N1-Neutron" and branch == "tb":
+    if version == "GRIDN1/Neutron" and branch == "tb":
         return _enumerate_neutron_tb(rt, data_dir)
-    if version == "N1-Gamma-EC" and branch == "ec_source":
+    if version == "GRIDN1/EC" and branch == "ec_source":
         return _enumerate_n1_ec_source(rt, data_dir)
-    if version == "N1-Gamma-EC" and branch == "ec_xray":
+    if version == "GRIDN1/EC" and branch == "ec_xray":
         return _enumerate_n1_ec_xray(rt, data_dir)
     if branch == "tb" and version in DATASET:
         return _enumerate_tb(rt, data_dir, DATASET[version])
@@ -181,8 +182,8 @@ def _record(dataset, temp, bias, seg_bias, sci_dir, fname):
 
 
 def selection(version: str, branch: str):
-    """Version/branch event-selection hook (only the future N1-Neutron uses it)."""
-    if version == "N1-Neutron" and branch == "neutron":
+    """Version/branch event-selection hook (only the future GRIDN1/Neutron uses it)."""
+    if version == "GRIDN1/Neutron" and branch == "neutron":
         return _neutron_selection()
     return None
 

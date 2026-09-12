@@ -11,8 +11,8 @@ wheels/
 
 # raw data 
 raw_data
-data/*/ec_src
-data/*/ec_xray
+data/**/ec_src
+data/**/ec_xray
 
 # binary data
 *.npy
@@ -28,14 +28,14 @@ data/*/ec_xray
 .cache
 .coverage
 .pytest_cache
-data/*/l1_cache/
-data/*/l1/
-data/*/l2/
+data/**/l1_cache/
+data/**/l1/
+data/**/l2/
 
 # L3 portable artifacts are outputs
-data/*/single_process/**/*.fit.json
-data/*/single_process/**/*.spectrum.parquet
-data/*/single_process/merged_tb.json
+data/**/single_process/**/*.fit.json
+data/**/single_process/**/*.spectrum.parquet
+data/**/single_process/merged_tb.json
 
 # result
 tb_logs/

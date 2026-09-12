@@ -32,6 +32,8 @@ class Read_config:
     reader_params: dict = field(default_factory=dict)
     # optional event selection hook: (selkey, fn) applied at L1->L2
     select: Optional[tuple] = None
+    # version whose data/<ver>/ caches the reader should use (may contain "/")
+    version: str = ""
 
 
 @dataclass
@@ -121,6 +123,8 @@ class File_operation_05b:
         kwargs["overwrite_cache"] = nocache
         if config.select is not None:
             kwargs["select"] = config.select
+        if config.version:
+            kwargs["cache_ver"] = config.version
         data = handler(config.path, config.config_file, **kwargs)
         if config.time_cut is not None:
             data = self.__time_cut(data, config.time_cut)

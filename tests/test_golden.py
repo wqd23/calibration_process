@@ -181,12 +181,12 @@ def test_global_tb_neutron_selfconsistent(tmp_path):
     the current fit output so later refactors are compared bit-for-bit.  The
     frozen points come from the 260322 neutron temperature scans at 28.5 V.
     """
-    rt = _rt("N1-Neutron")
-    per_channel = _load_points_tb("N1-Neutron")
+    rt = _rt("GRIDN1/Neutron")
+    per_channel = _load_points_tb("GRIDN1/Neutron")
     stages.global_tb(rt, per_channel, tmp_path / "tb_logs")
     produced = json.load(open(_latest(tmp_path / "tb_logs", "temp_bias_fit.json")))
-    golden = json.load(open(GOLDEN / "N1-Neutron" / "tb_coeff.json"))
-    assert_json_equivalent(produced, golden, "tb.N1-Neutron")
+    golden = json.load(open(GOLDEN / "GRIDN1/Neutron" / "tb_coeff.json"))
+    assert_json_equivalent(produced, golden, "tb.GRIDN1/Neutron")
 
 
 @pytest.mark.parametrize("ver", EC_GOLDEN)

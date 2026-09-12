@@ -1,4 +1,4 @@
-version: N1-Gamma-Am241
+version: GRIDN1/GAGG
 engine: grid1x
 readers:
   n1:

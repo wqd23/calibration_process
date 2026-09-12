@@ -96,7 +96,8 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
     def rc(path: str, ending: str, select=sel, **kwargs) -> "file_lib.Read_config":
         params = getattr(rt, "reader_params", lambda _e: {})(ending)
         return file_lib.Read_config(
-            path, ending=ending, reader_params=params, select=select, **kwargs
+            path, ending=ending, reader_params=params, select=select,
+            version=getattr(rt, "version", ""), **kwargs,
         )
 
     if branch == "tb":

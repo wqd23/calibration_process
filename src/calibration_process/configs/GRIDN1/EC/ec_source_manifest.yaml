@@ -1,4 +1,4 @@
-version: N1-Gamma-EC
+version: GRIDN1/EC
 branch: ec_source
 measurements:
 - id: Co60C-40m-209.event.dat

@@ -1,4 +1,4 @@
-version: N1-Neutron
+version: GRIDN1/CLYC
 tb:
   reader: n1
   bin_width: 4
@@ -11,7 +11,32 @@ tb:
   - 2
   - 3
   tb_fit_maxfev: 100000
-  skip_qa_fail: false
+  skip_qa_fail: true
+  tb_fit_p0_by_channel:
+    '0':
+    - 0.0007305
+    - 0.0162
+    - 23.6
+    - 500.0
+    - 32010.0
+    '1':
+    - 0.01062
+    - 0.0195
+    - 23.81
+    - 49.7
+    - 15610.0
+    '2':
+    - 0.01072
+    - 0.0191
+    - 23.97
+    - 47.1
+    - 15600.0
+    '3':
+    - 0.0007776
+    - 0.0129
+    - 23.57
+    - 500.0
+    - 37210.0
 ec:
   reader: n1
   bin_width: 4
@@ -22,13 +47,3 @@ ec:
   fit_range_file: fit_range_ec_xray.yaml
   energy_map: {}
   channel_count: 4
-neutron:
-  reader: n1
-  bin_width: 4
-  adc_max: 16384.0
-  fit_range_file: fit_range_neutron.yaml
-  channels:
-  - 0
-  - 1
-  - 2
-  - 3

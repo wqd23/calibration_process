@@ -1,7 +1,7 @@
-version: N1-Gamma-Na22
+version: GRIDN1/Neutron
 engine: grid1x
 readers:
   n1:
     handler: single_readN1
     params:
-      mode: wf
+      mode: wf256

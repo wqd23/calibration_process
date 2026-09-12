@@ -95,7 +95,7 @@ def read_frames(path, ver, kind="sci", **kwargs):
         if kind == "tl":
             return fa._decode_tl_l1(path, "03b")
         raise ValueError(f"{ver}: unknown L1 kind {kind!r}")
-    if ver.startswith("N1"):
+    if ver.startswith(("N1", "GRIDN1")):
         from .readerN1 import read as n1
 
         if kind == "sci":

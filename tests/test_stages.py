@@ -301,7 +301,7 @@ def test_single_run_spec_neutron(monkeypatch):
     hook = ("n1@1", lambda f: f["amp"] > 0)
     monkeypatch.setattr(stages, "_selection", lambda version, branch: hook)
     rt = SimpleNamespace(
-        version="N1-Neutron", data_dir=Path("data/N1-Neutron"),
+        version="GRIDN1/Neutron", data_dir=Path("data/GRIDN1/Neutron"),
         payload=SimpleNamespace(neutron=SimpleNamespace(reader="n1", bin_width=4, adc_max=16384.0)),
         reader_params=lambda e: {},
         fit_ranges={"neutron": {"m": [[0, 1], None, [0, 1], None]}},

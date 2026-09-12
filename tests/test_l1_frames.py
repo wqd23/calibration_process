@@ -29,10 +29,10 @@ CASES = [
     ("03B_src", "03B", "tl", "src_Cs137_12m_10cm_TimeLine2021-05-05-12-12-27.dat", {}),
     ("03B_xray", "03B", "sci", "jly_18p0_ch0_30s_rundata2021-04-29-15-21-50.dat",
      {"feature_mode": True}),
-    ("n1_gagg_ft", "N1-Gamma-Am241", "sci", "m20C-265-125.event.dat", {"mode": "ft"}),
-    ("n1_gagg_ft", "N1-Gamma-Am241", "hk", "m20C-265-ecu_027.hk", {}),
-    ("n1_clyc_wf", "N1-Gamma-Na22", "sci", "0C-265-290-164.event.dat", {"mode": "wf"}),
-    ("n1_clyc_wf", "N1-Gamma-Na22", "hk", "0C-265-290-ecu_073.hk", {}),
+    ("n1_gagg_ft", "GRIDN1/GAGG", "sci", "m20C-265-125.event.dat", {"mode": "ft"}),
+    ("n1_gagg_ft", "GRIDN1/GAGG", "hk", "m20C-265-ecu_027.hk", {}),
+    ("n1_clyc_wf", "GRIDN1/CLYC", "sci", "0C-265-290-164.event.dat", {"mode": "wf"}),
+    ("n1_clyc_wf", "GRIDN1/CLYC", "hk", "0C-265-290-ecu_073.hk", {}),
 ]
 
 

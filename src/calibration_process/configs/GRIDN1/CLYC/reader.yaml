@@ -1,7 +1,7 @@
-version: N1-Neutron
+version: GRIDN1/CLYC
 engine: grid1x
 readers:
   n1:
     handler: single_readN1
     params:
-      mode: wf256
+      mode: wf
