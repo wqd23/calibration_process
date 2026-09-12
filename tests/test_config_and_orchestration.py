@@ -20,6 +20,7 @@ from calibration_process.config_schema import (  # noqa: E402
     AnalysisSchema,
     FitRangeSet,
     ManifestSchema,
+    TBParams,
 )
 
 VER = "09"
@@ -186,6 +187,39 @@ def test_check_raw_is_real_dir_and_fix(tmp_path):
     shutil.rmtree(data / "ZK" / "tb_logs")
     assert deploy.check_version("ZK", config_root=root, data_root=data) is False
     assert deploy.check_version("ZK", fix=True, config_root=root, data_root=data) is True
+
+
+def test_tb_channels_schema():
+    base = dict(reader="12b", bin_width=6, adc_max=16384.0,
+                science_dir="raw_data", fit_range_file="fit_range_tb.yaml")
+    assert TBParams(**base).channels == [0, 1, 2, 3]
+    assert TBParams(**base, channels=[2, 1]).channels == [1, 2]
+    with pytest.raises(Exception):
+        TBParams(**base, channels=[0, 0])
+    with pytest.raises(Exception):
+        TBParams(**base, channels=[4])
+    with pytest.raises(Exception):
+        TBParams(**base, channels=[])
+
+
+def test_present_branches():
+    assert pipeline.present_branches("09") == ["tb", "ec_source", "ec_xray"]
+
+
+def test_check_version_partial_branches(tmp_path):
+    from calibration_process import deploy
+    import shutil
+    root = tmp_path / "cfg"
+    data = tmp_path / "d"
+    deploy.scaffold_version("ZK", config_root=root, data_root=data)
+    (data / "ZK" / "raw_data").mkdir(parents=True, exist_ok=True)
+    # a TB-only version must be READY: absent EC branches are skipped and their
+    # output dirs are no longer required
+    (root / "ZK" / "ec_source_manifest.yaml").unlink()
+    (root / "ZK" / "ec_xray_manifest.yaml").unlink()
+    shutil.rmtree(data / "ZK" / "single_process" / "EC_fit_result")
+    shutil.rmtree(data / "ZK" / "ec_logs")
+    assert deploy.check_version("ZK", config_root=root, data_root=data) is True
 
 
 def test_check_duplicate_ids_and_missing_file(tmp_path):

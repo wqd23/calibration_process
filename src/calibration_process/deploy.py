@@ -92,12 +92,13 @@ def check_version(ver: str, fix: bool = False,
         print(f"  ABSENT   data/{ver}/raw_data (run `calib scaffold {ver}` or link data)")
         ok = False
 
+    present = []
     for branch in ("tb", "ec_source", "ec_xray"):
         mp = root / f"{branch}_manifest.yaml"
         if not mp.exists():
-            print(f"  MISSING  configs/{ver}/{branch}_manifest.yaml (run `calib discover`)")
-            ok = False
+            print(f"  SKIP     configs/{ver}/{branch}_manifest.yaml (branch absent)")
             continue
+        present.append(branch)
         try:
             m = man.load_manifest(mp)
             ids = [x.id for x in m.measurements]
@@ -118,7 +119,21 @@ def check_version(ver: str, fix: bool = False,
             print(f"  INVALID  {branch}_manifest.yaml: {e}")
             ok = False
 
+    if not present:
+        print(f"  MISSING  no *_manifest.yaml under configs/{ver} (run `calib discover`)")
+        ok = False
+
+    # only require the output dirs the present branches actually produce
+    required = set()
+    if present:
+        required.add("single_process/single_fit_fig")
+    if "tb" in present:
+        required |= {"single_process/TB_fit_result", "tb_logs"}
+    if "ec_source" in present or "ec_xray" in present:
+        required |= {"single_process/EC_fit_result", "ec_logs"}
     for sub in _OUTPUT_SUBDIRS:
+        if sub not in required:
+            continue
         d = data_dir / sub
         if d.is_dir():
             print(f"  OK       data/{ver}/{sub}")

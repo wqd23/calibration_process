@@ -29,6 +29,18 @@ def _manifest_path(ver: str, branch: str) -> Path:
     return _config_root(ver) / f"{branch}_manifest.yaml"
 
 
+_BRANCHES = ("tb", "ec_source", "ec_xray")
+
+
+def present_branches(ver: str) -> list:
+    """The branches that have a manifest for ``ver`` (order: tb, ec_source, ec_xray).
+
+    Payload versions need not provide every branch: a gamma-only or neutron
+    sub-version simply omits the manifests it does not use.
+    """
+    return [b for b in _BRANCHES if _manifest_path(ver, b).exists()]
+
+
 def output_root(ver: str, override: Path | str | None = None) -> Path:
     if override is not None:
         return Path(override)
@@ -100,7 +112,10 @@ def build_ec_points(ver: str, out: Path | None = None):
     rt = load_rt(ver, out)
     src_items, x_items = [], []
     for branch in ("ec_source", "ec_xray"):
-        manifest = man.load_manifest(_manifest_path(ver, branch))
+        mp = _manifest_path(ver, branch)
+        if not mp.exists():
+            continue
+        manifest = man.load_manifest(mp)
         for m in man.filtered_measurements(manifest):
             fp = stages.load_single_fp_from_store(rt, branch, m, rt.output_root)
             items = src_items if branch == "ec_source" else x_items
@@ -128,8 +143,13 @@ STEP_ORDER = ("L1", "L2", "L3", "L4", "L5")
 
 def process_version(ver: str, nocache: bool = False, out: Path | None = None) -> None:
     """L1+L2 only: run the readers for every measurement without fitting."""
+    branches = present_branches(ver)
+    if not branches:
+        raise FileNotFoundError(
+            f"{ver}: no *_manifest.yaml found under {_config_root(ver)}"
+        )
     rt = load_rt(ver, out)
-    for branch in ("tb", "ec_source", "ec_xray"):
+    for branch in branches:
         manifest = man.load_manifest(_manifest_path(ver, branch))
         for m in man.filtered_measurements(manifest):
             fc = stages.single_run_spec(rt, branch, m)
@@ -141,18 +161,31 @@ def all_version(ver: str, nocache: bool = False, out: Path | None = None,
     until = until.upper()
     if until not in STEP_ORDER:
         raise ValueError(f"unknown layer {until!r}; choose from {STEP_ORDER}")
+    branches = present_branches(ver)
+    if not branches:
+        raise FileNotFoundError(
+            f"{ver}: no *_manifest.yaml found under {_config_root(ver)}"
+        )
     idx = STEP_ORDER.index(until)
     if idx <= STEP_ORDER.index("L2"):
         process_version(ver, nocache, out)
         return
-    fit_branch(ver, "tb", nocache, out)
-    fit_branch(ver, "ec-src", nocache, out)
-    fit_branch(ver, "ec-xray", nocache, out)
+    for manifest_branch, cli_branch in (
+        ("tb", "tb"), ("ec_source", "ec-src"), ("ec_xray", "ec-xray"),
+    ):
+        if manifest_branch in branches:
+            fit_branch(ver, cli_branch, nocache, out)
     if idx == STEP_ORDER.index("L3"):
         return
-    rt, tb_points = build_tb_points(ver, out)
-    _rt_ec, src_pts, x_pts = build_ec_points(ver, out)
+    rt = load_rt(ver, out)
+    tb_points = src_pts = x_pts = None
+    if "tb" in branches:
+        _rt_tb, tb_points = build_tb_points(ver, out)
+    if "ec_source" in branches or "ec_xray" in branches:
+        _rt_ec, src_pts, x_pts = build_ec_points(ver, out)
     if idx == STEP_ORDER.index("L4"):
         return
-    stages.global_tb(rt, tb_points, rt.output_root / "tb_logs")
-    stages.global_ec(rt, src_pts, x_pts, rt.output_root / "ec_logs")
+    if tb_points is not None:
+        stages.global_tb(rt, tb_points, rt.output_root / "tb_logs")
+    if src_pts is not None or x_pts is not None:
+        stages.global_ec(rt, src_pts, x_pts, rt.output_root / "ec_logs")
