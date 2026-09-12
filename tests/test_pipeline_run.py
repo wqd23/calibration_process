@@ -48,6 +48,10 @@ def test_all_versions_match_oracle(tmp_path):
             leg = oracle / sub
             new = out / "single_process" / sub
             for f in sorted(os_listdir(leg)):
+                if not f.endswith(".pickle"):
+                    # the oracle may also carry L3 artefacts (fit.json /
+                    # spectrum.parquet); only the pickles are compared here
+                    continue
                 try:
                     legacy_obj = pickle.load(open(leg / f, "rb"))
                 except (ModuleNotFoundError, ImportError, AttributeError) as e:

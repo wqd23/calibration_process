@@ -43,6 +43,7 @@ compare-10b:
 
 # freeze a legacy oracle snapshot: copy data/{{ver}} outputs into .oracle/{{ver}}
 oracle ver:
+  @rm -rf .oracle/{{ver}}
   @mkdir -p .oracle/{{ver}}
   @cp -r data/{{ver}}/single_process/TB_fit_result .oracle/{{ver}}/TB_fit_result
   @cp -r data/{{ver}}/single_process/EC_fit_result .oracle/{{ver}}/EC_fit_result

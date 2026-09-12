@@ -45,8 +45,8 @@ DATA = Path("data")
 CONFIG = Path("src/calibration_process/configs")
 GOLDEN = Path(__file__).parent / "golden"
 
-TB_GOLDEN = ["09", "11B", "12B"]
-EC_GOLDEN = ["09", "03B", "11B"]
+TB_GOLDEN = ["09", "11B", "12B", "GRIDN1/GAGG", "GRIDN1/CLYC"]
+EC_GOLDEN = ["09", "03B", "11B", "GRIDN1/EC"]
 
 
 def _rt(ver):

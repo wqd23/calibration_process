@@ -67,8 +67,13 @@ STORE = {
     "11B": Path("/tmp/opencode/store/11B"),
 }
 STORE_BASE = Path("/tmp/opencode/store")
-TB_VERSIONS = ["09", "11B", "12B"]
-EC_VERSIONS = ["09", "03B", "11B"]
+TB_VERSIONS = ["09", "11B", "12B", "GRIDN1/GAGG", "GRIDN1/CLYC"]
+EC_VERSIONS = ["09", "03B", "11B", "GRIDN1/EC"]
+# Versions whose TB golden is intentionally not the legacy oracle (the pipeline
+# was changed on purpose): build points/coeffs from the live pipeline so the
+# golden is self-consistent with the current code.
+SELF_CONSISTENT_TB = {"12B", "GRIDN1/GAGG", "GRIDN1/CLYC"}
+SELF_CONSISTENT_EC = {"GRIDN1/EC"}
 
 
 def _load_fp(path):
@@ -133,40 +138,51 @@ def ec_fields(p):
 
 def gen_tb(ver):
     rt = load_rt(ver)
-    manifest = man.load_manifest(CONFIG / ver / "tb_manifest.yaml")
-    items = [
-        (m, _load_fp(ORACLE / ver / "TB_fit_result" / f"{Path(m.id).stem}.pickle"))
-        for m in man.filtered_measurements(manifest)
-    ]
-    per_channel = stages.build_tb_points(rt, items)
     gdir = GOLDEN / ver
+    if ver in SELF_CONSISTENT_TB:
+        from calibration_process.pipeline import build_tb_points
+        _rt, per_channel = build_tb_points(ver)
+        src_dir = _rt.data_dir / "tb_logs"
+    else:
+        manifest = man.load_manifest(CONFIG / ver / "tb_manifest.yaml")
+        items = [
+            (m, _load_fp(ORACLE / ver / "TB_fit_result" / f"{Path(m.id).stem}.pickle"))
+            for m in man.filtered_measurements(manifest)
+        ]
+        per_channel = stages.build_tb_points(rt, items)
+        src_dir = ORACLE / ver / "tb_logs"
     _dump_points(per_channel, gdir / "points_tb.json")
-    src = _latest(ORACLE / ver / "tb_logs", "_temp_bias_fit.json")
+    src = _latest(src_dir, "_temp_bias_fit.json")
     if src:
-        shutil.copy(ORACLE / ver / "tb_logs" / src, gdir / "tb_coeff.json")
+        shutil.copy(src_dir / src, gdir / "tb_coeff.json")
     print(f"[{ver}] tb -> {gdir} ({len(per_channel[0])} points ch0)")
 
 
 def gen_ec(ver, store_dir=None):
     rt = load_rt(ver)
-    store = STORE[ver] if ver in STORE else (store_dir or STORE_BASE) / ver
-    if not store.exists():
-        raise FileNotFoundError(
-            f"store for {ver} not found at {store}; populate it with\n"
-            f"  python -m calibration_process.cli fit {ver} ec-src -o {store}\n"
-            f"  python -m calibration_process.cli fit {ver} ec-xray -o {store}"
-        )
-    src_items, x_items = [], []
-    for branch in ("ec_source", "ec_xray"):
-        manifest = man.load_manifest(CONFIG / ver / f"{branch}_manifest.yaml")
-        for m in man.filtered_measurements(manifest):
-            fp = _load_fp(store / "single_process/EC_fit_result" / f"{Path(m.id).stem}.pickle")
-            (src_items if branch == "ec_source" else x_items).append((m, fp))
-    src_pts = stages.build_ec_points(rt, src_items, "src")
-    x_pts = stages.build_ec_points(rt, x_items, "xray")
     gdir = GOLDEN / ver
+    if ver in SELF_CONSISTENT_EC:
+        from calibration_process.pipeline import build_ec_points
+        _rt, src_pts, x_pts = build_ec_points(ver)
+        elog = _rt.data_dir / "ec_logs"
+    else:
+        store = STORE[ver] if ver in STORE else (store_dir or STORE_BASE) / ver
+        if not store.exists():
+            raise FileNotFoundError(
+                f"store for {ver} not found at {store}; populate it with\n"
+                f"  python -m calibration_process.cli fit {ver} ec-src -o {store}\n"
+                f"  python -m calibration_process.cli fit {ver} ec-xray -o {store}"
+            )
+        src_items, x_items = [], []
+        for branch in ("ec_source", "ec_xray"):
+            manifest = man.load_manifest(CONFIG / ver / f"{branch}_manifest.yaml")
+            for m in man.filtered_measurements(manifest):
+                fp = _load_fp(store / "single_process/EC_fit_result" / f"{Path(m.id).stem}.pickle")
+                (src_items if branch == "ec_source" else x_items).append((m, fp))
+        src_pts = stages.build_ec_points(rt, src_items, "src")
+        x_pts = stages.build_ec_points(rt, x_items, "xray")
+        elog = ORACLE / ver / "ec_logs"
     _dump_ec_points(src_pts, x_pts, gdir / "points_ec.json")
-    elog = ORACLE / ver / "ec_logs"
     for ch in range(rt.payload.ec.channel_count):
         c = _latest(elog, f"_ec_coef_sci_ch{ch}.json")
         if c:
@@ -180,11 +196,16 @@ def gen_ec(ver, store_dir=None):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--store-dir", type=Path, default=STORE_BASE)
+    parser.add_argument("--versions", nargs="*", default=None,
+                        help="restrict to these versions (default: all)")
     args = parser.parse_args()
+    want = set(args.versions) if args.versions else None
     for ver in TB_VERSIONS:
-        gen_tb(ver)
+        if want is None or ver in want:
+            gen_tb(ver)
     for ver in EC_VERSIONS:
-        gen_ec(ver, store_dir=args.store_dir)
+        if want is None or ver in want:
+            gen_ec(ver, store_dir=args.store_dir)
 
 
 if __name__ == "__main__":

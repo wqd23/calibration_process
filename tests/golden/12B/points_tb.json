@@ -1,5 +1,16 @@
 [
  {
+  "measurement_id": "-10C_265",
+  "channel": 0,
+  "temperature": 4.659698581560287,
+  "temperature_err": 0.10720372961505631,
+  "bias": 26.507210593971628,
+  "bias_err": 0.009285132626987378,
+  "peak_center": 101.56614673907879,
+  "peak_center_err": 0.09929705465593232,
+  "enabled": true
+ },
+ {
   "measurement_id": "-10C_270",
   "channel": 0,
   "temperature": 5.000061919504648,
@@ -74,6 +85,17 @@
   "bias_err": 0.006651089174658,
   "peak_center": 422.49584540428657,
   "peak_center_err": 0.5159699341699557,
+  "enabled": true
+ },
+ {
+  "measurement_id": "-20C_265",
+  "channel": 0,
+  "temperature": -6.589541734860878,
+  "temperature_err": 0.028118049190511182,
+  "bias": 26.51119947790507,
+  "bias_err": 0.007603489466651436,
+  "peak_center": 119.28081457840426,
+  "peak_center_err": 0.21909272420714856,
   "enabled": true
  },
  {
@@ -209,6 +231,17 @@
   "enabled": true
  },
  {
+  "measurement_id": "0C_265",
+  "channel": 0,
+  "temperature": 15.287330016583752,
+  "temperature_err": 0.04211256586201259,
+  "bias": 26.505096716417917,
+  "bias_err": 0.006600370925617288,
+  "peak_center": 85.26235028798256,
+  "peak_center_err": 0.15210391783260527,
+  "enabled": true
+ },
+ {
   "measurement_id": "0C_275",
   "channel": 0,
   "temperature": 15.507862068965517,
@@ -272,6 +305,28 @@
   "bias_err": 0.007193480752145626,
   "peak_center": 392.38508501938145,
   "peak_center_err": 0.5240680020180634,
+  "enabled": true
+ },
+ {
+  "measurement_id": "10C_265",
+  "channel": 0,
+  "temperature": 25.392666666666667,
+  "temperature_err": 0.029089898972363002,
+  "bias": 26.494618571111108,
+  "bias_err": 0.007618460908467106,
+  "peak_center": 70.3777172985004,
+  "peak_center_err": 0.22463280447570966,
+  "enabled": true
+ },
+ {
+  "measurement_id": "10C_270",
+  "channel": 0,
+  "temperature": 25.43,
+  "temperature_err": 7.105427357601002e-15,
+  "bias": 26.99995036218679,
+  "bias_err": 0.008236069205769522,
+  "peak_center": 108.78755200132544,
+  "peak_center_err": 0.11502532453135075,
   "enabled": true
  },
  {
@@ -341,6 +396,28 @@
   "enabled": true
  },
  {
+  "measurement_id": "20C_265",
+  "channel": 0,
+  "temperature": 35.28608695652174,
+  "temperature_err": 0.039961435805121195,
+  "bias": 26.50025571603261,
+  "bias_err": 0.007868297503966799,
+  "peak_center": 58.646683588064306,
+  "peak_center_err": 0.32355567875513147,
+  "enabled": true
+ },
+ {
+  "measurement_id": "20C_270",
+  "channel": 0,
+  "temperature": 35.37466321243524,
+  "temperature_err": 0.043153125884670566,
+  "bias": 26.988232196891193,
+  "bias_err": 0.007332997469567668,
+  "peak_center": 91.92670698915009,
+  "peak_center_err": 0.1773427931032067,
+  "enabled": true
+ },
+ {
   "measurement_id": "20C_280",
   "channel": 0,
   "temperature": 35.46938574938575,
@@ -396,6 +473,39 @@
   "enabled": true
  },
  {
+  "measurement_id": "30C_265",
+  "channel": 0,
+  "temperature": 45.01626062322946,
+  "temperature_err": 0.03502585134584317,
+  "bias": 26.488071756373937,
+  "bias_err": 0.006900168967231187,
+  "peak_center": 55.27962996041043,
+  "peak_center_err": 0.6824385031730306,
+  "enabled": false
+ },
+ {
+  "measurement_id": "30C_270",
+  "channel": 0,
+  "temperature": 45.11786096256685,
+  "temperature_err": 0.04125986416019137,
+  "bias": 26.976722716577545,
+  "bias_err": 0.007308597215008383,
+  "peak_center": 76.78171890144954,
+  "peak_center_err": 0.18823228572707584,
+  "enabled": true
+ },
+ {
+  "measurement_id": "30C_275",
+  "channel": 0,
+  "temperature": 45.390606060606075,
+  "temperature_err": 0.028491295208590558,
+  "bias": 27.454868202020208,
+  "bias_err": 0.007693360483881935,
+  "peak_center": 118.27619945198924,
+  "peak_center_err": 1.5770610691089473,
+  "enabled": true
+ },
+ {
   "measurement_id": "30C_280",
   "channel": 0,
   "temperature": 45.498857808857814,
@@ -437,6 +547,17 @@
   "bias_err": 0.006606447091367682,
   "peak_center": 292.7153843111886,
   "peak_center_err": 0.538029611524926,
+  "enabled": true
+ },
+ {
+  "measurement_id": "-10C_265",
+  "channel": 1,
+  "temperature": 4.780248226950358,
+  "temperature_err": 0.11005128759406554,
+  "bias": 26.506329164893614,
+  "bias_err": 0.006663111405510446,
+  "peak_center": 101.95123049882301,
+  "peak_center_err": 0.15974479056300744,
   "enabled": true
  },
  {
@@ -514,6 +635,17 @@
   "bias_err": 0.006685886045215903,
   "peak_center": 421.76916939181257,
   "peak_center_err": 0.3399418843868164,
+  "enabled": true
+ },
+ {
+  "measurement_id": "-20C_265",
+  "channel": 1,
+  "temperature": -6.500458265139116,
+  "temperature_err": 0.0056452238928494936,
+  "bias": 26.509108492635022,
+  "bias_err": 0.007074760962658606,
+  "peak_center": 118.60838975587876,
+  "peak_center_err": 0.22265141274963127,
   "enabled": true
  },
  {
@@ -649,6 +781,17 @@
   "enabled": true
  },
  {
+  "measurement_id": "0C_265",
+  "channel": 1,
+  "temperature": 15.385190713101167,
+  "temperature_err": 0.04324815716112326,
+  "bias": 26.511944764510783,
+  "bias_err": 0.009080582621206411,
+  "peak_center": 87.20023960113747,
+  "peak_center_err": 0.1089389285149838,
+  "enabled": true
+ },
+ {
   "measurement_id": "0C_275",
   "channel": 1,
   "temperature": 15.596413793103451,
@@ -712,6 +855,28 @@
   "bias_err": 0.0068241858603810945,
   "peak_center": 392.0199538977379,
   "peak_center_err": 0.3829404138029137,
+  "enabled": true
+ },
+ {
+  "measurement_id": "10C_265",
+  "channel": 1,
+  "temperature": 25.488488888888888,
+  "temperature_err": 0.0259474873304777,
+  "bias": 26.508761995555552,
+  "bias_err": 0.007924169500401406,
+  "peak_center": 72.15693188065528,
+  "peak_center_err": 0.199243685148978,
+  "enabled": true
+ },
+ {
+  "measurement_id": "10C_270",
+  "channel": 1,
+  "temperature": 25.5,
+  "temperature_err": 0.0,
+  "bias": 27.000005810933935,
+  "bias_err": 0.007221596060518932,
+  "peak_center": 110.18822066212982,
+  "peak_center_err": 0.11148395846838731,
   "enabled": true
  },
  {
@@ -781,6 +946,28 @@
   "enabled": true
  },
  {
+  "measurement_id": "20C_265",
+  "channel": 1,
+  "temperature": 35.34432065217391,
+  "temperature_err": 0.042089777334841566,
+  "bias": 26.498392673913045,
+  "bias_err": 0.007546638934757234,
+  "peak_center": 59.545500225575196,
+  "peak_center_err": 0.3138508969970317,
+  "enabled": true
+ },
+ {
+  "measurement_id": "20C_270",
+  "channel": 1,
+  "temperature": 35.43145077720207,
+  "temperature_err": 0.04238937338625993,
+  "bias": 26.992846202072542,
+  "bias_err": 0.008672224152839535,
+  "peak_center": 94.60577837094706,
+  "peak_center_err": 0.15173634523473054,
+  "enabled": true
+ },
+ {
   "measurement_id": "20C_280",
   "channel": 1,
   "temperature": 35.50648648648649,
@@ -836,6 +1023,39 @@
   "enabled": true
  },
  {
+  "measurement_id": "30C_265",
+  "channel": 1,
+  "temperature": 45.05269121813031,
+  "temperature_err": 0.03637790876101925,
+  "bias": 26.494152637393768,
+  "bias_err": 0.008636712767400538,
+  "peak_center": 55.99239964988867,
+  "peak_center_err": 0.38365728778955277,
+  "enabled": false
+ },
+ {
+  "measurement_id": "30C_270",
+  "channel": 1,
+  "temperature": 45.153279857397514,
+  "temperature_err": 0.03820306616630872,
+  "bias": 26.974114242424243,
+  "bias_err": 0.007888768369904276,
+  "peak_center": 78.94230136149014,
+  "peak_center_err": 0.15800713315940565,
+  "enabled": true
+ },
+ {
+  "measurement_id": "30C_275",
+  "channel": 1,
+  "temperature": 45.42757575757577,
+  "temperature_err": 0.011814296175526463,
+  "bias": 27.45792668888889,
+  "bias_err": 0.007234319829404306,
+  "peak_center": 116.52373081728923,
+  "peak_center_err": 1.3587508632191454,
+  "enabled": true
+ },
+ {
   "measurement_id": "30C_280",
   "channel": 1,
   "temperature": 45.50699300699301,
@@ -877,6 +1097,17 @@
   "bias_err": 0.006420606941659212,
   "peak_center": 296.2016078073201,
   "peak_center_err": 0.45629432743546994,
+  "enabled": true
+ },
+ {
+  "measurement_id": "-10C_265",
+  "channel": 2,
+  "temperature": 4.609982269503549,
+  "temperature_err": 0.11063565389412101,
+  "bias": 26.512640326241137,
+  "bias_err": 0.007811404687017343,
+  "peak_center": 95.60870544862465,
+  "peak_center_err": 0.1814236884293561,
   "enabled": true
  },
  {
@@ -943,6 +1174,17 @@
   "bias_err": 0.00694181591099404,
   "peak_center": 398.7964320624353,
   "peak_center_err": 0.4793469850723064,
+  "enabled": true
+ },
+ {
+  "measurement_id": "-20C_265",
+  "channel": 2,
+  "temperature": -6.6814566284779024,
+  "temperature_err": 0.020966952433798917,
+  "bias": 26.511152561374793,
+  "bias_err": 0.007980515645906221,
+  "peak_center": 110.71093463180001,
+  "peak_center_err": 0.18609467935554924,
   "enabled": true
  },
  {
@@ -1078,6 +1320,17 @@
   "enabled": true
  },
  {
+  "measurement_id": "0C_265",
+  "channel": 2,
+  "temperature": 15.204145936981762,
+  "temperature_err": 0.04724999947432973,
+  "bias": 26.499588789386408,
+  "bias_err": 0.007921679770215549,
+  "peak_center": 79.65392769352542,
+  "peak_center_err": 0.10732375717044512,
+  "enabled": true
+ },
+ {
   "measurement_id": "0C_275",
   "channel": 2,
   "temperature": 15.40558620689656,
@@ -1141,6 +1394,28 @@
   "bias_err": 0.00682757927618588,
   "peak_center": 372.1326885199155,
   "peak_center_err": 0.46984380399106074,
+  "enabled": true
+ },
+ {
+  "measurement_id": "10C_265",
+  "channel": 2,
+  "temperature": 25.292533333333335,
+  "temperature_err": 0.027256477313761802,
+  "bias": 26.506441897777776,
+  "bias_err": 0.007463824021579521,
+  "peak_center": 66.78081926590441,
+  "peak_center_err": 0.2162823601536855,
+  "enabled": true
+ },
+ {
+  "measurement_id": "10C_270",
+  "channel": 2,
+  "temperature": 25.31,
+  "temperature_err": 3.552713678800501e-15,
+  "bias": 27.00298535079726,
+  "bias_err": 0.00770285712013189,
+  "peak_center": 103.93632520581616,
+  "peak_center_err": 0.07169242496050267,
   "enabled": true
  },
  {
@@ -1210,6 +1485,28 @@
   "enabled": true
  },
  {
+  "measurement_id": "20C_265",
+  "channel": 2,
+  "temperature": 35.148029891304354,
+  "temperature_err": 0.04035917785268676,
+  "bias": 26.49401338586956,
+  "bias_err": 0.0073058077208722075,
+  "peak_center": 57.89139457817424,
+  "peak_center_err": 1.0121037223643643,
+  "enabled": false
+ },
+ {
+  "measurement_id": "20C_270",
+  "channel": 2,
+  "temperature": 35.23974093264249,
+  "temperature_err": 0.03927365441025613,
+  "bias": 26.984636321243528,
+  "bias_err": 0.008357261519424048,
+  "peak_center": 87.58150783209967,
+  "peak_center_err": 0.20111494012928754,
+  "enabled": true
+ },
+ {
   "measurement_id": "20C_280",
   "channel": 2,
   "temperature": 35.31088452088452,
@@ -1265,6 +1562,39 @@
   "enabled": true
  },
  {
+  "measurement_id": "30C_265",
+  "channel": 2,
+  "temperature": 44.85640226628895,
+  "temperature_err": 0.03496379666193306,
+  "bias": 26.490493620396595,
+  "bias_err": 0.007627752496673798,
+  "peak_center": 55.20059801341606,
+  "peak_center_err": 0.5455128405852372,
+  "enabled": false
+ },
+ {
+  "measurement_id": "30C_270",
+  "channel": 2,
+  "temperature": 44.966827094474155,
+  "temperature_err": 0.043622759521174004,
+  "bias": 26.972333967914437,
+  "bias_err": 0.007456293708476805,
+  "peak_center": 73.70165427372852,
+  "peak_center_err": 0.16928375476068933,
+  "enabled": true
+ },
+ {
+  "measurement_id": "30C_275",
+  "channel": 2,
+  "temperature": 45.24547474747475,
+  "temperature_err": 0.01721306963764205,
+  "bias": 27.458465426262627,
+  "bias_err": 0.007644836724717595,
+  "peak_center": 117.11697014033683,
+  "peak_center_err": 0.6654312697901978,
+  "enabled": true
+ },
+ {
   "measurement_id": "30C_280",
   "channel": 2,
   "temperature": 45.31125874125874,
@@ -1306,6 +1636,17 @@
   "bias_err": 0.007399522288121771,
   "peak_center": 283.61837472896065,
   "peak_center_err": 0.4896263323938498,
+  "enabled": true
+ },
+ {
+  "measurement_id": "-10C_265",
+  "channel": 3,
+  "temperature": 4.8087588652482305,
+  "temperature_err": 0.11034706053595215,
+  "bias": 26.5156537712766,
+  "bias_err": 0.008393575159192597,
+  "peak_center": 122.65828556447028,
+  "peak_center_err": 0.14045837698377905,
   "enabled": true
  },
  {
@@ -1383,6 +1724,17 @@
   "bias_err": 0.006332675725306834,
   "peak_center": 489.8951396843553,
   "peak_center_err": 0.6127128328440683,
+  "enabled": true
+ },
+ {
+  "measurement_id": "-20C_265",
+  "channel": 3,
+  "temperature": -6.553846153846149,
+  "temperature_err": 0.029492753096429146,
+  "bias": 26.507721400981993,
+  "bias_err": 0.006791678607600901,
+  "peak_center": 140.58412089205623,
+  "peak_center_err": 0.2569133008145921,
   "enabled": true
  },
  {
@@ -1529,6 +1881,17 @@
   "enabled": true
  },
  {
+  "measurement_id": "0C_265",
+  "channel": 3,
+  "temperature": 15.422354892205645,
+  "temperature_err": 0.04421146330619293,
+  "bias": 26.496098504145944,
+  "bias_err": 0.008095427389468368,
+  "peak_center": 104.00876332905818,
+  "peak_center_err": 0.15988843893055318,
+  "enabled": true
+ },
+ {
   "measurement_id": "0C_270",
   "channel": 3,
   "temperature": 15.55549718574109,
@@ -1606,6 +1969,28 @@
   "enabled": true
  },
  {
+  "measurement_id": "10C_265",
+  "channel": 3,
+  "temperature": 25.517333333333333,
+  "temperature_err": 0.02719477073916255,
+  "bias": 26.50882855777778,
+  "bias_err": 0.008404468318037504,
+  "peak_center": 89.41334138317214,
+  "peak_center_err": 0.1464011861611088,
+  "enabled": true
+ },
+ {
+  "measurement_id": "10C_270",
+  "channel": 3,
+  "temperature": 25.56,
+  "temperature_err": 3.552713678800501e-15,
+  "bias": 27.00777495444191,
+  "bias_err": 0.008862332021995625,
+  "peak_center": 132.7321429118452,
+  "peak_center_err": 0.08578723903510951,
+  "enabled": true
+ },
+ {
   "measurement_id": "10C_275",
   "channel": 3,
   "temperature": 25.560327272727275,
@@ -1672,6 +2057,28 @@
   "enabled": true
  },
  {
+  "measurement_id": "20C_265",
+  "channel": 3,
+  "temperature": 35.403953804347836,
+  "temperature_err": 0.042275533019096465,
+  "bias": 26.49095041032609,
+  "bias_err": 0.0072570955222182746,
+  "peak_center": 71.62351657222173,
+  "peak_center_err": 0.14959217435187072,
+  "enabled": true
+ },
+ {
+  "measurement_id": "20C_270",
+  "channel": 3,
+  "temperature": 35.49683937823834,
+  "temperature_err": 0.04275317887919542,
+  "bias": 26.9994741865285,
+  "bias_err": 0.00815375476026771,
+  "peak_center": 114.85905178322264,
+  "peak_center_err": 0.19593049037469695,
+  "enabled": true
+ },
+ {
   "measurement_id": "20C_275",
   "channel": 3,
   "temperature": 35.55943925233645,
@@ -1735,6 +2142,39 @@
   "bias_err": 0.0065046646313300675,
   "peak_center": 384.392213023995,
   "peak_center_err": 0.40695827850547117,
+  "enabled": true
+ },
+ {
+  "measurement_id": "30C_265",
+  "channel": 3,
+  "temperature": 45.141076487252136,
+  "temperature_err": 0.03702808576656455,
+  "bias": 26.477950855524078,
+  "bias_err": 0.00776886020778711,
+  "peak_center": 60.721486565544865,
+  "peak_center_err": 0.4774919608656642,
+  "enabled": false
+ },
+ {
+  "measurement_id": "30C_270",
+  "channel": 3,
+  "temperature": 45.24381461675579,
+  "temperature_err": 0.04587895257113083,
+  "bias": 26.96984950980392,
+  "bias_err": 0.007148545826494861,
+  "peak_center": 97.17977713528371,
+  "peak_center_err": 0.16283162185488598,
+  "enabled": true
+ },
+ {
+  "measurement_id": "30C_275",
+  "channel": 3,
+  "temperature": 45.511272727272726,
+  "temperature_err": 0.023436920791742005,
+  "bias": 27.45497457777778,
+  "bias_err": 0.008045990345250116,
+  "peak_center": 141.77879562131335,
+  "peak_center_err": 0.14939625622555566,
   "enabled": true
  },
  {

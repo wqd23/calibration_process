@@ -85,6 +85,7 @@ def test_enumerate_n1_ec(tmp_path):
     for i in range(4):
         (tmp_path / "ec_xray" / f"40-ch{i}-089.event.dat").write_bytes(b"")
     ec = SimpleNamespace(src_path="ec_src", x_path="ec_xray",
+                         x_path_low=None, xray_reader_low=None,
                          energy_map={"Cs137C-30m-208.event.dat": 662.0, "40": 40.0})
     rt = SimpleNamespace(payload=SimpleNamespace(ec=ec), energies=ec.energy_map)
 
