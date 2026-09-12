@@ -37,8 +37,21 @@ class RuntimeConfig:
     bkg_forms: Dict[str, Dict[str, Optional[str]]] = field(default_factory=dict)
     # measurement_id -> energy (keV)
     energies: Dict[str, float] = field(default_factory=dict)
-    # per EC branch corr functions (ref temp-bias correction)
-    corr: List = field(default_factory=list)
+    # lazily built per-channel temp-bias correction functions (see ``corr``)
+    _corr: Optional[List] = field(default=None, repr=False, compare=False)
+
+    @property
+    def corr(self) -> List:
+        """Per-channel temp-bias gain correction, built on first access.
+
+        Reading the ``tb_ref_path`` reference is deliberately deferred: a
+        payload with no EC branch (or a TB-only sub-version whose reference is
+        not produced yet) must still load its runtime.  Only the EC branches
+        touch this, and a missing reference then fails with a clear message.
+        """
+        if self._corr is None:
+            self._corr = _build_corr(self.payload, self.data_dir)
+        return self._corr
 
     def fit_range(self, branch: str, measurement_id: str) -> List[List[float]]:
         return self.fit_ranges[branch][measurement_id]
@@ -113,8 +126,8 @@ def load_runtime(version: str, config_root: Path, data_dir: Path,
         ).measurements
     for branch in ("tb", "ec_source", "ec_xray"):
         rt.bkg_forms[branch] = _resolve_bkg(branch, analysis)
-    # corr from TB reference
-    rt.corr = _build_corr(payload, data_dir)
+    # ``rt.corr`` is built lazily on first access (EC branches only), so a
+    # TB-only / neutron payload does not need its TB reference to exist yet.
     return rt
 
 
@@ -122,6 +135,11 @@ def _build_corr(payload: PayloadSchema, data_dir: Path) -> List:
     from . import util_lib as util
 
     tb_ref = data_dir / payload.ec.tb_ref_path
+    if not tb_ref.exists():
+        raise util.FitError(
+            f"EC correction reference not found: {tb_ref}; run `calib global "
+            f"<ver> tb` (and merge per-source results where applicable) first"
+        )
     tb_result = util.json_load(str(tb_ref))
     ref_temp = payload.ec.ref_temp
     ref_bias = payload.ec.ref_bias
