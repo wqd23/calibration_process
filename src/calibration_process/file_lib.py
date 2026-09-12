@@ -30,6 +30,8 @@ class Read_config:
     kwarg: dict = field(default_factory=dict)
     # version-specific reader params (from configs/{ver}/reader.yaml)
     reader_params: dict = field(default_factory=dict)
+    # optional event selection hook: (selkey, fn) applied at L1->L2
+    select: Optional[tuple] = None
 
 
 @dataclass
@@ -113,6 +115,8 @@ class File_operation_05b:
         kwargs = dict(config.kwarg)
         kwargs.update(config.reader_params)
         kwargs["overwrite_cache"] = nocache
+        if config.select is not None:
+            kwargs["select"] = config.select
         data = handler(config.path, config.config_file, **kwargs)
         if config.time_cut is not None:
             data = self.__time_cut(data, config.time_cut)

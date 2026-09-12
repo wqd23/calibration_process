@@ -21,7 +21,7 @@ import numpy as np
 from ..packet_parser import parse_grid_data_new
 from ..frame_io import load_binary
 from ..util import data_refactor
-from ..l1_cache import get_l1_frames, get_l1_meta, get_l2_processed
+from ..l1_cache import get_l1_frames, get_l1_meta, get_l2_processed, apply_selection
 from . import readout
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
@@ -363,7 +363,7 @@ def _sibling_paths(path):
     return filename_no_path, hk_file, timeline_file
 
 
-def _process(path, ver, reader, feature_mode, no_udp, ending):
+def _process(path, ver, reader, feature_mode, no_udp, ending, select=None):
     filename_no_path, hk_file, timeline_file = _sibling_paths(path)
     params = {"feature_mode": feature_mode, "no_udp": no_udp}
     sci_extra = {}
@@ -376,6 +376,8 @@ def _process(path, ver, reader, feature_mode, no_udp, ending):
     sci_frames = get_l1_frames(
         ver, reader, path, {"sci": _decode_sci}, params, extra_meta=sci_extra,
     )["sci"]
+    if select is not None:
+        sci_frames = apply_selection(ver, reader, path, params, select[0], select[1], sci_frames)
     drop_packets = get_l1_meta(ver, reader, path, params, "sci").get(
         "legacy_drop_frame_idx", [])
     hk_frames = get_l1_frames(
@@ -391,30 +393,37 @@ def _process(path, ver, reader, feature_mode, no_udp, ending):
         drop_packets)
 
 
-def _read(path, ver, reader, feature_mode, no_udp, ending, overwrite_cache=False):
+def _read(path, ver, reader, feature_mode, no_udp, ending, overwrite_cache=False, select=None):
     params = {"feature_mode": feature_mode, "no_udp": no_udp, "ending": ending}
+    l2_params = dict(params)
+    if select is not None:
+        l2_params["select"] = select[0]
     return get_l2_processed(
-        ver, reader, path, params,
-        lambda: _process(path, ver, reader, feature_mode, no_udp, ending),
+        ver, reader, path, l2_params,
+        lambda: _process(path, ver, reader, feature_mode, no_udp, ending, select=select),
         overwrite=overwrite_cache,
     )
 
 
 def single_read05b_normal(path, config=None, **kwargs):
     return _read(path, "05B", "normal", feature_mode=False, no_udp=True, ending="normal",
-                 overwrite_cache=kwargs.get("overwrite_cache", False))
+                 overwrite_cache=kwargs.get("overwrite_cache", False),
+                 select=kwargs.get("select"))
 
 
 def single_read05b_xray(path, config=None, **kwargs):
     return _read(path, "05B", "xray", feature_mode=False, no_udp=True, ending="x_ray",
-                 overwrite_cache=kwargs.get("overwrite_cache", False))
+                 overwrite_cache=kwargs.get("overwrite_cache", False),
+                 select=kwargs.get("select"))
 
 
 def single_read03b(path, config=None, **kwargs):
     return _read(path, "03B", "03b", feature_mode=True, no_udp=False, ending="03b",
-                 overwrite_cache=kwargs.get("overwrite_cache", False))
+                 overwrite_cache=kwargs.get("overwrite_cache", False),
+                 select=kwargs.get("select"))
 
 
 def src_read03b(path, config=None, **kwargs):
     return _read(path, "03B", "03b-src", feature_mode=False, no_udp=False, ending="03b",
-                 overwrite_cache=kwargs.get("overwrite_cache", False))
+                 overwrite_cache=kwargs.get("overwrite_cache", False),
+                 select=kwargs.get("select"))

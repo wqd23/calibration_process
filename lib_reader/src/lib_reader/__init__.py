@@ -10,6 +10,7 @@ from .reader07.read import single_read07, single_read04, single_read09
 from .reader10.read import single_read10
 from .reader11.read import single_read11
 from .reader12.read import single_read12
+from .select import EventTable
 
 
 def get_project_root() -> Path:
@@ -97,5 +98,5 @@ def read_frames(path, ver, kind="sci", **kwargs):
 __all__ = [
     "single_read03b", "src_read03b", "single_read04", "single_read05b_normal",
     "single_read05b_xray", "single_read07", "single_read09", "single_read10",
-    "single_read11", "single_read12", "READERS", "read_frames",
+    "single_read11", "single_read12", "READERS", "read_frames", "EventTable",
 ]

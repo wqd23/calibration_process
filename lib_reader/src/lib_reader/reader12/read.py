@@ -27,7 +27,7 @@ import numpy as np
 from addict import Dict
 
 from ..packet_parser import parse_grid_data_new
-from ..l1_cache import with_l1_cache, get_l2_processed
+from ..l1_cache import with_l1_cache, get_l2_processed, apply_selection
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
 
@@ -79,8 +79,10 @@ def getHK(sciFile):
     raise FileNotFoundError(f"HK file for {sciFile} does not exist.")
 
 
-def _single_read12_impl(path, mode, hk_name, hk_bias, sci_half, overwrite):
+def _single_read12_impl(path, mode, hk_name, hk_bias, sci_half, overwrite, select=None):
     sciExtracted = readSci(path, mode=mode, overwrite_cache=overwrite)
+    if select is not None:
+        sciExtracted = apply_selection("12B", "12b", path, {"mode": mode}, select[0], select[1], sciExtracted)
     telExtracted = readHK(str(hk_name), overwrite_cache=overwrite)
 
     # keep only one half of the events in file order (file order == time
@@ -148,15 +150,18 @@ def _single_read12_impl(path, mode, hk_name, hk_bias, sci_half, overwrite):
 
 def single_read12(path: str, config=None, mode="ft", hk_path=None, hk_bias=None, sci_half=None, **kwargs):
     overwrite = kwargs.get("overwrite_cache", False)
+    select = kwargs.get("select")
     params = {
         "mode": mode,
         "hk_path": None if hk_path is None else str(hk_path),
         "hk_bias": hk_bias,
         "sci_half": sci_half,
     }
+    if select is not None:
+        params["select"] = select[0]
 
     def process():
         hk_name = Path(hk_path) if hk_path else getHK(path)
-        return _single_read12_impl(path, mode, hk_name, hk_bias, sci_half, overwrite)
+        return _single_read12_impl(path, mode, hk_name, hk_bias, sci_half, overwrite, select=select)
 
     return get_l2_processed("12B", "12b", path, params, process, overwrite=overwrite)

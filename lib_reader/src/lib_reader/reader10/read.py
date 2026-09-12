@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ..packet_parser import parse_grid_data_new
 from .tb_cut import tel_cut
-from ..l1_cache import with_l1_cache, get_l2_processed
+from ..l1_cache import with_l1_cache, get_l2_processed, apply_selection
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
 
@@ -35,8 +35,10 @@ def readHK(path):
     return _readHK_impl(path)
 
 
-def _single_read10_impl(path, hk_name, overwrite):
+def _single_read10_impl(path, hk_name, overwrite, select=None):
     wf_data_l = readSci(path, overwrite_cache=overwrite)
+    if select is not None:
+        wf_data_l = apply_selection("10B", "10b", path, {}, select[0], select[1], wf_data_l)
     hk_data = readHK(hk_name, overwrite_cache=overwrite)
     sciExtracted, telExtracted = wf_data_l, hk_data
 
@@ -72,8 +74,12 @@ def _single_read10_impl(path, hk_name, overwrite):
 
 def single_read10(path: str, config=None, **kwargs):
     overwrite = kwargs.get('overwrite_cache', False)
+    select = kwargs.get('select')
+    l2_params = {}
+    if select is not None:
+        l2_params["select"] = select[0]
 
     def process():
-        return _single_read10_impl(path, path.replace('observe', 'hk'), overwrite)
+        return _single_read10_impl(path, path.replace('observe', 'hk'), overwrite, select=select)
 
-    return get_l2_processed("10B", "10b", path, {}, process, overwrite=overwrite)
+    return get_l2_processed("10B", "10b", path, l2_params, process, overwrite=overwrite)

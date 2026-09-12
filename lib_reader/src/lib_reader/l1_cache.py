@@ -515,3 +515,58 @@ def with_l1_cache_processed(ver: str, reader: str, kind: str):
         return wrapper
 
     return decorate
+
+
+# --- event selection sidecar (L1 -> L2 hook) ----------------------------------
+
+def apply_selection(ver: str, reader: str, raw_path, parse_kwargs: dict,
+                    selkey: str, fn, frames):
+    """Apply an event selection to the shared L1 ``frames`` and return the mask.
+
+    ``selkey`` is the selection version tag (it is what enters the L2 cache
+    key); ``fn(frames)`` returns either a boolean mask or ``(mask, extra_cols)``.
+    The mask and any extra columns are cached next to the L1 frames as
+    ``select__<token>.parquet`` + ``.meta.json`` so a later run does not
+    recompute them.  The returned frames keep the input type (``addict.Dict``)
+    so downstream attribute access is unchanged.
+    """
+    parse_kwargs = dict(parse_kwargs or {})
+    key = _make_key(ver, reader, raw_path, parse_kwargs)
+    token = hashlib.sha256(selkey.encode("utf-8")).hexdigest()[:8]
+    cache_dir = _cache_root(ver) / key
+    parquet = cache_dir / f"select__{token}.parquet"
+    meta_path = cache_dir / f"select__{token}.meta.json"
+
+    mask = None
+    if parquet.exists() and meta_path.exists():
+        try:
+            meta = json.loads(meta_path.read_text())
+            if meta.get("schema_ver") == SCHEMA_VER:
+                mask = np.asarray(read_frame(parquet, meta)["select_mask"]).astype(bool)
+        except Exception:
+            mask = None  # corrupt/mismatched sidecar -> recompute below
+
+    if mask is None:
+        out = fn(frames)
+        if isinstance(out, tuple):
+            mask, extra = out
+        else:
+            mask, extra = out, {}
+        mask = np.asarray(mask, dtype=bool)
+        n = len(next(iter(frames.values())))
+        if mask.shape[0] != n:
+            raise ValueError(f"selection mask has {mask.shape[0]} rows, expected {n}")
+        try:
+            cols = {k: np.asarray(v) for k, v in dict(extra).items()}
+            cols["select_mask"] = mask
+            ser, dtypes, _rows, shapes = serialize(cols)
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            write_frame(ser, parquet)
+            meta_path.write_text(json.dumps({
+                "schema_ver": SCHEMA_VER, "ver": ver, "reader": reader,
+                "selkey": selkey, "token": token, "dtypes": dtypes, "shapes": shapes,
+            }, ensure_ascii=False, indent=2))
+        except Exception:
+            pass  # never let the sidecar cache put the pipeline at risk
+
+    return Dict({k: np.asarray(v)[mask] for k, v in frames.items()})

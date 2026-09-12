@@ -2,7 +2,7 @@ from ..packet_parser import parse_grid_data_new
 from addict import Dict
 from pathlib import Path
 from ..reader11.tb_cut import tel_cut
-from ..l1_cache import with_l1_cache, get_l2_processed
+from ..l1_cache import with_l1_cache, get_l2_processed, apply_selection
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
 
@@ -36,8 +36,10 @@ def getHK(sciFile):
     hkFile = hkFile[0]
     return hkFile
 
-def _single_read11_impl(path, mode, hk_name, overwrite):
+def _single_read11_impl(path, mode, hk_name, overwrite, select=None):
     wf_data_l = readSci(path, mode=mode, overwrite_cache=overwrite)
+    if select is not None:
+        wf_data_l = apply_selection("11B", "11b", path, {"mode": mode}, select[0], select[1], wf_data_l)
     hk_data = readHK(hk_name)
     sciExtracted, telExtracted = wf_data_l, hk_data
     
@@ -73,9 +75,13 @@ def _single_read11_impl(path, mode, hk_name, overwrite):
 
 def single_read11(path: str, config=None, mode='wf', **kwargs):
     overwrite = kwargs.get('overwrite_cache', False)
+    select = kwargs.get('select')
+    l2_params = {"mode": mode}
+    if select is not None:
+        l2_params["select"] = select[0]
 
     def process():
-        return _single_read11_impl(path, mode, getHK(path), overwrite)
+        return _single_read11_impl(path, mode, getHK(path), overwrite, select=select)
 
-    return get_l2_processed("11B", "11b", path, {"mode": mode}, process,
+    return get_l2_processed("11B", "11b", path, l2_params, process,
                             overwrite=overwrite)

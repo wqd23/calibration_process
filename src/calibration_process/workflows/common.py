@@ -61,6 +61,25 @@ def _save_spectrum(fp, path) -> None:
 # --------------------------------------------------------------------------- #
 # FileRunSpec resolution
 # --------------------------------------------------------------------------- #
+def _selection(version: str, branch: str):
+    """Version-defined event selection hook for a branch, or None.
+
+    A version module may expose ``selection(version, branch) -> (selkey, fn)``;
+    the hook is written entirely in Python (never YAML) and is applied by the
+    reader at L1->L2.
+    """
+    from .registry import get_workflow
+
+    try:
+        wf = get_workflow(version)
+    except KeyError:
+        return None
+    hook = getattr(wf, "selection", None)
+    if hook is None:
+        return None
+    return hook(version, branch)
+
+
 def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRunSpec:
     """Resolve the read/bkg/spectrum/fit config for one measurement.
 
@@ -69,13 +88,16 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
     (background rotation, 4-channel reconstruction, corr).
     """
     data_dir = rt.data_dir
+    sel = _selection(getattr(rt, "version", ""), branch)
 
     def abspath(rel: str) -> str:
         return str(data_dir / rel)
 
-    def rc(path: str, ending: str, **kwargs) -> "file_lib.Read_config":
+    def rc(path: str, ending: str, select=sel, **kwargs) -> "file_lib.Read_config":
         params = getattr(rt, "reader_params", lambda _e: {})(ending)
-        return file_lib.Read_config(path, ending=ending, reader_params=params, **kwargs)
+        return file_lib.Read_config(
+            path, ending=ending, reader_params=params, select=select, **kwargs
+        )
 
     if branch == "tb":
         pb = rt.payload.tb
@@ -87,7 +109,7 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
         if m.metadata.get("hk_bias") is not None:
             kwarg["hk_bias"] = m.metadata["hk_bias"]
         read = rc(abspath(m.science_files[-1]), pb.reader, kwarg=kwarg)
-        bkg = rc("", "normal")
+        bkg = rc("", "normal", select=None)
         spec = file_lib.Spectrum_config(bin_width=pb.bin_width, adc_max=pb.adc_max)
         fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
         return FileRunSpec(read, bkg, spec, fit)
@@ -98,9 +120,9 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
         read = rc(abspath(m.science_files[-1]), src_reader)
         bkg_rel = m.aux_files[-1] if m.aux_files else ""
         bkg = (
-            rc(abspath(bkg_rel), src_reader)
+            rc(abspath(bkg_rel), src_reader, select=None)
             if bkg_rel
-            else rc("", src_reader)
+            else rc("", src_reader, select=None)
         )
         spec = file_lib.Spectrum_config(
             corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
@@ -124,6 +146,7 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
                 abspath(m.science_files[-1]), reader,
                 config_file=pb.xray_config_file or "",
                 time_cut=_bkg_time_cut(pb, basename),
+                select=None,
             )
             spec = file_lib.Spectrum_config(
                 corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max

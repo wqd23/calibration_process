@@ -248,3 +248,27 @@ def test_global_ec_default_form_untagged(tmp_path):
     j = json.load(open(next((tmp_path / "def").glob("*ec_coef_sci_ch0.json"))))
     assert "ec_form" not in j             # default stays byte-compatible
     assert len(j["EC_low"]) == 3          # piecewise quadratic
+
+
+def test_selection_hook_default_none():
+    assert stages._selection("09", "tb") is None
+
+
+def test_single_run_spec_threads_selection(monkeypatch):
+    from types import SimpleNamespace
+    from calibration_process.config_schema import ManifestEntry
+    hook = ("n1@1", lambda f: f["amp"] > 0)
+    monkeypatch.setattr(stages, "_selection", lambda version, branch: hook)
+    rt = SimpleNamespace(
+        version="12B", data_dir=Path("data/12B"),
+        payload=SimpleNamespace(tb=SimpleNamespace(reader="12b", bin_width=6, adc_max=16384.0)),
+        reader_params=lambda e: {},
+        fit_ranges={"tb": {"m": [[0, 1]] * 4}},
+        bkg_forms={"tb": {"m": "lin"}},
+        fit_range=lambda branch, key: {"m": [[0, 1]] * 4}[key],
+        bkg_form=lambda branch, key: "lin",
+    )
+    m = ManifestEntry(id="m", branch="tb", science_files=["raw_data/a.dat"])
+    spec = stages.single_run_spec(rt, "tb", m)
+    assert spec.read_config.select == hook
+    assert spec.bkg_read_config.select is None

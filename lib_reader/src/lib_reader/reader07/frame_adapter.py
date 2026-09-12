@@ -18,7 +18,7 @@ import numpy as np
 from ..packet_parser import parse_grid_data_new
 from ..frame_io import load_hex_text
 from ..parity_check import crc16_xmodem_nd
-from ..l1_cache import get_l1_frames, get_l2_processed
+from ..l1_cache import get_l1_frames, get_l2_processed, apply_selection
 
 _XML = str(Path(__file__).with_name("grid_packet.xml"))
 
@@ -202,22 +202,28 @@ def frames_to_processed(sci_frames, tel_frames, internal_resistance, imon_div):
     return sci_extracted, tel_extracted
 
 
-def _process(path, ver, internal_resistance, imon_div):
+def _process(path, ver, internal_resistance, imon_div, select=None):
     buf = load_hex_text(path)
     frames = get_l1_frames(ver, ver, path, {
         "sci": lambda: _read_sci_frames(buf),
         "tl": lambda: _read_tel_frames(buf),
     })
+    sci = frames["sci"]
+    if select is not None:
+        sci = apply_selection(ver, ver, path, {}, select[0], select[1], sci)
     return frames_to_processed(
-        frames["sci"], frames["tl"], internal_resistance, imon_div)
+        sci, frames["tl"], internal_resistance, imon_div)
 
 
-def single_read_hex(path, internal_resistance, imon_div, ver="07", overwrite_cache=False):
+def single_read_hex(path, internal_resistance, imon_div, ver="07", overwrite_cache=False, select=None):
     """Return ``(sci, tel)`` for a 04/07/09 hexprint file (legacy-shaped)."""
     params = {"internal_resistance": internal_resistance, "imon_div": imon_div}
+    l2_params = dict(params)
+    if select is not None:
+        l2_params["select"] = select[0]
     return get_l2_processed(
-        ver, ver, path, params,
-        lambda: _process(path, ver, internal_resistance, imon_div),
+        ver, ver, path, l2_params,
+        lambda: _process(path, ver, internal_resistance, imon_div, select=select),
         overwrite=overwrite_cache,
     )
 
@@ -226,18 +232,21 @@ def single_read07(path, config=None, **kwargs):
     p = _PARAMS["07"]
     return single_read_hex(path, kwargs.get("internal_resistance", p["internal_resistance"]),
                            kwargs.get("imon_div", p["imon_div"]), ver="07",
-                           overwrite_cache=kwargs.get("overwrite_cache", False))
+                           overwrite_cache=kwargs.get("overwrite_cache", False),
+                           select=kwargs.get("select"))
 
 
 def single_read09(path, config=None, **kwargs):
     p = _PARAMS["09"]
     return single_read_hex(path, kwargs.get("internal_resistance", p["internal_resistance"]),
                            kwargs.get("imon_div", p["imon_div"]), ver="09",
-                           overwrite_cache=kwargs.get("overwrite_cache", False))
+                           overwrite_cache=kwargs.get("overwrite_cache", False),
+                           select=kwargs.get("select"))
 
 
 def single_read04(path, config=None, **kwargs):
     p = _PARAMS["04"]
     return single_read_hex(path, kwargs.get("internal_resistance", p["internal_resistance"]),
                            kwargs.get("imon_div", p["imon_div"]), ver="04",
-                           overwrite_cache=kwargs.get("overwrite_cache", False))
+                           overwrite_cache=kwargs.get("overwrite_cache", False),
+                           select=kwargs.get("select"))
