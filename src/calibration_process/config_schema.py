@@ -77,6 +77,21 @@ class TBParams(_StrictBase):
     tb_file_map: Optional[str] = None
     # 11B uses the lmfit temp-bias fit (which needs temp/bias errors); 11B stores "lmfit"
     tb_fit_method: str = "curvefit"
+    # which channels the TB global fit runs; unlisted channels stay null in the
+    # four-slot result (default keeps the historical all-four behaviour)
+    channels: List[int] = [0, 1, 2, 3]
+
+    @field_validator("channels")
+    @classmethod
+    def _check_channels(cls, v: List[int]) -> List[int]:
+        if not v:
+            raise ValueError("tb.channels must not be empty")
+        if len(set(v)) != len(v):
+            raise ValueError(f"tb.channels has duplicates: {v}")
+        for ch in v:
+            if ch not in (0, 1, 2, 3):
+                raise ValueError(f"tb.channels entry {ch} out of range 0..3")
+        return sorted(v)
 
 
 class ECParams(_StrictBase):

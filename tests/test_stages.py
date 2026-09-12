@@ -190,3 +190,24 @@ def test_build_ec_points_respects_channel_count():
     assert len(per_ch) == 3                 # channel_count caps to 3
     for ch_list in per_ch:
         assert len(ch_list) == 1            # only channel ch contributed
+
+
+def _tb_rt(channels):
+    from types import SimpleNamespace
+    tb = SimpleNamespace(channels=channels, bias_min_filter=None,
+                         tb_fit_method="curvefit", tb_fit_p0=None,
+                         tb_fit_maxfev=10000)
+    ec = SimpleNamespace(tb_ref_path=None)
+    return SimpleNamespace(payload=SimpleNamespace(tb=tb, ec=ec))
+
+
+def test_global_tb_channel_list_and_empty_channels(tmp_path):
+    # explicit channel list with no points anywhere: four-slot result, all null,
+    # and no exception (empty/disabled channels are tolerated, not fatal)
+    res = stages.global_tb(_tb_rt([1, 2]), [[] for _ in range(4)], tmp_path / "a")
+    assert res == [None, None, None, None]
+    assert (tmp_path / "a").is_dir()
+
+    # a runtime without a channel list falls back to the historical four channels
+    res = stages.global_tb(_tb_rt(None), [[] for _ in range(4)], tmp_path / "b")
+    assert res == [None, None, None, None]

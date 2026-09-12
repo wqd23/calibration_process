@@ -429,17 +429,24 @@ def global_tb(rt: RuntimeConfig, per_channel: List[List[TBPoint]],
     from lib_plot import plot
 
     result_path.mkdir(parents=True, exist_ok=True)
-    result = []
-    for ch, points in enumerate(per_channel):
+    pb = rt.payload.tb
+    channels = getattr(pb, "channels", None) or [0, 1, 2, 3]
+    # Keep the historical four-slot result so downstream consumers can index by
+    # channel; a channel that is not configured, disabled or has no points stays
+    # ``null`` instead of aborting the whole fit.
+    result: List[Optional[dict]] = [None] * 4
+    for ch in channels:
+        points = per_channel[ch] if ch < len(per_channel) else []
         pts = [p for p in points if p.enabled]
+        if not pts:
+            continue
         data_all = np.array(
             [[p.peak_center, p.peak_center_err, p.temperature, p.temperature_err,
               p.bias, p.bias_err] for p in pts]
         )
-        if data_all.size == 0:
-            raise util.FitError(f"channel {ch}: no enabled TB points")
-        pb = rt.payload.tb
         data_all = _apply_bias_filter(data_all, pb.bias_min_filter)
+        if data_all.size == 0:
+            continue
         center, center_err, temp, temp_err, bias, bias_err = (
             data_all[:, 0], data_all[:, 1], data_all[:, 2],
             data_all[:, 3], data_all[:, 4], data_all[:, 5],
@@ -456,7 +463,7 @@ def global_tb(rt: RuntimeConfig, per_channel: List[List[TBPoint]],
                 )
         except util.FitError as e:
             raise util.FitError(f"failed to do temp bias fit: {e.args[-1]}")
-        result.append(res)
+        result[ch] = res
         xy = np.stack([temp, bias], axis=1)
         name = f"temp_bias_fit_{ch}.png"
         plot.fit_err_plot_2d(
