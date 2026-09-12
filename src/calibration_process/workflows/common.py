@@ -128,7 +128,8 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
             else rc("", src_reader, select=None)
         )
         spec = file_lib.Spectrum_config(
-            corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
+            corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max,
+            rate_span=getattr(pb, "rate_span", "union"),
         )
         fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
         return FileRunSpec(read, bkg, spec, fit)
@@ -165,7 +166,8 @@ def single_run_spec(rt: RuntimeConfig, branch: str, m: ManifestEntry) -> FileRun
         rotation = pb.xray_bkg_rotation
         bkg_reads = _rotate_bkg(reads, rotation, n)
         spec = file_lib.Spectrum_config(
-            corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max
+            corr=rt.corr, bin_width=pb.bin_width, adc_max=pb.adc_max,
+            rate_span=getattr(pb, "rate_span", "union"),
         )
         fit = file_lib.Fit_config(rt.fit_range(branch, _fit_key(m)), rt.bkg_form(branch, _fit_key(m)))
         return FileRunSpec(reads, bkg_reads, spec, fit)
@@ -653,6 +655,21 @@ def global_ec(rt: RuntimeConfig, src_pts: List[List[ECPoint]], x_pts: List[List[
                 "resolution_high": res_high,
                 "resolution_high_err": res_high_err,
                 "ec_form": "linear",
+            }
+        elif _ec_form(pb, ch) == "quadratic":
+            # single unsplit quadratic (N1: no Gd K-edge split)
+            ec, ec_err = _center_fit(en, c, ce, deg=2)
+            result[ch] = {
+                "channel": ch,
+                "EC_low": ec,
+                "EC_low_err": ec_err,
+                "EC_high": ec,
+                "EC_high_err": ec_err,
+                "resolution_low": res_low,
+                "resolution_low_err": res_low_err,
+                "resolution_high": res_high,
+                "resolution_high_err": res_high_err,
+                "ec_form": "quadratic",
             }
         else:
             ec_low, ec_low_err = _center_fit(en[q_low], c[q_low], ce[q_low])

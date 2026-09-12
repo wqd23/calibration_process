@@ -119,6 +119,8 @@ class ECParams(_StrictBase):
     energy_map: Dict[str, float] = {}
     resolution_method: str = "polyfit"  # polyfit | exprfit | lmfit
     channel_count: int = 4
+    # rate time base: "union" (legacy) or "channel" (per-channel files)
+    rate_span: str = "union"
     # per-channel E-C center form: "piecewise_quadratic" (default, split at the
     # K edge) or "linear" (a single unsplit line); keys are channel numbers
     ec_form: Dict[str, str] = {}
@@ -126,7 +128,7 @@ class ECParams(_StrictBase):
     @field_validator("ec_form")
     @classmethod
     def _check_ec_form(cls, v: Dict[str, str]) -> Dict[str, str]:
-        allowed = {"piecewise_quadratic", "linear"}
+        allowed = {"piecewise_quadratic", "quadratic", "linear"}
         for k, form in v.items():
             if not str(k).isdigit():
                 raise ValueError(f"ec_form key {k!r} must be a channel number")

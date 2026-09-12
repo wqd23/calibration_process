@@ -250,6 +250,20 @@ def test_global_ec_default_form_untagged(tmp_path):
     assert len(j["EC_low"]) == 3          # piecewise quadratic
 
 
+def test_global_ec_single_quadratic(tmp_path):
+    import json
+    stages.global_ec(_ec_rt({"0": "quadratic"}), _linear_points(), [[]], tmp_path / "q")
+    j = json.load(open(next((tmp_path / "q").glob("*ec_coef_sci_ch0.json"))))
+    assert j["ec_form"] == "quadratic"
+    assert len(j["EC_low"]) == 3          # single unsplit quadratic
+    assert j["EC_low"] == j["EC_high"]
+
+
+def test_spectrum_config_rate_span_default():
+    from calibration_process import file_lib
+    assert file_lib.Spectrum_config().rate_span == "union"
+
+
 def test_selection_hook_default_none():
     assert stages._selection("09", "tb") is None
 

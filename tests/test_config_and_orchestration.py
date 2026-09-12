@@ -126,7 +126,10 @@ def test_ec_form_schema():
     base = dict(reader="12b", bin_width=4, adc_max=16384.0, x_path="x",
                 src_path="s", tb_ref_path="r.json", fit_range_file="f.yaml")
     assert ECParams(**base).ec_form == {}
+    assert ECParams(**base).rate_span == "union"
     assert ECParams(**base, ec_form={"0": "linear"}).ec_form == {"0": "linear"}
+    assert ECParams(**base, ec_form={"0": "quadratic"}).ec_form == {"0": "quadratic"}
+    assert ECParams(**base, rate_span="channel").rate_span == "channel"
     with pytest.raises(Exception):
         ECParams(**base, ec_form={"0": "bogus"})
     with pytest.raises(Exception):

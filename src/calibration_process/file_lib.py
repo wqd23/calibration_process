@@ -46,6 +46,10 @@ class Spectrum_config:
     bin_width: int = 2
     # how to change count into count rate,'' for simply divide (time[-1]-time[0])
     rate_style: str = ""
+    # rate time base: "union" (all four channels share the global span, legacy)
+    # or "channel" (each channel uses its own span; needed when a spectrum is
+    # rebuilt from per-channel files taken at different times, e.g. N1 X-ray)
+    rate_span: str = "union"
     kwarg: dict = field(default_factory=dict)
 
 
@@ -138,12 +142,14 @@ class File_operation_05b:
         return spectrum, spectrum_err, x
 
     def __raw_rate(self, spectrum, spectrum_err, timestampEvt):
-        if self.read_config.time_cut == None:
+        if self.spectrum_config.rate_span == "channel" or self.read_config.time_cut != None:
+            # per-channel span: correct when the four channels come from
+            # separately measured files (N1 X-ray), or a per-channel time cut
+            time_spec = np.array([np.max(time) - np.min(time) for time in timestampEvt])
+        else:
             time_spec = np.array(
                 [np.max(np.hstack(timestampEvt)) - np.min(np.hstack(timestampEvt))] * 4
             )
-        else:
-            time_spec = np.array([np.max(time) - np.min(time) for time in timestampEvt])
         self.time = time_spec
         spectrum = [s / t for s, t in zip(spectrum, time_spec)]
         spectrum_err = [s / t for s, t in zip(spectrum_err, time_spec)]
