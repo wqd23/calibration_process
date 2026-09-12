@@ -110,6 +110,22 @@ class ECParams(_StrictBase):
     energy_map: Dict[str, float] = {}
     resolution_method: str = "polyfit"  # polyfit | exprfit | lmfit
     channel_count: int = 4
+    # per-channel E-C center form: "piecewise_quadratic" (default, split at the
+    # K edge) or "linear" (a single unsplit line); keys are channel numbers
+    ec_form: Dict[str, str] = {}
+
+    @field_validator("ec_form")
+    @classmethod
+    def _check_ec_form(cls, v: Dict[str, str]) -> Dict[str, str]:
+        allowed = {"piecewise_quadratic", "linear"}
+        for k, form in v.items():
+            if not str(k).isdigit():
+                raise ValueError(f"ec_form key {k!r} must be a channel number")
+            if form not in allowed:
+                raise ValueError(
+                    f"ec_form[{k}] must be one of {sorted(allowed)}, got {form!r}"
+                )
+        return v
     # how the energy name is derived from an X-ray file name (split index)
     xray_name_index: int = 0
     # substrings (in the file name) that mark a file to be dropped

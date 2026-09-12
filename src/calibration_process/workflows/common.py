@@ -570,21 +570,38 @@ def global_ec(rt: RuntimeConfig, src_pts: List[List[ECPoint]], x_pts: List[List[
         en, c, ce, r, re = energies_all, center[ch], center_err[ch], resolution[ch], resolution_err[ch]
         q_low = en < pb.energy_split_low
         q_high = en >= pb.energy_split_high
-        ec_low, ec_low_err = _center_fit(en[q_low], c[q_low], ce[q_low])
-        ec_high, ec_high_err = _center_fit(en[q_high], c[q_high], ce[q_high])
         res_low, res_low_err = _resolution_fit(pb.resolution_method, en[q_low], r[q_low], re[q_low])
         res_high, res_high_err = _resolution_fit(pb.resolution_method, en[q_high], r[q_high], re[q_high])
-        result[ch] = {
-            "channel": ch,
-            "EC_low": ec_low,
-            "EC_low_err": ec_low_err,
-            "EC_high": ec_high,
-            "EC_high_err": ec_high_err,
-            "resolution_low": res_low,
-            "resolution_low_err": res_low_err,
-            "resolution_high": res_high,
-            "resolution_high_err": res_high_err,
-        }
+        if _ec_form(pb, ch) == "linear":
+            # single unsplit line; mirrored into low/high so the plotting layer
+            # (which always reads EC_low/EC_high) keeps working
+            ec, ec_err = _center_fit(en, c, ce, deg=1)
+            result[ch] = {
+                "channel": ch,
+                "EC_low": ec,
+                "EC_low_err": ec_err,
+                "EC_high": ec,
+                "EC_high_err": ec_err,
+                "resolution_low": res_low,
+                "resolution_low_err": res_low_err,
+                "resolution_high": res_high,
+                "resolution_high_err": res_high_err,
+                "ec_form": "linear",
+            }
+        else:
+            ec_low, ec_low_err = _center_fit(en[q_low], c[q_low], ce[q_low])
+            ec_high, ec_high_err = _center_fit(en[q_high], c[q_high], ce[q_high])
+            result[ch] = {
+                "channel": ch,
+                "EC_low": ec_low,
+                "EC_low_err": ec_low_err,
+                "EC_high": ec_high,
+                "EC_high_err": ec_high_err,
+                "resolution_low": res_low,
+                "resolution_low_err": res_low_err,
+                "resolution_high": res_high,
+                "resolution_high_err": res_high_err,
+            }
         util.json_save(result[ch], str(result_path / util.headtime(f"ec_coef_sci_ch{ch}.json")))
         save_data = np.array([en, c], dtype=np.float64)
         np.save(str(result_path / util.headtime(f"ec_data_ch{ch}.npy")), arr=save_data)
@@ -655,10 +672,15 @@ def _pad_group_4ch(groups: List[list]) -> List[list]:
     return out
 
 
-def _center_fit(energy, center, center_err):
-    popt, pcov = np.polyfit(center, energy, deg=2, full=False, cov=True, w=1.0 / center_err)
+def _center_fit(energy, center, center_err, deg: int = 2):
+    popt, pcov = np.polyfit(center, energy, deg=deg, full=False, cov=True, w=1.0 / center_err)
     perr = np.sqrt(np.diag(pcov))
     return list(popt), list(perr)
+
+
+def _ec_form(pb, ch: int) -> str:
+    """E-C center form for a channel (default: K-edge piecewise quadratic)."""
+    return (getattr(pb, "ec_form", None) or {}).get(str(ch), "piecewise_quadratic")
 
 
 def _resolution_fit(method, energy, resolution, resolution_err):

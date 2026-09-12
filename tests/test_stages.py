@@ -211,3 +211,40 @@ def test_global_tb_channel_list_and_empty_channels(tmp_path):
     # a runtime without a channel list falls back to the historical four channels
     res = stages.global_tb(_tb_rt(None), [[] for _ in range(4)], tmp_path / "b")
     assert res == [None, None, None, None]
+
+
+def _ec_point(energy, center, ch=0):
+    from calibration_process.products import ECPoint
+    return ECPoint(measurement_id=f"m{energy}", channel=ch, source_kind="src",
+                   energy=energy, peak_center=center, peak_center_err=0.1,
+                   resolution=0.1, resolution_err=0.001, enabled=True)
+
+
+def _ec_rt(ec_form):
+    from types import SimpleNamespace
+    ec = SimpleNamespace(channel_count=1, energy_split_low=49.0,
+                         energy_split_high=55.0, resolution_method="polyfit",
+                         ec_form=ec_form)
+    return SimpleNamespace(payload=SimpleNamespace(ec=ec))
+
+
+def _linear_points():
+    energies = [10.0, 20.0, 30.0, 40.0, 60.0, 70.0, 80.0, 90.0]
+    return [[_ec_point(e, (e - 5.0) / 2.0) for e in energies]]
+
+
+def test_global_ec_linear_form(tmp_path):
+    import json
+    stages.global_ec(_ec_rt({"0": "linear"}), _linear_points(), [[]], tmp_path / "lin")
+    j = json.load(open(next((tmp_path / "lin").glob("*ec_coef_sci_ch0.json"))))
+    assert j["ec_form"] == "linear"
+    assert len(j["EC_low"]) == 2          # single unsplit line
+    assert j["EC_low"] == j["EC_high"]
+
+
+def test_global_ec_default_form_untagged(tmp_path):
+    import json
+    stages.global_ec(_ec_rt({}), _linear_points(), [[]], tmp_path / "def")
+    j = json.load(open(next((tmp_path / "def").glob("*ec_coef_sci_ch0.json"))))
+    assert "ec_form" not in j             # default stays byte-compatible
+    assert len(j["EC_low"]) == 3          # piecewise quadratic

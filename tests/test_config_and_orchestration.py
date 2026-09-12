@@ -121,6 +121,18 @@ def test_channel_use_semantics():
     assert channel_use(ch_disabled, 0) is True
 
 
+def test_ec_form_schema():
+    from calibration_process.config_schema import ECParams
+    base = dict(reader="12b", bin_width=4, adc_max=16384.0, x_path="x",
+                src_path="s", tb_ref_path="r.json", fit_range_file="f.yaml")
+    assert ECParams(**base).ec_form == {}
+    assert ECParams(**base, ec_form={"0": "linear"}).ec_form == {"0": "linear"}
+    with pytest.raises(Exception):
+        ECParams(**base, ec_form={"0": "bogus"})
+    with pytest.raises(Exception):
+        ECParams(**base, ec_form={"a": "linear"})
+
+
 def test_check_version_ready():
     from calibration_process import deploy
     assert deploy.check_version("09") is True
