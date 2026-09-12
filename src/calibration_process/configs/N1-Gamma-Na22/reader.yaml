@@ -3,4 +3,5 @@ engine: grid1x
 readers:
   n1:
     handler: single_readN1
-    params: {}
+    params:
+      mode: wf

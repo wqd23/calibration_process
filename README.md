@@ -101,6 +101,7 @@ calib all {ver}                                 # 全流程：单拟合 + TB/EC 
 | [docs/data.md](docs/data.md) | 数据准备与目录约定：新配置/manifest 格式、新载荷接入流程与方法论 |
 | [docs/results.md](docs/results.md) | 结果产物与 QA 指标说明 |
 | [docs/12B_13B/data.md](docs/12B_13B/data.md) | 12B/13B 类载荷的数据说明（点位对照表、各文件的特殊情况） |
+| [docs/N1/data.md](docs/N1/data.md) | N1（GRIDN1）的数据说明（GAGG/CLYC 双数据集、扫描分段、坏点） |
 | [docs/payloads_data.md](docs/payloads_data.md) | 其它 7 个载荷的数据说明（简化版：通用结构 + 各版本选点/排除） |
 | [docs/intermediate_data.md](docs/intermediate_data.md) | 分层中间数据（L1/L2 缓存、L3 可移植产物、pickle）、怎么读、跨项目分析、定制 pipeline |
 

@@ -8,6 +8,21 @@ tb:
   channels:
   - 1
   - 2
+  tb_fit_maxfev: 100000
+  skip_qa_fail: true
+  tb_fit_p0_by_channel:
+    '1':
+    - 0.0003296
+    - 0.0182
+    - 23.87
+    - 64.7
+    - 51970.0
+    '2':
+    - 0.0003775
+    - 0.0188
+    - 23.98
+    - 66.6
+    - 44760.0
 ec:
   reader: n1
   bin_width: 4

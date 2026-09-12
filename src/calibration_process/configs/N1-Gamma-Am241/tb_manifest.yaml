@@ -1,3 +1,627 @@
 version: N1-Gamma-Am241
 branch: tb
-measurements: []
+measurements:
+- id: GAGG_0C_265
+  branch: tb
+  science_files:
+  - raw_data/0C-265-290-139.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 0C
+    bias: 265
+    seg_bias: 265
+  use: true
+  channels: null
+- id: GAGG_0C_270
+  branch: tb
+  science_files:
+  - raw_data/0C-265-290-139.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 0C
+    bias: 270
+    seg_bias: 270
+  use: true
+  channels: null
+- id: GAGG_0C_275
+  branch: tb
+  science_files:
+  - raw_data/0C-265-290-139.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 0C
+    bias: 275
+    seg_bias: 275
+  use: true
+  channels: null
+- id: GAGG_0C_280
+  branch: tb
+  science_files:
+  - raw_data/0C-265-290-139.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 0C
+    bias: 280
+    seg_bias: 280
+  use: true
+  channels: null
+- id: GAGG_0C_283
+  branch: tb
+  science_files:
+  - raw_data/0C-265-290-139.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 0C
+    bias: 283
+    seg_bias: 283
+  use: true
+  channels: null
+- id: GAGG_0C_285
+  branch: tb
+  science_files:
+  - raw_data/0C-265-290-139.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 0C
+    bias: 285
+    seg_bias: 285
+  use: true
+  channels: null
+- id: GAGG_0C_287
+  branch: tb
+  science_files:
+  - raw_data/0C-265-290-139.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 0C
+    bias: 287
+    seg_bias: 287
+  use: true
+  channels: null
+- id: GAGG_0C_290
+  branch: tb
+  science_files:
+  - raw_data/0C-265-290-139.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 0C
+    bias: 290
+    seg_bias: 290
+  use: true
+  channels: null
+- id: GAGG_10C_265
+  branch: tb
+  science_files:
+  - raw_data/10C-265-290-142.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 10C
+    bias: 265
+    seg_bias: 265
+  use: true
+  channels: null
+- id: GAGG_10C_270
+  branch: tb
+  science_files:
+  - raw_data/10C-265-290-142.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 10C
+    bias: 270
+    seg_bias: 270
+  use: true
+  channels: null
+- id: GAGG_10C_275
+  branch: tb
+  science_files:
+  - raw_data/10C-265-290-142.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 10C
+    bias: 275
+    seg_bias: 275
+  use: true
+  channels: null
+- id: GAGG_10C_280
+  branch: tb
+  science_files:
+  - raw_data/10C-265-290-142.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 10C
+    bias: 280
+    seg_bias: 280
+  use: true
+  channels: null
+- id: GAGG_10C_283
+  branch: tb
+  science_files:
+  - raw_data/10C-265-290-142.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 10C
+    bias: 283
+    seg_bias: 283
+  use: true
+  channels: null
+- id: GAGG_10C_285
+  branch: tb
+  science_files:
+  - raw_data/10C-265-290-142.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 10C
+    bias: 285
+    seg_bias: 285
+  use: true
+  channels: null
+- id: GAGG_10C_287
+  branch: tb
+  science_files:
+  - raw_data/10C-265-290-142.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 10C
+    bias: 287
+    seg_bias: 287
+  use: true
+  channels: null
+- id: GAGG_10C_290
+  branch: tb
+  science_files:
+  - raw_data/10C-265-290-142.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 10C
+    bias: 290
+    seg_bias: 290
+  use: true
+  channels: null
+- id: GAGG_20C_265
+  branch: tb
+  science_files:
+  - raw_data/20C-265-290-144.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 20C
+    bias: 265
+    seg_bias: 265
+  use: true
+  channels: null
+- id: GAGG_20C_270
+  branch: tb
+  science_files:
+  - raw_data/20C-265-290-144.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 20C
+    bias: 270
+    seg_bias: 270
+  use: true
+  channels: null
+- id: GAGG_20C_275
+  branch: tb
+  science_files:
+  - raw_data/20C-265-290-144.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 20C
+    bias: 275
+    seg_bias: 275
+  use: true
+  channels: null
+- id: GAGG_20C_280
+  branch: tb
+  science_files:
+  - raw_data/20C-265-290-144.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 20C
+    bias: 280
+    seg_bias: 280
+  use: true
+  channels: null
+- id: GAGG_20C_283
+  branch: tb
+  science_files:
+  - raw_data/20C-265-290-144.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 20C
+    bias: 283
+    seg_bias: 283
+  use: true
+  channels: null
+- id: GAGG_20C_285
+  branch: tb
+  science_files:
+  - raw_data/20C-265-290-144.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 20C
+    bias: 285
+    seg_bias: 285
+  use: true
+  channels: null
+- id: GAGG_20C_287
+  branch: tb
+  science_files:
+  - raw_data/20C-265-290-144.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 20C
+    bias: 287
+    seg_bias: 287
+  use: true
+  channels: null
+- id: GAGG_20C_290
+  branch: tb
+  science_files:
+  - raw_data/20C-265-290-144.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 20C
+    bias: 290
+    seg_bias: 290
+  use: true
+  channels: null
+- id: GAGG_30C_265
+  branch: tb
+  science_files:
+  - raw_data/30C-265-290-148.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 30C
+    bias: 265
+    seg_bias: 265
+  use: true
+  channels: null
+- id: GAGG_30C_270
+  branch: tb
+  science_files:
+  - raw_data/30C-265-290-148.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 30C
+    bias: 270
+    seg_bias: 270
+  use: true
+  channels: null
+- id: GAGG_30C_275
+  branch: tb
+  science_files:
+  - raw_data/30C-265-290-148.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 30C
+    bias: 275
+    seg_bias: 275
+  use: true
+  channels: null
+- id: GAGG_30C_280
+  branch: tb
+  science_files:
+  - raw_data/30C-265-290-148.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 30C
+    bias: 280
+    seg_bias: 280
+  use: true
+  channels: null
+- id: GAGG_30C_283
+  branch: tb
+  science_files:
+  - raw_data/30C-265-290-148.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 30C
+    bias: 283
+    seg_bias: 283
+  use: true
+  channels: null
+- id: GAGG_30C_285
+  branch: tb
+  science_files:
+  - raw_data/30C-265-290-148.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 30C
+    bias: 285
+    seg_bias: 285
+  use: true
+  channels: null
+- id: GAGG_30C_287
+  branch: tb
+  science_files:
+  - raw_data/30C-265-290-148.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 30C
+    bias: 287
+    seg_bias: 287
+  use: true
+  channels: null
+- id: GAGG_30C_290
+  branch: tb
+  science_files:
+  - raw_data/30C-265-290-148.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: 30C
+    bias: 290
+    seg_bias: 290
+  use: true
+  channels: null
+- id: GAGG_m10C_265
+  branch: tb
+  science_files:
+  - raw_data/m10C-265-128.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m10C
+    bias: 265
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m10C_270
+  branch: tb
+  science_files:
+  - raw_data/m10C-270-132.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m10C
+    bias: 270
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m10C_275
+  branch: tb
+  science_files:
+  - raw_data/m10C-275-133.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m10C
+    bias: 275
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m10C_280
+  branch: tb
+  science_files:
+  - raw_data/m10C-280-134.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m10C
+    bias: 280
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m10C_283
+  branch: tb
+  science_files:
+  - raw_data/m10C-283-131.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m10C
+    bias: 283
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m10C_285
+  branch: tb
+  science_files:
+  - raw_data/m10C-285-129.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m10C
+    bias: 285
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m10C_287
+  branch: tb
+  science_files:
+  - raw_data/m10C-287-130.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m10C
+    bias: 287
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m10C_290
+  branch: tb
+  science_files:
+  - raw_data/m10C-290-127.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m10C
+    bias: 290
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m20C_265
+  branch: tb
+  science_files:
+  - raw_data/m20C-265-125.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m20C
+    bias: 265
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m20C_270
+  branch: tb
+  science_files:
+  - raw_data/m20C-270-124.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m20C
+    bias: 270
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m20C_275
+  branch: tb
+  science_files:
+  - raw_data/m20C-275-123.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m20C
+    bias: 275
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m20C_280
+  branch: tb
+  science_files:
+  - raw_data/m20C-280-122.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m20C
+    bias: 280
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m20C_283
+  branch: tb
+  science_files:
+  - raw_data/m20C-283-121.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m20C
+    bias: 283
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m20C_285
+  branch: tb
+  science_files:
+  - raw_data/m20C-285-120.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m20C
+    bias: 285
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m20C_287
+  branch: tb
+  science_files:
+  - raw_data/m20C-287-119.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m20C
+    bias: 287
+    seg_bias: null
+  use: true
+  channels: null
+- id: GAGG_m20C_290
+  branch: tb
+  science_files:
+  - raw_data/m20C-290-118.event.dat
+  hk_files: []
+  aux_files: []
+  metadata:
+    dataset: GAGG
+    temp: m20C
+    bias: 290
+    seg_bias: null
+  use: true
+  channels: null

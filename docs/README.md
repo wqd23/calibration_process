@@ -17,6 +17,7 @@
 | D6 | [12B_13B/data.md](12B_13B/data.md) | 12B/13B 类载荷的数据说明：温度偏压点位与文件对照表、X 光机/放射源各数据文件的状态与特殊情况 |
 | D7 | [payloads_data.md](payloads_data.md) | 其它 7 个载荷的数据说明（简化版）：通用结构 + 每个版本的目录/reader/命名/选择与排除/已知坑 |
 | D8 | [intermediate_data.md](intermediate_data.md) | 中间数据分层（L1 忠实帧 / L2 处理输出 / L3 `fit.json`+`spectrum.parquet`、pickle）、怎么读、能否跨项目分析、如何定制 pipeline；第 5/5b 节为 L1/L2 缓存与 L3/L4，第 6/7 节为读取层统一与 reader golden，第 8 节为分层流水线与 `grid_common` |
+| D9 | [N1/data.md](N1/data.md) | N1（GRIDN1）的数据说明：GAGG/CLYC 双数据集、两种包格式（ft/wf 512）、扫描文件分段、坏点清单 |
 
 **数据说明的约定**：数据特殊的载荷（如 12B/13B）单独放一个子目录详述
 （数据从哪来、每个文件对应什么条件、哪些文件有坑：截断/复制/补测等）。
