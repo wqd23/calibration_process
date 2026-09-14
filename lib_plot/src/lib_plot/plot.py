@@ -382,6 +382,7 @@ def ec_plot(
     xray_channels=None,
     src_energy_meas=None,
     x_energy_meas=None,
+    ec_forms=None,
 ):
     x_energy, src_energy = np.asarray(x_energy), np.asarray(src_energy)
     # measurement-level energy arrays (one entry per measurement/group); they
@@ -478,18 +479,20 @@ def ec_plot(
             )
 
         if adc_low[i] is not None:
+            form = "quadratic" if ec_forms is None else ec_forms[i]
             ax.plot(
                 adc_low[i],
                 energy_low[i],
                 linestyle="-",
-                label=f"quadratic fit on EC data of ch{i}, < {energy_split_low}keV",
+                label=f"{form} fit on EC data of ch{i}, < {energy_split_low}keV",
             )
         if adc_high[i] is not None:
+            form = "quadratic" if ec_forms is None else ec_forms[i]
             ax.plot(
                 adc_high[i],
                 energy_high[i],
                 linestyle="-",
-                label=f"quadratic fit on EC data of ch{i}, > {energy_split_high}keV",
+                label=f"{form} fit on EC data of ch{i}, > {energy_split_high}keV",
             )
         ax.axhline(energy_split_low)
         ax.axhline(energy_split_high)

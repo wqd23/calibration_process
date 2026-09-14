@@ -397,6 +397,36 @@ def resolution_polyfit(energy: Float1D, resolution: Float1D, resolution_err: Flo
     return p0, pcov
 
 
+def resolution_polyfit_nn(energy: Float1D, resolution: Float1D, resolution_err: Float1D):
+    """Non-negative least-squares fit of ``sqrt(a E^2 + b E + c) / E``.
+
+    Same model as :func:`resolution_polyfit`, but the coefficients are bounded
+    at zero: the plain quadratic fit can return negative ``a``/``c`` (especially
+    on short segments), which makes the curve turn over and vanish at high
+    energy.
+    """
+    def model(x, a, b, c):
+        arg = np.clip(a * x * x + b * x + c, 0.0, None)
+        return np.sqrt(arg) / x
+
+    try:
+        p0, _ = resolution_polyfit(energy, resolution, resolution_err)
+        p0 = [max(float(v), 1.0e-6) for v in p0]
+    except Exception:  # noqa: BLE001  (too few points for a covariance)
+        p0 = [1.0e-4, 1.0, 100.0]
+    try:
+        popt, pcov = curve_fit(
+            model, energy, resolution, sigma=resolution_err,
+            absolute_sigma=True, p0=p0,
+            bounds=([0.0, 0.0, 0.0], [np.inf, np.inf, np.inf]),
+            maxfev=20000,
+        )
+    except (RuntimeError, ValueError) as e:
+        raise FitError(str(e))
+    perr = np.sqrt(np.diag(pcov))
+    return popt.tolist(), perr.tolist()
+
+
 def resolution_ExprFit(energy: Float1D, resolution: Float1D, resolution_err: Float1D):
     p0, pcov = resolution_polyfit(energy, resolution, resolution_err)
     mod = lmfit.models.ExpressionModel(

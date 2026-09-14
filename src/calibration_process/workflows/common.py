@@ -700,6 +700,7 @@ def global_ec(rt: RuntimeConfig, src_pts: List[List[ECPoint]], x_pts: List[List[
         plot_kwargs.update({
             "per_channel_energy": _pad_to4([np.asarray(e) for e in en_by_ch]),
             "xray_channels": sorted({p.channel for p in xr}),
+            "ec_forms": [_ec_form(pb, ch) for ch in range(4)],
         })
     try:
         plot.ec_plot(
@@ -787,6 +788,8 @@ def _resolution_fit(method, energy, resolution, resolution_err):
         p0, pcov = util.resolution_polyfit(energy, resolution, resolution_err)
         perr = np.sqrt(np.diag(pcov))
         return list(p0), list(perr)
+    if method == "polyfit_nn":
+        return util.resolution_polyfit_nn(energy, resolution, resolution_err)
     if method == "exprfit":
         return util.resolution_ExprFit(energy, resolution, resolution_err)
     if method == "lmfit":
