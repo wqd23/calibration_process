@@ -202,6 +202,13 @@ def test_global_ec_golden(tmp_path, ver):
         prod_npy = np.load(_latest(tmp_path / "ec_logs", f"ec_data_ch{ch}.npy"))
         gold_npy = np.load(GOLDEN / ver / f"ec_data_ch{ch}.npy")
         assert_npy_equivalent(prod_npy, gold_npy, f"ec.{ver}.ch{ch}")
+    # the EC fit must also plot every channel, including when channels cover
+    # different energy point sets (GRIDN1: X-ray on ch1/ch2, source-only ch0/ch3)
+    for ch in range(nch):
+        for kind in ("ec_fit", "resolution_fit"):
+            assert list((tmp_path / "ec_logs").glob(f"*_{kind}_ch{ch}.png")), (
+                f"missing {kind}_ch{ch} plot for {ver}"
+            )
 
 
 def test_golden_points_file_is_small():

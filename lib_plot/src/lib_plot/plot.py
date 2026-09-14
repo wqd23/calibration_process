@@ -378,29 +378,56 @@ def ec_plot(
     save_path,
     energy_split_low,
     energy_split_high,
+    per_channel_energy=None,
+    xray_channels=None,
+    src_energy_meas=None,
+    x_energy_meas=None,
 ):
-    q_low = energy < energy_split_low
-    q_high = energy > energy_split_high
-    center_low = [c[q_low] for c in center]
-    center_high = [c[q_high] for c in center]
     x_energy, src_energy = np.asarray(x_energy), np.asarray(src_energy)
-    adc_low = [
-        np.arange(np.min(center_low[i]), np.max(center_low[i])) for i in range(4)
-    ]
-    adc_high = [
-        np.arange(np.min(center_high[i]), np.max(center_high[i])) for i in range(4)
-    ]
-    energy_low = [np.polyval(result[i]["EC_low"], adc_low[i]) for i in range(4)]
-    energy_high = [np.polyval(result[i]["EC_high"], adc_high[i]) for i in range(4)]
+    # measurement-level energy arrays (one entry per measurement/group); they
+    # can repeat (GRIDN1 measured Cs-137 twice and Co-60 on two files), unlike
+    # the unique ``src_energy``/``x_energy`` above.
+    src_e = np.asarray(src_energy if src_energy_meas is None else src_energy_meas)
+    x_e = np.asarray(x_energy if x_energy_meas is None else x_energy_meas)
+    # ``per_channel_energy`` lets channels carry different energy point sets
+    # (GRIDN1: ch1/ch2 have X-ray + source, ch0/ch3 source only); ``xray_channels``
+    # restricts the X-ray scatter to the channels that actually have those points.
+    if per_channel_energy is None:
+        en_by_ch = [np.asarray(energy)] * 4
+    else:
+        en_by_ch = [np.asarray(e) for e in per_channel_energy]
+    center_low, center_high = [], []
+    adc_low, adc_high = [], []
+    energy_low, energy_high = [], []
+    for _i in range(4):
+        en_i = en_by_ch[_i]
+        c = np.asarray(center[_i])
+        cl = c[en_i < energy_split_low]
+        chh = c[en_i > energy_split_high]
+        center_low.append(cl)
+        center_high.append(chh)
+        lo = np.arange(np.min(cl), np.max(cl)) if cl.size else None
+        hi = np.arange(np.min(chh), np.max(chh)) if chh.size else None
+        adc_low.append(lo)
+        adc_high.append(hi)
+        energy_low.append(
+            np.polyval(result[_i]["EC_low"], lo) if lo is not None else None
+        )
+        energy_high.append(
+            np.polyval(result[_i]["EC_high"], hi) if hi is not None else None
+        )
 
-    src_center = [np.array([fit[i]["b"] for fit in src_result]) for i in range(4)]
-    src_center_err = [
-        np.array([fit[i]["b_err"] for fit in src_result]) for i in range(4)
-    ]
-    x_center = [np.array([fit[i]["b"] for fit in x_result]) for i in range(4)]
-    x_center_err = [np.array([fit[i]["b_err"] for fit in x_result]) for i in range(4)]
+    def _col(groups, i, key):
+        return np.array([
+            g[i][key] if i < len(g) and g[i] is not None else np.nan for g in groups
+        ])
 
-    xpoint = (x_energy > energy_split_high) | (x_energy < energy_split_low)
+    src_center = [_col(src_result, i, "b") for i in range(4)]
+    src_center_err = [_col(src_result, i, "b_err") for i in range(4)]
+    x_center = [_col(x_result, i, "b") for i in range(4)]
+    x_center_err = [_col(x_result, i, "b_err") for i in range(4)]
+
+    xpoint = (x_e > energy_split_high) | (x_e < energy_split_low)
     xpoint_not = np.logical_not(xpoint)
     gs = gridspec.GridSpec(
         2, 1, wspace=0.5, hspace=0.2, left=0.13, right=0.95, height_ratios=[4, 1]
@@ -408,22 +435,23 @@ def ec_plot(
     for i in range(4):
         fig = plt.figure(figsize=(12, 8))
         ax = fig.add_subplot(gs[0])
-        ax.errorbar(
-            x_center[i][xpoint],
-            x_energy[xpoint],
-            xerr=x_center_err[i][xpoint],
-            fmt="s",
-            mfc="white",
-            ms=6,
-            elinewidth=1,
-            capsize=3,
-            barsabove=True,
-            zorder=1,
-            label=f" CH{i}",
-        )
+        if xray_channels is None or i in xray_channels:
+            ax.errorbar(
+                x_center[i][xpoint],
+                x_e[xpoint],
+                xerr=x_center_err[i][xpoint],
+                fmt="s",
+                mfc="white",
+                ms=6,
+                elinewidth=1,
+                capsize=3,
+                barsabove=True,
+                zorder=1,
+                label=f" CH{i}",
+            )
         ax.errorbar(
             src_center[i],
-            src_energy,
+            src_e,
             xerr=src_center_err[i],
             fmt="^",
             mfc="white",
@@ -434,32 +462,35 @@ def ec_plot(
             zorder=0,
             label=f"source CH{i}",
         )
-        ax.errorbar(
-            x_center[i][xpoint_not],
-            x_energy[xpoint_not],
-            xerr=x_center_err[i][xpoint_not],
-            fmt="s",
-            mfc="red",
-            ms=6,
-            elinewidth=1,
-            capsize=3,
-            barsabove=True,
-            zorder=1,
-            label=f" CH{i} data not used",
-        )
+        if xray_channels is None or i in xray_channels:
+            ax.errorbar(
+                x_center[i][xpoint_not],
+                x_e[xpoint_not],
+                xerr=x_center_err[i][xpoint_not],
+                fmt="s",
+                mfc="red",
+                ms=6,
+                elinewidth=1,
+                capsize=3,
+                barsabove=True,
+                zorder=1,
+                label=f" CH{i} data not used",
+            )
 
-        ax.plot(
-            adc_low[i],
-            energy_low[i],
-            linestyle="-",
-            label=f"quadratic fit on EC data of ch{i}, < {energy_split_low}keV",
-        )
-        ax.plot(
-            adc_high[i],
-            energy_high[i],
-            linestyle="-",
-            label=f"quadratic fit on EC data of ch{i}, > {energy_split_high}keV",
-        )
+        if adc_low[i] is not None:
+            ax.plot(
+                adc_low[i],
+                energy_low[i],
+                linestyle="-",
+                label=f"quadratic fit on EC data of ch{i}, < {energy_split_low}keV",
+            )
+        if adc_high[i] is not None:
+            ax.plot(
+                adc_high[i],
+                energy_high[i],
+                linestyle="-",
+                label=f"quadratic fit on EC data of ch{i}, > {energy_split_high}keV",
+            )
         ax.axhline(energy_split_low)
         ax.axhline(energy_split_high)
         ax.set_xlabel("ADC")
@@ -473,42 +504,24 @@ def ec_plot(
         fig.savefig(os.path.join(save_path, headtime(f"ec_fit_ch{i}.png")))
 
     e_union = np.concatenate((x_energy, src_energy))
-    e_low = np.arange(
-        np.min(energy), max(e_union[np.where(e_union < energy_split_low)])
-    )
-    e_high = np.arange(
-        min(e_union[np.where(e_union > energy_split_high)]), np.max(energy)
-    )
-    resolution_low = [
-        resolutionFunction(
-            e_low,
-            result[i]["resolution_low"][0],
-            result[i]["resolution_low"][1],
-            result[i]["resolution_low"][2],
-        )
-        for i in range(4)
-    ]
-    resolution_high = [
-        resolutionFunction(
-            e_high,
-            result[i]["resolution_high"][0],
-            result[i]["resolution_high"][1],
-            result[i]["resolution_high"][2],
-        )
-        for i in range(4)
-    ]
-    src_resolution = [
-        np.array([fit[i]["resolution"] for fit in src_result]) for i in range(4)
-    ]
-    src_resolution_err = [
-        np.array([fit[i]["resolution_err"] for fit in src_result]) for i in range(4)
-    ]
-    x_resolution = [
-        np.array([fit[i]["resolution"] for fit in x_result]) for i in range(4)
-    ]
-    x_resolution_err = [
-        np.array([fit[i]["resolution_err"] for fit in x_result]) for i in range(4)
-    ]
+    nonempty = [np.asarray(e) for e in en_by_ch if np.asarray(e).size]
+    all_energy = np.concatenate(nonempty) if nonempty else np.asarray(energy)
+    below = e_union[e_union < energy_split_low]
+    above = e_union[e_union > energy_split_high]
+    e_low = np.arange(np.min(all_energy), max(below)) if below.size else np.array([])
+    e_high = np.arange(min(above), np.max(all_energy)) if above.size else np.array([])
+
+    def _res_curve(e, coef):
+        if coef is None or e.size == 0:
+            return None
+        return resolutionFunction(e, coef[0], coef[1], coef[2])
+
+    resolution_low = [_res_curve(e_low, result[i]["resolution_low"]) for i in range(4)]
+    resolution_high = [_res_curve(e_high, result[i]["resolution_high"]) for i in range(4)]
+    src_resolution = [_col(src_result, i, "resolution") for i in range(4)]
+    src_resolution_err = [_col(src_result, i, "resolution_err") for i in range(4)]
+    x_resolution = [_col(x_result, i, "resolution") for i in range(4)]
+    x_resolution_err = [_col(x_result, i, "resolution_err") for i in range(4)]
 
     gs = gridspec.GridSpec(
         2, 1, wspace=0.5, hspace=0.2, left=0.13, right=0.95, height_ratios=[4, 1]
@@ -516,9 +529,10 @@ def ec_plot(
     for i in range(4):
         fig = plt.figure(figsize=(12, 8))
         ax = fig.add_subplot(gs[0])
-        if not any(map(math.isinf, x_resolution_err[i])):
+        has_xray = xray_channels is None or i in xray_channels
+        if has_xray and not any(map(math.isinf, x_resolution_err[i])):
             ax.errorbar(
-                x_energy[xpoint],
+                x_e[xpoint],
                 x_resolution[i][xpoint] * 100,
                 yerr=x_resolution_err[i][xpoint] * 100,
                 fmt="s",
@@ -531,7 +545,7 @@ def ec_plot(
                 label=f" CH{i} data used",
             )
             ax.errorbar(
-                x_energy[xpoint_not],
+                x_e[xpoint_not],
                 x_resolution[i][xpoint_not] * 100,
                 yerr=x_resolution_err[i][xpoint_not] * 100,
                 fmt="s",
@@ -543,11 +557,11 @@ def ec_plot(
                 zorder=1,
                 label=f" CH{i} data not used",
             )
-        else:
-            ax.scatter(x_energy, x_resolution[i] * 100, label=f" CH{i}, inf in error")
-        if not any(map(math.isinf, src_resolution_err[i])):
+        elif has_xray:
+            ax.scatter(x_e, x_resolution[i] * 100, label=f" CH{i}, inf in error")
+        if src_resolution[i].size and not any(map(math.isinf, src_resolution_err[i])):
             ax.errorbar(
-                src_energy,
+                src_e,
                 src_resolution[i] * 100,
                 yerr=src_resolution_err[i] * 100,
                 fmt="^",
@@ -559,22 +573,24 @@ def ec_plot(
                 zorder=0,
                 label=f"source CH{i}",
             )
-        else:
+        elif src_resolution[i].size:
             ax.scatter(
-                src_energy, src_resolution[i] * 100, label=f"source CH{i}, inf in error"
+                src_e, src_resolution[i] * 100, label=f"source CH{i}, inf in error"
             )
-        ax.plot(
-            e_low,
-            resolution_low[i] * 100,
-            linestyle="-",
-            label=f"Fit on resolution data of ch{i}, < {energy_split_low}keV",
-        )
-        ax.plot(
-            e_high,
-            resolution_high[i] * 100,
-            linestyle="-",
-            label=f"Fit on resolution data of ch{i}, > {energy_split_high}keV",
-        )
+        if resolution_low[i] is not None:
+            ax.plot(
+                e_low,
+                resolution_low[i] * 100,
+                linestyle="-",
+                label=f"Fit on resolution data of ch{i}, < {energy_split_low}keV",
+            )
+        if resolution_high[i] is not None:
+            ax.plot(
+                e_high,
+                resolution_high[i] * 100,
+                linestyle="-",
+                label=f"Fit on resolution data of ch{i}, > {energy_split_high}keV",
+            )
         ax.axvline(energy_split_low)
         ax.axvline(energy_split_high)
         ax.set_xlabel("Energy/keV")
@@ -582,7 +598,8 @@ def ec_plot(
         ax.set_xscale("log")
         ax.set_yscale("log")
         # ax.set_xlim(20, 1500)
-        ax.set_ylim(min(8, *list(src_resolution[i] * 100)), 150)
+        ymin = min(8, *list(src_resolution[i] * 100)) if src_resolution[i].size else 8
+        ax.set_ylim(ymin, 150)
         ax.legend(loc=0)
         ax.grid()
         fig.savefig(os.path.join(save_path, headtime(f"resolution_fit_ch{i}.png")))

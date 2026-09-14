@@ -688,11 +688,25 @@ def global_ec(rt: RuntimeConfig, src_pts: List[List[ECPoint]], x_pts: List[List[
     result4 = _pad_to4(result)
     src_result = _pad_group_4ch(_group_4ch(src))
     x_result = _pad_group_4ch(_group_4ch(xr))
+    # channels may cover different energy point sets (GRIDN1: ch1/ch2 have X-ray
+    # + source, ch0/ch3 source only); when that happens, hand the plotter the
+    # per-channel energies and the channels that actually have X-ray points.
+    _keys = {tuple(np.asarray(e).tolist()) for e in en_by_ch if np.asarray(e).size}
+    plot_kwargs = {
+        "src_energy_meas": _group_meas_energy(src),
+        "x_energy_meas": _group_meas_energy(xr),
+    }
+    if len(_keys) > 1:
+        plot_kwargs.update({
+            "per_channel_energy": _pad_to4([np.asarray(e) for e in en_by_ch]),
+            "xray_channels": sorted({p.channel for p in xr}),
+        })
     try:
         plot.ec_plot(
             energies_all, center4, result4,
             src_energy, x_energy, src_result, x_result,
             str(result_path), pb.energy_split_low, pb.energy_split_high,
+            **plot_kwargs,
         )
     except Exception as e:
         # a channel with too few points has no resolution model; the fit
@@ -711,11 +725,11 @@ def _pad_to4(seq):
 
 
 def _group_4ch(points: List[ECPoint]) -> List[list]:
-    """Rebuild per-measurement list-of-4-channel fit dicts for ec_plot.
+    """Rebuild per-measurement channel-indexed fit dicts for ec_plot.
 
-    Each element is a list of dicts ``[{b, b_err, resolution,
-    resolution_err}, ...]``, exactly the shape legacy ``ec_fit`` passes to
-    ``plot.ec_plot``.  Ordered by energy to make the scatter arrays internally
+    Each element is a length-4 list indexed by channel (``None`` for a channel
+    absent from that measurement), holding ``{b, b_err, resolution,
+    resolution_err}``.  Ordered by energy so the scatter arrays stay internally
     consistent.
     """
     by_id = {}
@@ -724,31 +738,31 @@ def _group_4ch(points: List[ECPoint]) -> List[list]:
     items = sorted(by_id.items(), key=lambda kv: min(q.energy for q in kv[1].values()))
     out = []
     for _mid, chmap in items:
-        fit = []
-        for ch in sorted(chmap):
-            p = chmap[ch]
-            fit.append({
-                "b": p.peak_center,
-                "b_err": p.peak_center_err,
-                "resolution": p.resolution,
-                "resolution_err": p.resolution_err,
-            })
+        fit = [None, None, None, None]
+        for ch, p in chmap.items():
+            if 0 <= ch < 4:
+                fit[ch] = {
+                    "b": p.peak_center,
+                    "b_err": p.peak_center_err,
+                    "resolution": p.resolution,
+                    "resolution_err": p.resolution_err,
+                }
         out.append(fit)
     return out
 
 
+def _group_meas_energy(points: List[ECPoint]):
+    """Measurement energy per grouped measurement, in ``_group_4ch`` order."""
+    by_id = {}
+    for p in points:
+        by_id.setdefault(p.measurement_id, {})[p.channel] = p
+    items = sorted(by_id.items(), key=lambda kv: min(q.energy for q in kv[1].values()))
+    return np.array([min(q.energy for q in chmap.values()) for _, chmap in items])
+
+
 def _pad_group_4ch(groups: List[list]) -> List[list]:
-    """Pad each per-measurement fit list to 4 channels (ch3 = ch0 copy)."""
-    out = []
-    for g in groups:
-        if len(g) >= 4:
-            out.append(g[:4])
-        else:
-            padded = list(g)
-            while len(padded) < 4:
-                padded.append(padded[0])
-            out.append(padded)
-    return out
+    """Ensure each measurement list has four channel slots (``None`` if absent)."""
+    return [g[:4] if len(g) >= 4 else list(g) + [None] * (4 - len(g)) for g in groups]
 
 
 def _center_fit(energy, center, center_err, deg: int = 2):
