@@ -28,7 +28,6 @@ ec:
     Cs137C-90m-208.event.dat: 662.0
     Co60C-70m-209.event.dat: 1332.0
     Co60C-40m-209.event.dat: 1173.0
-    Th228C-20m-210.event.dat: 583.2
     '15': 15.0
     '20': 20.0
     '25': 25.0
@@ -47,13 +46,15 @@ ec:
     '75': 75.0
     '80': 80.0
     '90': 90.0
-    Th228C-2m-210.event.dat: 2614.5
   channel_count: 4
+  # CLYC channels (ch0/ch3) have no K edge and only Cs-137/Co-60 anchors left,
+  # so use a single line; GAGG (ch1/ch2) keeps the split quadratic.
   ec_form:
-    '0': quadratic
+    '0': linear
     '1': piecewise_quadratic
     '2': piecewise_quadratic
-    '3': quadratic
+    '3': linear
+  resolution_method: polyfit_nn
   src_reader: n1
   rate_span: channel
   xray_bkg_rotation: fixed

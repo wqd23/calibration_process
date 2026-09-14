@@ -37,21 +37,3 @@ measurements:
   metadata: {}
   use: true
   channels: null
-- id: Th228C-20m-210.event.dat
-  branch: ec_source
-  science_files:
-  - ec_src/Th228C-20m-210.event.dat
-  hk_files: []
-  aux_files: []
-  metadata: {}
-  use: true
-  channels: null
-- id: Th228C-2m-210.event.dat
-  branch: ec_source
-  science_files:
-  - ec_src/Th228C-2m-210.event.dat
-  hk_files: []
-  aux_files: []
-  metadata: {}
-  use: true
-  channels: null

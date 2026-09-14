@@ -45,28 +45,6 @@
  },
  {
   "source_kind": "src",
-  "measurement_id": "Th228C-20m-210.event.dat",
-  "channel": 0,
-  "energy": 583.2,
-  "peak_center": 797.7545064483534,
-  "peak_center_err": 8.212867624693262,
-  "resolution": 0.04885752397720697,
-  "resolution_err": 0.025491197032317534,
-  "enabled": true
- },
- {
-  "source_kind": "src",
-  "measurement_id": "Th228C-2m-210.event.dat",
-  "channel": 0,
-  "energy": 2614.5,
-  "peak_center": 3441.448397983415,
-  "peak_center_err": 4.763698857444931,
-  "resolution": 0.00857679798453872,
-  "resolution_err": 0.0031445222238562598,
-  "enabled": true
- },
- {
-  "source_kind": "src",
   "measurement_id": "Co60C-40m-209.event.dat",
   "channel": 1,
   "energy": 1173.0,
@@ -107,17 +85,6 @@
   "peak_center_err": 1.2883906183377187,
   "resolution": 0.09949752832197116,
   "resolution_err": 0.0011346093132952495,
-  "enabled": true
- },
- {
-  "source_kind": "src",
-  "measurement_id": "Th228C-20m-210.event.dat",
-  "channel": 1,
-  "energy": 583.2,
-  "peak_center": 3020.0762033035867,
-  "peak_center_err": 26.259720757477595,
-  "resolution": 0.0954962587540254,
-  "resolution_err": 0.0316243492734453,
   "enabled": true
  },
  {
@@ -166,17 +133,6 @@
  },
  {
   "source_kind": "src",
-  "measurement_id": "Th228C-20m-210.event.dat",
-  "channel": 2,
-  "energy": 583.2,
-  "peak_center": 2831.524990328709,
-  "peak_center_err": 10.133398469961287,
-  "resolution": 0.01607429254173716,
-  "resolution_err": 0.009628927531565976,
-  "enabled": true
- },
- {
-  "source_kind": "src",
   "measurement_id": "Co60C-40m-209.event.dat",
   "channel": 3,
   "energy": 1173.0,
@@ -217,28 +173,6 @@
   "peak_center_err": 0.5384586698930542,
   "resolution": 0.11618673558282368,
   "resolution_err": 0.001191192258603115,
-  "enabled": true
- },
- {
-  "source_kind": "src",
-  "measurement_id": "Th228C-20m-210.event.dat",
-  "channel": 3,
-  "energy": 583.2,
-  "peak_center": 1005.3587717204109,
-  "peak_center_err": 16.341495876716568,
-  "resolution": 0.07720303723621698,
-  "resolution_err": 0.04448038284472976,
-  "enabled": true
- },
- {
-  "source_kind": "src",
-  "measurement_id": "Th228C-2m-210.event.dat",
-  "channel": 3,
-  "energy": 2614.5,
-  "peak_center": 4375.597433758765,
-  "peak_center_err": 13.108748147468036,
-  "resolution": 0.016363698936984347,
-  "resolution_err": 0.007450052518274404,
   "enabled": true
  },
  {
