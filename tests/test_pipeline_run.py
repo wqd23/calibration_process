@@ -3,12 +3,16 @@
 
 Runs the full formal workflow (single fit + global fit for TB and EC) into a
 temporary output root, then compares every output to the frozen legacy oracle
-(``.oracle/<ver>``).  This exercises the pipeline, the shared stages and the
+(``<oracle>/<ver>``).  This exercises the pipeline, the shared stages and the
 version workflow, and provides the Level 1/2/3 regression evidence.
 
-Skipped when the raw data or the frozen oracle are absent.
+The oracle root defaults to ``.oracle`` in the repository (usually a symlink
+to the shared fixture directory) and can be overridden with the
+``CALIB_ORACLE_DIR`` environment variable.  Skipped when the raw data or the
+frozen oracle are absent.
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -30,12 +34,14 @@ VERSIONS = ["09", "12B"]
 # expected single-fit pickle counts per version
 COUNTS = {"09": (48, 16), "12B": (54, 18)}
 
+ORACLE_ROOT = Path(os.environ.get("CALIB_ORACLE_DIR", ".oracle"))
+
 
 def test_all_versions_match_oracle(tmp_path):
     for VER in VERSIONS:
-        oracle = Path(".oracle") / VER
+        oracle = ORACLE_ROOT / VER
         if not (oracle / "TB_fit_result").exists():
-            pytest.skip(f".oracle/{VER} not present")
+            pytest.skip(f"{oracle} not present")
         out = tmp_path / VER
         assert cli_main(["all", VER, "-o", str(out)]) == 0
 

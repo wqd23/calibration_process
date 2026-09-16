@@ -45,7 +45,7 @@ data/**/qa/
 *.zip
 
 # differential regression scratch dirs
-.oracle/
+.oracle
 .new/
 
 .vscode

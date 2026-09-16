@@ -230,11 +230,14 @@ calib all {ver}
 
 回归分两层，**基准都是 legacy（旧实现）产物**，绝不用当前版本输出当基准（自我验证发现不了重构引入的偏差）：
 
-1. **本地冻结 oracle（不入库）**：`just oracle {ver}` 会把旧实现的产物快照到
-   `.oracle/{ver}/`（flat 布局：`TB_fit_result`/`EC_fit_result`/`single_fit_fig`/
-   `tb_logs`/`ec_logs`）。`tests/test_pipeline_run.py` 用 `calib all` 的完整输出逐项
-   与 `.oracle` 比对（pickle/json/npy + 图），`.oracle` 存在就跑、缺失则 skip。
-   `.oracle/` 与 `.new/` 都在 `.gitignore`，仅本机有效，无法入库。
+1. **本地冻结 oracle（不入库，仓库外固定目录）**：旧实现的产物快照（flat 布局：
+   `TB_fit_result`/`EC_fit_result`/`single_fit_fig`/`tb_logs`/`ec_logs`）现固定放在
+   `/home/wqd/cali_data/calib_test_fixtures/oracle`，各 worktree 用 `.oracle` 软链
+   引用：`bash scripts/setup_test_fixtures.sh` 建链，或用 `CALIB_ORACLE_DIR` 指定。
+   `tests/test_pipeline_run.py` 用 `calib all` 的完整输出逐项与 oracle 比对
+   （pickle/json/npy + 图，覆盖 09/12B），oracle 缺失则 skip。`.oracle`（目录与软链）
+   与 `.new/` 都在 `.gitignore`，仅本机有效，无法入库；8 个版本清单、备份与用法见
+   [docs/test_fixtures.md](docs/test_fixtures.md)。
 2. **git 内小数据 Golden（自包含、全新 clone 可跑、零 raw 依赖）**：
    `tests/golden/` 提交精简真实点 + 冻结系数（≈240KB，另加 B/C reader 截断样本后
    共约 1.7MB），`tests/test_golden.py`
