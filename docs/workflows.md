@@ -116,12 +116,24 @@ GRIDN1 按组成部分拆成 4 个路径式版本（`GRIDN1/<part>`），共享
 
 - `GRIDN1/GAGG`（TB，Am241，ft 包，ch1/2）与 `GRIDN1/CLYC`（TB，Na22，wf 512 包，
   ch0–3）：两轮源不同、峰位 ADC 差约 9–10 倍，**按数据集分别做二维面**；逐通道
-  初值用 `tb_fit_p0_by_channel`；`skip_qa_fail: true` 丢弃 fail 单点。跨数据集由
-  `scripts/merge_tb.py` 按通道（ch1/2 取 GAGG、ch0/3 取 CLYC）合并成 EC 用的参考。
-- `GRIDN1/EC`（`ec_source`/`ec_xray`）：EC 用**单条二次**（`ec_form: quadratic`，
-  不拆 Gd K 边）；源 = 放射源 ft 锚点（不减本底）、X 光 = 逐通道准直 wf 文件，
-  背景旋转 `[1,2,0,0]`（`fixed`）；X 光各通道来自不同文件，速率用
-  `rate_span: channel`（逐通道时间跨度）。
+  初值用 `tb_fit_p0_by_channel`；`skip_qa_fail: false`（默认，2026-09-13 关闭）——
+  全部点先做单谱拟合，QA 出来后按人工检查结果逐通道写 `channels.{ch}.use:false`
+  排除（GAGG `0C/10C/20C_265` 的 ch1/ch2、CLYC `10C_265` 的 ch1/ch2、`0C_270`
+  的 ch0、`m10C_265` 的 ch0）。跨数据集由 `scripts/merge_tb.py` 按通道
+  （ch1/2 取 GAGG、ch0/3 取 CLYC）合并成 EC 用的参考。
+- `GRIDN1/EC`（`ec_source`/`ec_xray`）：E-C 形式**按通道不同**（`ec_form`）：
+  ch1/ch2（GAGG）用 `piecewise_quadratic`，按 Gd K 边把能量轴拆成两段二次，
+  拆分点 `energy_split_low=49.0` / `energy_split_high=55.0`，落在死区 `[49,55)`
+  的点（49/51/53）不参与拟合；ch0/ch3（CLYC）无 Gd K 边、源锚点只剩
+  662/1173/1332，用单条 `linear`。源 = 放射源 ft 锚点（不减本底）、X 光 =
+  逐通道准直文件，背景旋转 `[1,2,0,0]`（`fixed`）；X 光各通道来自不同文件，
+  速率用 `rate_span: channel`（逐通道时间跨度）。分辨率用 `polyfit_nn`
+  （系数非负）。X 光分两个根：`ec_xray`（260202，wf，40–90 keV）与
+  `ec_xray_low`（260129，ft，15–35 keV，无 ch0）。
+- `GRIDN1/EC` 的排除：Th228（583/2614 keV）源太弱、无可信峰，整体剔除；
+  15–35 keV 低能 X 光峰落在阈值附近、跨通道本底扣减在阈值处留大负凹陷，
+  且没有 ch0 文件，整体**移出正式 manifest**（文件与原因记在
+  `configs/GRIDN1/EC/ec_xray_excluded.yaml`），只保留 40/45/47 三个低段锚点。
 - `GRIDN1/Neutron`（`tb`/`neutron`）：中子束流固定 28.5V 温度扫描（256 点 wf，
   reader 模式 `wf256`）；TB 面因无偏压自由度而简并，仅冻结为**自洽回归基准**
   （非物理标定）；PSD 走 `vN1.selection` 的 `data_ccm`/`amp` 阈值钩子（占位）。

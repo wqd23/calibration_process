@@ -227,6 +227,22 @@ class ManifestEntry(_StrictBase):
     use: bool = True
     channels: Optional[Dict[str, Dict[str, Any]]] = None
 
+    @field_validator("science_files", "hk_files", "aux_files")
+    @classmethod
+    def _no_empty_paths(cls, v: List[str]) -> List[str]:
+        # An empty path is a positional placeholder (e.g. a missing ch0 file).
+        # It cannot be told apart from a real relative path and silently
+        # resolves to the data dir, so a formal manifest must never carry one:
+        # the measurement is removed from the manifest instead, with its files
+        # and reason recorded in a machine-readable exclusion record.
+        for p in v:
+            if p is None or (isinstance(p, str) and not p.strip()):
+                raise ValueError(
+                    "manifest file paths must be non-empty; use an exclusion "
+                    "record for a measurement with a missing channel file"
+                )
+        return v
+
 
 class ManifestSchema(_StrictBase):
     """A branch manifest: the human-confirmed list of measurements."""

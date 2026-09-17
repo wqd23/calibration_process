@@ -8,9 +8,13 @@ import numpy as np
 import pytest
 import yaml
 
+from calibration_process import manifest as man
 from calibration_process import pipeline
+from calibration_process.config_schema import ManifestEntry
 from calibration_process.workflows.registry import get_workflow
 from calibration_process.workflows.versions import vN1
+
+N1_EC_CFG = Path("src/calibration_process/configs/GRIDN1/EC")
 
 
 def test_n1_registered_for_all_subversions():
@@ -108,3 +112,45 @@ def test_enumerate_n1_ec_matches_committed():
     xids = {r["id"] for r in vN1.enumerate_measurements(ver, "ec_xray", rt, Path("data") / ver)}
     xfr = set(yaml.safe_load((cfg / "fit_range_ec_xray.yaml").read_text())["measurements"])
     assert xids == xfr
+
+
+def test_manifest_entry_rejects_empty_path():
+    # an empty string is a positional placeholder that resolves to the data
+    # dir; a formal manifest must never carry one (GRIDN1 low-energy X-ray).
+    ManifestEntry(id="x", branch="ec_xray", science_files=["a.dat"])
+    with pytest.raises(Exception):
+        ManifestEntry(id="x", branch="ec_xray", science_files=["", "a.dat"])
+    with pytest.raises(Exception):
+        ManifestEntry(id="x", branch="tb", hk_files=["  "])
+
+
+def test_n1_ec_xray_formal_manifest_channel_identity():
+    """Every formal X-ray measurement maps science_files[i] to channel i.
+
+    The low-energy 15-35 keV points are absent from this manifest (their ch0
+    file does not exist); they live in the machine-readable exclusion record.
+    """
+    manifest = man.load_manifest(N1_EC_CFG / "ec_xray_manifest.yaml")
+    ids = {m.id for m in manifest.measurements}
+    assert not ({"15", "20", "25", "30", "35"} & ids)
+    assert ids == {"40", "45", "47", "49", "51", "53", "55", "60", "65",
+                   "70", "75", "80", "90"}
+    for m in manifest.measurements:
+        assert len(m.science_files) == 4, m.id
+        for ch, rel in enumerate(m.science_files):
+            assert rel, f"{m.id}: empty path at channel {ch}"
+            assert f"-ch{ch}-" in Path(rel).name, (m.id, ch, rel)
+
+
+def test_n1_ec_xray_exclusion_record():
+    rec = yaml.safe_load((N1_EC_CFG / "ec_xray_excluded.yaml").read_text())
+    assert rec["version"] == "GRIDN1/EC" and rec["branch"] == "ec_xray"
+    assert rec["reason"].strip()
+    by_id = {m["id"]: m for m in rec["measurements"]}
+    assert set(by_id) == {"15", "20", "25", "30", "35"}
+    for mid, m in by_id.items():
+        assert m["absent_channels"] == [0]
+        assert m["fit_range"] is None
+        assert set(m["science_files"]) == {"1", "2", "3"}
+        for ch, rel in m["science_files"].items():
+            assert f"-ch{ch}-" in Path(rel).name, (mid, ch, rel)

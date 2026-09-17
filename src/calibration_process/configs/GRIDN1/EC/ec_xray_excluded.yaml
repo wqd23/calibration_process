@@ -1,0 +1,60 @@
+version: GRIDN1/EC
+branch: ec_xray
+reason: >-
+  The 260129 low-energy X-ray root (15/20/25/30/35 keV) has no ch0 file, so a
+  positional science_files list can only be written with an empty ch0 slot.
+  An empty string cannot be told apart from a real relative path and resolves
+  to the data dir, so these five measurements are removed from the formal
+  execution manifest (ec_xray_manifest.yaml) rather than carried as a
+  placeholder that could shift ch1/ch2/ch3 into the wrong channel. They are
+  also excluded from the formal E-C fit: the peaks are threshold-dominated and
+  the cross-channel background subtraction leaves a large negative dip at the
+  threshold, making the ch2/ch3 centres unstable (redchi often > 10, sigma at a
+  bound). The files below are kept for inventory only. Do not re-add them to
+  ec_xray_manifest.yaml without resolving the missing ch0 slot explicitly.
+measurements:
+- id: '15'
+  energy_keV: 15.0
+  absent_channels:
+  - 0
+  fit_range: null
+  science_files:
+    '1': ec_xray_low/15-ch1-084.event.dat
+    '2': ec_xray_low/15-ch2-084.event.dat
+    '3': ec_xray_low/15-ch3-084.event.dat
+- id: '20'
+  energy_keV: 20.0
+  absent_channels:
+  - 0
+  fit_range: null
+  science_files:
+    '1': ec_xray_low/20-ch1-084.event.dat
+    '2': ec_xray_low/20-ch2-084.event.dat
+    '3': ec_xray_low/20-ch3-084.event.dat
+- id: '25'
+  energy_keV: 25.0
+  absent_channels:
+  - 0
+  fit_range: null
+  science_files:
+    '1': ec_xray_low/25-ch1-084.event.dat
+    '2': ec_xray_low/25-ch2-084.event.dat
+    '3': ec_xray_low/25-ch3-084.event.dat
+- id: '30'
+  energy_keV: 30.0
+  absent_channels:
+  - 0
+  fit_range: null
+  science_files:
+    '1': ec_xray_low/30-ch1-084.event.dat
+    '2': ec_xray_low/30-ch2-084.event.dat
+    '3': ec_xray_low/30-ch3-084.event.dat
+- id: '35'
+  energy_keV: 35.0
+  absent_channels:
+  - 0
+  fit_range: null
+  science_files:
+    '1': ec_xray_low/35-ch1-084.event.dat
+    '2': ec_xray_low/35-ch2-084.event.dat
+    '3': ec_xray_low/35-ch3-084.event.dat
