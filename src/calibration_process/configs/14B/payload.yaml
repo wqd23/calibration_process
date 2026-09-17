@@ -1,0 +1,25 @@
+version: 14B
+tb:
+  reader: 14b
+  bin_width: 4
+  adc_max: 16384.0
+  science_dir: raw_data/Temp_Vbias
+  fit_range_file: fit_range_tb.yaml
+  tb_fit_maxfev: 100000
+  skip_qa_fail: false
+ec:
+  reader: 14b
+  bin_width: 4
+  adc_max: 16384.0
+  x_path: raw_data/X
+  src_path: raw_data/source
+  energy_split_low: 49.0
+  energy_split_high: 55.0
+  ref_temp: 25.0
+  ref_bias: 28.5
+  tb_ref_path: single_process/temp_bias_fit.json
+  fit_range_file: fit_range_ec_xray.yaml
+  energy_map: {}
+  resolution_method: polyfit
+  channel_count: 4
+  xray_bkg_rotation: fixed

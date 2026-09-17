@@ -1,0 +1,16 @@
+tb:
+  default_bkg: quad
+  background_overrides:
+    m20C_285: lin
+  peak_overrides: {}
+  qa: {}
+ec_source:
+  default_bkg: lin
+  background_overrides: {}
+  peak_overrides: {}
+  qa: {}
+ec_xray:
+  default_bkg: lin
+  background_overrides: {}
+  peak_overrides: {}
+  qa: {}

@@ -178,8 +178,11 @@ def _single_readN1_impl(path, mode, hk_name, seg_bias, quantity, overwrite,
 
     tel.tempSipm = [np.asarray(tel[f"sipm_temp{i}"]) / 100 - 273.15 for i in range(4)]
     tel.iMon = [np.asarray(tel[f"sipm_current{i}"]) for i in range(4)]
+    # the HK monitor reads the regulated SiPM-side voltage (equals the file-name
+    # setpoint), so no 499 ohm series-resistor drop is subtracted; pending
+    # hardware confirmation, see docs/intermediate_data.md section 6.1
     tel.vMon = [np.asarray(tel[f"sipm_voltage{i}"]) / 1000 for i in range(4)]
-    tel.bias = [tel.vMon[i] - 499 * tel.iMon[i] * 1e-6 for i in range(4)]
+    tel.bias = [tel.vMon[i] for i in range(4)]
     for k in list(tel.keys()):
         v = tel[k]
         if isinstance(v, list) and len(v) == 4:

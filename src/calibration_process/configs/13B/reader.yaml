@@ -1,0 +1,5 @@
+version: 13B
+engine: grid1x
+readers:
+  "12b":
+    handler: single_read12

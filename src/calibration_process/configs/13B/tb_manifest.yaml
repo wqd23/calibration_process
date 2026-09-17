@@ -1,0 +1,434 @@
+version: 13B
+branch: tb
+measurements:
+- id: 20C_265
+  branch: tb
+  science_files:
+  - raw_data/058_TB_20C_265.dat
+  hk_files:
+  - raw_data/091_TB_20C_265.hk
+  aux_files: []
+  metadata:
+    hk_bias: 26.5
+  use: true
+  channels: null
+- id: 20C_275
+  branch: tb
+  science_files:
+  - raw_data/060_TB_20C_275.dat
+  hk_files:
+  - raw_data/094_TB_20C_275.hk
+  aux_files: []
+  metadata:
+    hk_bias: 27.5
+  use: true
+  channels: null
+- id: 20C_280
+  branch: tb
+  science_files:
+  - raw_data/061_TB_20C_280.dat
+  hk_files:
+  - raw_data/095_TB_20C_280.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.0
+  use: true
+  channels: null
+- id: 20C_283
+  branch: tb
+  science_files:
+  - raw_data/062_TB_20C_283.dat
+  hk_files:
+  - raw_data/096_TB_20C_283.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.3
+  use: true
+  channels: null
+- id: 20C_285
+  branch: tb
+  science_files:
+  - raw_data/063_TB_20C_285.dat
+  hk_files:
+  - raw_data/097_TB_20C_285.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.5
+  use: true
+  channels: null
+- id: 20C_287
+  branch: tb
+  science_files:
+  - raw_data/064_TB_20C_287.dat
+  hk_files:
+  - raw_data/098_TB_20C_287.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.7
+  use: true
+  channels: null
+- id: 20C_290
+  branch: tb
+  science_files:
+  - raw_data/065_TB_20C_290.dat
+  hk_files:
+  - raw_data/099_TB_20C_290.hk
+  aux_files: []
+  metadata:
+    hk_bias: 29.0
+  use: true
+  channels: null
+- id: 0C_265
+  branch: tb
+  science_files:
+  - raw_data/TB_0C_265.dat
+  hk_files:
+  - raw_data/TB_0C_265.hk
+  aux_files: []
+  metadata:
+    hk_bias: 26.5
+  use: true
+  channels: null
+- id: 0C_270
+  branch: tb
+  science_files:
+  - raw_data/TB_0C_270.dat
+  hk_files:
+  - raw_data/TB_0C_270.hk
+  aux_files: []
+  metadata:
+    hk_bias: 27.0
+  use: true
+  channels: null
+- id: 0C_275
+  branch: tb
+  science_files:
+  - raw_data/TB_0C_275.dat
+  hk_files:
+  - raw_data/TB_0C_275.hk
+  aux_files: []
+  metadata:
+    hk_bias: 27.5
+  use: true
+  channels: null
+- id: 0C_280
+  branch: tb
+  science_files:
+  - raw_data/TB_0C_280.dat
+  hk_files:
+  - raw_data/TB_0C_280.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.0
+  use: true
+  channels: null
+- id: 0C_283
+  branch: tb
+  science_files:
+  - raw_data/TB_0C_283.dat
+  hk_files:
+  - raw_data/TB_0C_283.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.3
+  use: true
+  channels: null
+- id: 0C_285
+  branch: tb
+  science_files:
+  - raw_data/TB_0C_285.dat
+  hk_files:
+  - raw_data/TB_0C_285.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.5
+  use: true
+  channels: null
+- id: 0C_290
+  branch: tb
+  science_files:
+  - raw_data/TB_0C_290.dat
+  hk_files:
+  - raw_data/TB_0C_290.hk
+  aux_files: []
+  metadata:
+    hk_bias: 29.0
+  use: true
+  channels: null
+- id: 10C_270
+  branch: tb
+  science_files:
+  - raw_data/TB_10C_270.dat
+  hk_files:
+  - raw_data/TB_10C_270.hk
+  aux_files: []
+  metadata:
+    hk_bias: 27.0
+  use: true
+  channels: null
+- id: 10C_275
+  branch: tb
+  science_files:
+  - raw_data/TB_10C_275.dat
+  hk_files:
+  - raw_data/TB_10C_275.hk
+  aux_files: []
+  metadata:
+    hk_bias: 27.5
+  use: true
+  channels: null
+- id: 10C_280
+  branch: tb
+  science_files:
+  - raw_data/TB_10C_280.dat
+  hk_files:
+  - raw_data/TB_10C_280.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.0
+  use: true
+  channels: null
+- id: 10C_283
+  branch: tb
+  science_files:
+  - raw_data/TB_10C_283.dat
+  hk_files:
+  - raw_data/TB_10C_283.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.3
+  use: true
+  channels: null
+- id: 10C_285
+  branch: tb
+  science_files:
+  - raw_data/TB_10C_285.dat
+  hk_files:
+  - raw_data/TB_10C_285.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.5
+  use: true
+  channels: null
+- id: 10C_287
+  branch: tb
+  science_files:
+  - raw_data/TB_10C_287.dat
+  hk_files:
+  - raw_data/TB_10C_287.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.7
+  use: true
+  channels: null
+- id: 10C_290
+  branch: tb
+  science_files:
+  - raw_data/TB_10C_290.dat
+  hk_files:
+  - raw_data/TB_10C_290.hk
+  aux_files: []
+  metadata:
+    hk_bias: 29.0
+  use: true
+  channels: null
+- id: m10C_265
+  branch: tb
+  science_files:
+  - raw_data/TB_m10C_265.dat
+  hk_files:
+  - raw_data/TB_m10C_265.hk
+  aux_files: []
+  metadata:
+    hk_bias: 26.5
+  use: true
+  channels: null
+- id: m10C_290
+  branch: tb
+  science_files:
+  - raw_data/TB_m10C_290.dat
+  hk_files:
+  - raw_data/TB_m10C_290.hk
+  aux_files: []
+  metadata:
+    hk_bias: 29.0
+  use: true
+  channels: null
+- id: m20C_265
+  branch: tb
+  science_files:
+  - raw_data/TB_m20C_265.dat
+  hk_files:
+  - raw_data/TB_m20C_265.hk
+  aux_files: []
+  metadata:
+    hk_bias: 26.5
+  use: true
+  channels: null
+- id: m20C_270
+  branch: tb
+  science_files:
+  - raw_data/TB_m20C_270.dat
+  hk_files:
+  - raw_data/TB_m20C_270.hk
+  aux_files: []
+  metadata:
+    hk_bias: 27.0
+  use: true
+  channels: null
+- id: m20C_275
+  branch: tb
+  science_files:
+  - raw_data/TB_m20C_275.dat
+  hk_files:
+  - raw_data/TB_m20C_275.hk
+  aux_files: []
+  metadata:
+    hk_bias: 27.5
+  use: true
+  channels: null
+- id: m20C_280
+  branch: tb
+  science_files:
+  - raw_data/TB_m20C_280.dat
+  hk_files:
+  - raw_data/TB_m20C_280.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.0
+    note: duplicate of m20C_283 (md5 identical; real data lost)
+  use: false
+  channels: null
+- id: m20C_283
+  branch: tb
+  science_files:
+  - raw_data/TB_m20C_283.dat
+  hk_files:
+  - raw_data/TB_m20C_283.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.3
+  use: true
+  channels: null
+- id: m20C_285
+  branch: tb
+  science_files:
+  - raw_data/TB_m20C_285.dat
+  hk_files:
+  - raw_data/TB_m20C_285.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.5
+    note: HK plateau is 28.7V/-8C (retake), not 28.5V; excluded from the TB fit
+  use: false
+  channels: null
+- id: m20C_287
+  branch: tb
+  science_files:
+  - raw_data/TB_m20C_287.dat
+  hk_files:
+  - raw_data/TB_m20C_287.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.7
+  use: true
+  channels: null
+- id: m20C_290
+  branch: tb
+  science_files:
+  - raw_data/TB_m20C_290.dat
+  hk_files:
+  - raw_data/TB_m20C_290.hk
+  aux_files: []
+  metadata:
+    hk_bias: 29.0
+  use: true
+  channels: null
+- id: m30C_265
+  branch: tb
+  science_files:
+  - raw_data/TB_m30C_265.dat
+  hk_files:
+  - raw_data/TB_m30C_265.hk
+  aux_files: []
+  metadata:
+    hk_bias: 26.5
+  use: true
+  channels: null
+- id: m30C_270
+  branch: tb
+  science_files:
+  - raw_data/TB_m30C_270.dat
+  hk_files:
+  - raw_data/TB_m30C_270.hk
+  aux_files: []
+  metadata:
+    hk_bias: 27.0
+  use: true
+  channels: null
+- id: m30C_275
+  branch: tb
+  science_files:
+  - raw_data/TB_m30C_275.dat
+  hk_files:
+  - raw_data/TB_m30C_275.hk
+  aux_files: []
+  metadata:
+    hk_bias: 27.5
+  use: true
+  channels: null
+- id: m30C_280
+  branch: tb
+  science_files:
+  - raw_data/TB_m30C_280.dat
+  hk_files:
+  - raw_data/TB_m30C_280.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.0
+  use: true
+  channels: null
+- id: m30C_283
+  branch: tb
+  science_files:
+  - raw_data/TB_m30C_283.dat
+  hk_files:
+  - raw_data/TB_m30C_283.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.3
+  use: true
+  channels: null
+- id: m30C_285
+  branch: tb
+  science_files:
+  - raw_data/TB_m30C_285.dat
+  hk_files:
+  - raw_data/TB_m30C_285.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.5
+  use: true
+  channels: null
+- id: m30C_287
+  branch: tb
+  science_files:
+  - raw_data/TB_m30C_287.dat
+  hk_files:
+  - raw_data/TB_m30C_287.hk
+  aux_files: []
+  metadata:
+    hk_bias: 28.7
+  use: true
+  channels: null
+- id: m30C_290
+  branch: tb
+  science_files:
+  - raw_data/TB_m30C_290.dat
+  hk_files:
+  - raw_data/TB_m30C_290.hk
+  aux_files: []
+  metadata:
+    hk_bias: 29.0
+  use: true
+  channels: null

@@ -28,7 +28,10 @@ import polars as pl
 from addict import Dict
 
 SCHEMA_VER = 4
-SCHEMA_VER_PROCESSED = 5
+# bumped to 6: 12B/N1/14B dropped the 499-ohm series-resistor drop from the
+# reported ``bias`` (see docs/intermediate_data.md section 6.1), so cached L2
+# processed outputs of those versions must be recomputed.
+SCHEMA_VER_PROCESSED = 6
 
 
 def get_project_root(marker=("justfile", ".gitignore")):

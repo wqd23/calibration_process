@@ -10,6 +10,7 @@ from .reader07.read import single_read07, single_read04, single_read09
 from .reader10.read import single_read10
 from .reader11.read import single_read11
 from .reader12.read import single_read12
+from .reader14B.read import single_read14B
 from .readerN1.read import single_readN1
 from .select import EventTable
 
@@ -43,6 +44,7 @@ READERS = {
     "10b": single_read10,
     "11b": single_read11,
     "12b": single_read12,
+    "14b": single_read14B,
     "n1": single_readN1,
     "n1wf": single_readN1,
 }
@@ -64,6 +66,14 @@ def read_frames(path, ver, kind="sci", **kwargs):
             return mod.readSci(path, **kwargs)
         if kind == "hk":
             return mod.readHK(path)
+        raise ValueError(f"{ver}: unknown L1 kind {kind!r}")
+    if ver == "14B":
+        from .reader14B import read as r14
+
+        if kind == "sci":
+            return r14._readSci_impl(path, kwargs.get("mode", "ft"))
+        if kind == "hk":
+            return r14._readHK_impl(path)
         raise ValueError(f"{ver}: unknown L1 kind {kind!r}")
     if ver in ("04", "07", "09"):
         from .reader07 import frame_adapter as fa
@@ -109,6 +119,6 @@ def read_frames(path, ver, kind="sci", **kwargs):
 __all__ = [
     "single_read03b", "src_read03b", "single_read04", "single_read05b_normal",
     "single_read05b_xray", "single_read07", "single_read09", "single_read10",
-    "single_read11", "single_read12", "single_readN1", "READERS", "read_frames",
+    "single_read11", "single_read12", "single_read14B", "single_readN1", "READERS", "read_frames",
     "EventTable",
 ]

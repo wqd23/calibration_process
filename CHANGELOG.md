@@ -4,6 +4,37 @@
 
 版本号遵循 [Semantic Versioning](https://semver.org/)，并见 `pyproject.toml`。
 
+## [Unreleased]
+
+### Added
+- **接入 14B / 13B / 15B 三个载荷，均跑到 TB 单谱 + 二维全局拟合**（新 reader、
+  `configs/{ver}/`、`workflows/versions/v{ver}.py`）：
+  - 14B：新增 `reader14B`（584B `grid1x_ft_packet` + 178B `hk_packet`，XML 为
+    `yunyao_packet.xml`；该 XML 里的 224B HK 与实际数据不符，实际 HK 复用 N1 的
+    178B 定义），数据 `14B15B/03`。
+  - 13B：复用 12B 的 grid1x reader，数据为 12B、13B 目录下的设备 **073**。
+  - 15B：复用 14B reader，数据为 `14B15B/02`。
+- `tests/golden/GRIDN1`、`tests/golden/12B` 之外的自洽基准思路不变；本轮新增的是
+  载荷接入与初步 TB 结果，未改动单谱/TB 数学模型。
+
+> **13B、15B 的 TB 结果未经人工核验**，只是流程接入与初步结果，核验前不要用于
+> 正式标定。已知的排除项与残差：
+> - 13B：`m20C_280` 与 `m20C_283` 逐字节重复（280 真实数据丢失）、`m20C_285` 的 HK
+>   平台实为 28.7V/−8°C 的重测，两者 `use:false`；26.5V 行贴近阈值沿、单谱 redchi
+>   很大，二维拟合用 `bias_min_filter: 26.75` 排除。保留点相对残差 max < 5%。
+> - 15B：`30C_265`（最高温+最低偏压，四通道单谱 QA fail）`use:false`；保留点相对
+>   残差 max < 5%。
+
+### Changed
+- **N1 / 12B / 14B 报出的 `bias` 不再扣 499Ω 串联电阻压降**（`bias = vMon`）：跨版本
+  检查（`docs/intermediate_data.md` §6.1）显示这几型的 HK 监测值就等于 PID 设定值，
+  扣 I·R 会让结果系统性低于文件名；依据待硬件确认。为此 L2 处理缓存 schema 5→6，
+  N1 reader golden 按新约定重新冻结，12B 与 legacy oracle 的逐字节比对暂时豁免。
+- `reader12` / `reader14B` 的 L1/L2 缓存版本改为按原始路径推导，使同一个 reader 能
+  服务 12B/13B、14B/15B 两组数据（各自缓存到 `data/{ver}/`）。
+- 13B 的 `fit_range_tb.yaml` 以 12B 窗口中心为先验、在 13B 直方图上重新找峰生成；
+  15B 沿用 14B 的找峰规则。
+
 ## [0.3.0] - 2026-09-14
 
 ### Changed
