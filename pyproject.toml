@@ -1,6 +1,6 @@
 [project]
 name = "calibration_process"
-version = "0.3.0"
+version = "0.4.0"
 description = "calibration process for GRID"
 scripts = { calib = "calibration_process.cli:main" }
 authors = [

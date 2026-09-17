@@ -4,7 +4,7 @@
 
 版本号遵循 [Semantic Versioning](https://semver.org/)，并见 `pyproject.toml`。
 
-## [Unreleased]
+## [0.4.0] - 2026-09-18
 
 ### Added
 - **接入 14B / 13B / 15B 三个载荷，均跑到 TB 单谱 + 二维全局拟合**（新 reader、
